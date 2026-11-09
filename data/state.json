@@ -1,0 +1,14 @@
+{
+ "ok": true,
+ "status": "success",
+ "message": "数据已更新（4 彩种全部实时）",
+ "updated": "2026-11-10 05:11:14",
+ "updatedAt": "2026-11-10T05:11:14+08:00",
+ "lastSuccess": "2026-11-10 05:11:14",
+ "liveRules": [
+  "Macau",
+  "MacauOld",
+  "HongKong",
+  "Happy8"
+ ]
+}
