@@ -1,0 +1,61 @@
+/* 骨架样式（不参与复刻视觉；最终配色/字号以存档 CSS 为准）
+   这里只保证：骨架看得懂、手机端不破版、槽位清楚地标出待接入位置 */
+:root{
+  --bg:#F5F6F8;
+  --panel:#FFFFFF;
+  --ink:#1B2430;
+  --muted:#6C7887;
+  --line:#DDE3EA;
+  --slot:#F8FAFC;
+  --accent:#C7453C;
+  --ok:#1F8A5B;
+  --warn:#B7791F;
+  --radius:10px;
+  --maxw:1160px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:14px/1.65 "Microsoft YaHei UI","PingFang SC",system-ui,sans-serif;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 18px}
+.skel-bar{background:#231E1B;color:#F3EBDD;font-size:12.5px}
+.skel-bar .wrap{display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between;padding:7px 18px}
+.skel-bar b{color:#fff}
+.skel-bar a{color:#FFD9A0}
+.skel-head{background:var(--panel);border-bottom:1px solid var(--line)}
+.skel-head .wrap{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding:14px 18px}
+.skel-brand{font-size:18px;font-weight:700;letter-spacing:.5px;display:flex;align-items:center;gap:9px}
+.skel-brand .dot{width:20px;height:20px;border-radius:50%;background:var(--accent)}
+.skel-brand small{font-size:11px;color:var(--muted);font-weight:400;letter-spacing:0}
+.skel-nav{display:flex;gap:4px;flex-wrap:wrap;min-width:0}
+.skel-nav a{padding:5px 10px;border-radius:6px;color:var(--muted);text-decoration:none;font-size:13px;border:1px solid transparent}
+.skel-nav a:hover{border-color:var(--line);color:var(--ink)}
+.skel-nav a.on{background:#F1E7E3;color:#932A24;border-color:#E4CDC8}
+main{padding:20px 0 8px}
+h1{font-size:20px;margin:0 0 4px}
+.lead{color:var(--muted);font-size:13px;margin:0 0 18px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:0 0 16px}
+.panel h2{font-size:14px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.panel h2::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--accent)}
+.slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.slot{border:1px dashed #BFD0E0;background:var(--slot);border-radius:8px;padding:12px 14px;min-width:0}
+.slot .idx{font:600 11px/1 ui-monospace,Consolas,monospace;color:#7C8FA3;letter-spacing:.6px}
+.slot .name{font-weight:600;font-size:13.5px;margin:5px 0 3px}
+.slot .desc{color:var(--muted);font-size:12px;margin:0}
+.slot .src{display:inline-block;margin-top:7px;font:11px/1 ui-monospace,Consolas,monospace;color:#8B7A4F;background:#FBF4E4;border:1px solid #EADFC2;border-radius:4px;padding:3px 6px}
+.wiring{font:12.5px/1.9 ui-monospace,Consolas,monospace;color:#39424E;white-space:pre-wrap;word-break:break-word}
+.k-ok{color:var(--ok);font-weight:700}
+.k-warn{color:var(--warn);font-weight:700}
+.k-bad{color:var(--accent);font-weight:700}
+ul.todo{margin:6px 0 0;padding-left:20px;color:#4A5462;font-size:13px}
+ul.todo li{margin:3px 0}
+footer.skel-foot{border-top:1px solid var(--line);margin-top:22px;background:#EFEDE9}
+footer.skel-foot .wrap{padding:16px 18px 20px;color:var(--muted);font-size:12px}
+@media (max-width:760px){
+  .slots{grid-template-columns:minmax(0,1fr)}
+  .skel-head .wrap{padding:11px 18px;gap:8px}
+  .skel-nav{flex:1 1 100%;overflow-x:auto;flex-wrap:nowrap;min-width:0;max-width:100%}
+  .skel-nav a{white-space:nowrap}
+}
