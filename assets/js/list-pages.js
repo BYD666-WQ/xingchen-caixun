@@ -124,6 +124,37 @@
   }
 
   // ---------- \u56fe\u5e93 ----------
+  function renderZiliaoDetail(rootEl) {
+    var id = (location.search.match(/[?&]id=([^&]+)/) || [])[1] || '';
+    id = decodeURIComponent(id);
+    var tabId = (id.match(/^c_([a-z0-9]+)_/) || [])[1] || '';
+    Promise.all([loadJson('ziliao'), loadJson('ziliao-list')]).then(function (arr) {
+      var zd = arr[0] || {}, idx = arr[1] || {};
+      var item = null;
+      (zd.items || []).forEach(function (x) { if (String(x.id) === String(id)) item = x; });
+      var tab = null;
+      (idx.tabs || []).forEach(function (t) { if (String(t.id) === tabId) tab = t; });
+      var file = ((tab && tab.file) || ('ziliao-list-' + tabId + '.json')).replace(/\.json$/, '');
+      loadJson(file).then(function (d) {
+        d = d || {};
+        var cats = d.categories || {}, by = d.byCategory || {};
+        var rows = Array.isArray(by[id]) ? by[id] : [];
+        var meta = cats[id] || {};
+        var title = (item && item.title) || meta.name || '\u8d44\u6599\u5217\u8868';
+        var html = '<div class="xc-crumb"><a href="ziliao.html">\u8d44\u6599\u5927\u5168</a> / ' + esc(title) + '</div>' +
+          '<h2 class="xc-detail-title">' + esc(title) + (meta.total ? '\uff08' + meta.total + '\u6761\uff09' : '') + '</h2>';
+        if (rows.length) {
+          html += '<ul class="xc-artlist">' + rows.map(function (r) {
+            return '<li><a href="javascript:void(0)"><span class="t">' + esc(r.title || '') +
+              '</span><span class="d">' + esc(r.issueLabel || r.date || '') + '</span></a></li>';
+          }).join('') + '</ul>';
+        } else { html += emptyState('\u8be5\u5206\u7c7b\u6682\u65e0\u8be6\u60c5\u6570\u636e'); }
+        html += '<p class="xc-updated">\u6570\u636e\u65f6\u95f4\uff1a' + esc(d.updated || zd.updated || '-') + '</p>';
+        rootEl.innerHTML = html;
+      });
+    });
+  }
+
   function renderTuku(rootEl) {
     Promise.all([loadJson('tuku'), loadJson('tuku-images')]).then(function (res) {
       var d = res[0] || {}, tmap = res[1] || [];
