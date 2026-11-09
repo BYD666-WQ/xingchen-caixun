@@ -1,0 +1,55 @@
+.aomentanjipic-img-yxym .container,
+  .wxsm .wxsm_table tr td font:first-child {
+    font-size: 16px !important;
+  }
+  .aomentanjipic-img-yxym {
+    font-size: 18px;
+    margin: 4.8px 0;
+    border: solid 1px #cfcfcf;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .aomentanjipic-img-period-box {
+    background-color: var(--theme-color);
+  }
+  .aomentanjipic-img-period-list {
+    height: 48px;
+    /* padding: 0 12px; */
+    overflow: auto;
+    width: 100%;
+  }
+  .aomentanjipic-img-period-list .current-period {
+    background-color: #fff !important;
+    color: var(--theme-color);
+  }
+
+  .aomentanjipic-img-period-list > div {
+    flex-shrink: 0;
+    width: 72px;
+    margin: 0px 0.2rem;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 20px;
+  }
+
+  .aomentanjipic-img-period-list .no-current {
+    background-color: #ffffff57;
+  }
+  .aomentanjipic-img-yxym img {
+    max-width: 100%;
+    height: auto;
+  }
+  .aomentanjipic-img-yxym-img {
+    width: 100%;
+    height: auto;
+  }
+  @media only all and (max-width: 500px) {
+    .aomentanjipic-img-period-list > div {
+      width: 62px !important;
+      font-size: 16px !important;
+    }
+  }

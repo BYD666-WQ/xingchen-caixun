@@ -1,0 +1,94 @@
+/* 三期四肖区块样式 */
+  .sanqiwuxiao {
+    width: 100%;
+    max-width: 720px;
+    margin: 0;
+    border: 1px solid var(--ppc-primary-color);
+  }
+  /* 表格容器 */
+  .sanqiwuxiao-table-container {
+    background-color: white;
+  }
+  /* 表格样式 */
+  .sanqiwuxiao-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+  }
+  /* 表格行 */
+  .sanqiwuxiao-table tr {
+    border-bottom: 1px solid #ddd;
+    height: 36px;
+  }
+  @media (max-width: 480px) {
+    .sanqiwuxiao-table tr {
+      border-bottom: 1px solid #ddd;
+      height: 30px;
+    }
+  }
+  .sanqiwuxiao-table tr:last-child {
+    border-bottom: none;
+  }
+  /* 表格单元格 */
+  .sanqiwuxiao-table td {
+    text-align: center;
+    font-size: clamp(1rem, 4.5vw, 1.5rem);
+    font-weight: bold;
+    vertical-align: middle;
+    padding: 0 4px;
+    border-right: 1px solid #ddd;
+  }
+  .sanqiwuxiao-table td:last-child {
+    border-right: none;
+  }
+  /* 期数列 */
+  .sanqiwuxiao-period-cell {
+    color: #000;
+    width: 20%;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: clamp(1rem, 4.5vw, 1.5rem);
+  }
+  /* 开奖结果列 */
+  .sanqiwuxiao-result-cell {
+    color: #000;
+    width: 20%;
+    text-align: right;
+    border-bottom: 1px solid #ddd;
+    font-size: clamp(1rem, 4.5vw, 1.5rem);
+  }
+  .sanqiwuxiao-pending-result {
+    /* color: #ff0000; */
+  }
+  /* 合并单元格 - 动物名称 */
+  .sanqiwuxiao-animals-merged {
+    color: blue;
+    font-size: clamp(1.8rem, 4.8vw, 2.5rem) !important;
+    letter-spacing: 3px;
+    text-align: center;
+    background-color: white;
+    border-bottom: 1px solid #ddd;
+    width: 60%;
+  }
+
+  /* 動態屬性選擇器 - 更簡潔的CSS解決方案 */
+  .sanqiwuxiao-animals-merged span[data-animal][data-check] {
+    position: relative;
+  }
+
+  /* 使用CSS屬性選擇器來高亮命中的生肖 */
+  .sanqiwuxiao-animals-merged span[data-animal='鼠'][data-check*='鼠'],
+  .sanqiwuxiao-animals-merged span[data-animal='牛'][data-check*='牛'],
+  .sanqiwuxiao-animals-merged span[data-animal='虎'][data-check*='虎'],
+  .sanqiwuxiao-animals-merged span[data-animal='兔'][data-check*='兔'],
+  .sanqiwuxiao-animals-merged span[data-animal='龙'][data-check*='龙'],
+  .sanqiwuxiao-animals-merged span[data-animal='蛇'][data-check*='蛇'],
+  .sanqiwuxiao-animals-merged span[data-animal='马'][data-check*='马'],
+  .sanqiwuxiao-animals-merged span[data-animal='羊'][data-check*='羊'],
+  .sanqiwuxiao-animals-merged span[data-animal='猴'][data-check*='猴'],
+  .sanqiwuxiao-animals-merged span[data-animal='鸡'][data-check*='鸡'],
+  .sanqiwuxiao-animals-merged span[data-animal='狗'][data-check*='狗'],
+  .sanqiwuxiao-animals-merged span[data-animal='猪'][data-check*='猪'] {
+    color: red !important;
+    background: yellow !important;
+  }

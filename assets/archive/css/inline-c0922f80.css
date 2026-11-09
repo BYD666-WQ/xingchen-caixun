@@ -1,0 +1,105 @@
+.wuturetwentyfourma-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            background-color: #FFFFFF;
+            overflow-wrap: break-word;
+            padding: 0;
+            margin: 0;
+        }
+
+        .wuturetwentyfourma-cell {
+            border: 1px solid #D4D4D4;
+            text-align: center;
+            overflow-wrap: break-word;
+            word-break: break-all;
+            height: 39px;
+            padding: 3px 2px;
+            line-height: 1.5;
+            font-size: clamp(1.2rem, 5vw, 1.5rem);
+        }
+
+        .wuturetwentyfourma-period {
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .wuturetwentyfourma-result {
+            font-weight: bold;
+        }
+
+        .wuturetwentyfourma-main-attack {
+            color: #CC33FF;
+        }
+
+        .wuturetwentyfourma-prediction {
+            color: #000000;
+            font-weight: bold;
+        }
+
+        .wuturetwentyfourma-assist {
+            color: #CC33FF;
+            font-weight: bold;
+        }
+
+        .wuturetwentyfourma-win-highlight {
+            background-color: #FFFF00;
+        }
+
+        .wuturetwentyfourma-link {
+            text-decoration: none;
+        }
+
+        .wuturetwentyfourma-link-text {
+            color: #0000FF;
+        }
+
+        .wuturetwentyfourma-website-red {
+            color: #FF0000;
+        }
+
+        .wuturetwentyfourma-website-blue {
+            color: #0000FF;
+        }
+
+        .wuturetwentyfourma-banner-red {
+            background-color: #FF0000;
+            color: #FFFF00;
+        }
+
+        .wuturetwentyfourma-banner-blue {
+            background-color: #000080;
+            color: #FFFF00;
+        }
+
+        .wuturetwentyfourma-banner-dark {
+            background-color: #800000;
+            color: #FFFF00;
+        }
+
+        /* 推荐标题样式 */
+        .wuturetwentyfourma-recommendation-container {
+            border: none;
+            margin: 5px 0;
+            overflow: hidden;
+            font-family: "Microsoft YaHei", Arial, Helvetica;
+            background-color: var(--ppc-primary-color);
+            padding: 1px 4px;
+        }
+
+        .wuturetwentyfourma-recommendation-title {
+            border: none;
+            font-size: clamp(1.5rem, 4.5vw, 1.8rem);
+            text-align: center;
+            text-shadow: #e5e5e5 0 0 10px;
+            background: var(--ppc-primary-color);
+            font-weight: bold;
+        }
+
+        .wuturetwentyfourma-recommendation-title-white {
+            color: #FFFFFF;
+        }
+
+        .wuturetwentyfourma-recommendation-title-yellow {
+            color: #FFFF00;
+        }

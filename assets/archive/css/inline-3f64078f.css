@@ -1,0 +1,302 @@
+/* ===== 内幕单双③肖 · 喜庆红金版 ===== */
+.nmsx-festive,
+.nmsx-festive * {
+  box-sizing: border-box;
+}
+
+.nmsx-festive {
+  width: 100%;
+  margin: 4px auto;
+  padding: 5px;
+  overflow: hidden;
+  border: 2px solid #f6c65b;
+  border-radius: 15px;
+  background: linear-gradient(145deg,
+    #e90000 0%,
+    #ff3020 35%,
+    #e60c08 70%,
+    #c90000 100%);
+  font-family: "Microsoft YaHei", "PingFang SC",
+    Arial, sans-serif;
+}
+
+/* 内部金色细框 */
+.nmsx-festive-inner {
+  overflow: hidden;
+  border: 1px solid #ffd878;
+  border-radius: 11px;
+  background: #fff4d7;
+}
+
+/* 顶部标题 */
+.nmsx-festive-title {
+  position: relative;
+  padding: 16px 6px 15px;
+  text-align: center;
+  background: linear-gradient(180deg,
+    #f92315 0%,
+    #db0000 100%);
+  border-bottom: 3px solid #ffc54b;
+  color: #fff3b6;
+  font-size: clamp(28px, 5.5vw, 46px);
+  font-weight: 900;
+  line-height: 1.3;
+  letter-spacing: 1px;
+}
+
+/* 标题两侧点缀 */
+.nmsx-festive-title::before,
+.nmsx-festive-title::after {
+  content: "◆";
+  display: inline-block;
+  margin: 0 10px;
+  color: #ffd765;
+  font-size: .45em;
+  vertical-align: middle;
+}
+
+/* 内容 */
+.nmsx-festive-content {
+  padding: 7px;
+  background: linear-gradient(180deg,
+    #fff7e3 0%,
+    #ffe8b8 100%);
+}
+
+/* 每期资料 */
+.nmsx-festive-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  width: 100%;
+  min-height: 68px;
+  margin: 0 0 6px;
+  padding: 9px 7px;
+  border: 1px solid #f0ca7b;
+  border-radius: 7px;
+  background: linear-gradient(180deg,
+    #fffef5 0%,
+    #ffedcb 100%);
+  color: #30231d;
+  text-align: center;
+  font-size: clamp(15px, 2.8vw, 25px);
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.fonzhingono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  width: 100%;
+  min-height: 68px;
+  margin: 0 0 6px;
+  padding: 9px 7px;
+  border: 1px solid #f0ca7b;
+  border-radius: 7px;
+  background: linear-gradient(180deg,
+    #fffef5 0%,
+    #ffedcb 100%);
+  color: #30231d;
+  text-align: center;
+font-size: 19pt;
+  font-weight: 900;
+  line-height: 1.5;
+}
+/* Tối ưu giao diện trên iPhone */
+@media only screen and (max-width: 430px) {
+    .fonzhingono{
+        font-size: 10.8pt !important;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* iPhone màn hình lớn */
+@media only screen and (min-width: 431px) and (max-width: 720px) {
+    .fonzhingono{
+        font-size: 13pt !important;
+        box-sizing: border-box;
+        width: 100%;
+    }
+}
+
+/* iPhone có tai thỏ và Dynamic Island */
+@supports (-webkit-touch-callout: none) {
+    .fonzhingono{
+        -webkit-text-size-adjust: 100%;
+    }
+}
+.nmsx-festive-row1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  width: 100%;
+  min-height: 68px;
+  margin: 0 0 6px;
+  padding: 9px 7px;
+  border: 1px solid #f0ca7b;
+  border-radius: 7px;
+  background: linear-gradient(180deg,
+    #fffef5 0%,
+    #ffedcb 100%);
+  color: #30231d;
+  text-align: center;
+  font-size: clamp(16.5px, 2.8vw, 25px);
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.nmsx-festive-row:last-child {
+  margin-bottom: 0;
+}
+
+/* 期数红色标签 */
+.nmsx-festive-issue {
+  display: inline-block;
+  padding: 4px 10px;
+  border: 1px solid #ffca58;
+  border-radius: 6px;
+  background: linear-gradient(180deg,
+    #f52c17 0%,
+    #d60000 100%);
+  color: #fff7d6;
+  white-space: nowrap;
+}
+
+/* 单双 */
+.nmsx-festive-type {
+  color: #c90000;
+  white-space: nowrap;
+  
+}
+
+/* 主 */
+.nmsx-festive-main {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #d90000;
+  color: #ffec64;
+}
+
+/* 生肖 */
+.nmsx-festive-zodiac {
+  color: #30231d;
+  white-space: nowrap;
+}
+
+/* 重点生肖 */
+.nmsx-festive-hit {
+  color: #e00000;
+}
+
+/* 开奖结果 */
+.nmsx-festive-result {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 5px;
+  background: #d90000;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* 准字 */
+.nmsx-festive-accurate {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #d90000;
+  color: #ffeb62;
+}
+
+/* 最新一期稍突出 */
+.nmsx-festive-row:first-child {
+  border: 2px solid #e6a631;
+  background: #fff5d7;
+}
+
+/* 底部装饰 */
+.nmsx-festive-footer {
+  height: 12px;
+  background: linear-gradient(90deg,
+    #c90000 0%,
+    #ffcc58 25%,
+    #f22613 50%,
+    #ffcc58 75%,
+    #c90000 100%);
+}
+
+
+
+/* ===== 手机端 ===== */
+
+
+ 
+ @media only all and (max-width: 500px) {
+  .nmsx-festive {
+    padding: 3px;
+    border-radius: 10px;
+  }
+
+
+ 
+  .nmsx-festive-inner {
+    border-radius: 7px;
+  }
+
+  .nmsx-festive-title {
+    padding: 12px 3px;
+    font-size: 7vw;
+    letter-spacing: 0;
+  }
+
+  .nmsx-festive-title::before,
+  .nmsx-festive-title::after {
+    margin: 0 4px;
+  }
+
+  .nmsx-festive-content {
+    padding: 4px;
+  }
+
+  .nmsx-festive-row {
+    min-height: 0;
+    gap: 4px;
+    margin-bottom: 4px;
+    padding: 8px 3px;
+    font-size: clamp(14px, 3.7vw, 19px);
+    line-height: 1.5;
+  }
+
+  .nmsx-festive-issue {
+    padding: 3px 5px;
+  }
+
+  .nmsx-festive-result {
+    padding: 2px 5px;
+  }
+
+  .nmsx-festive-main,
+  .nmsx-festive-accurate {
+    padding: 2px 4px;
+  }
+}
+
+@media (max-width: 360px) {
+  .nmsx-festive-row {
+    font-size: 3.65vw;
+    gap: 3px;
+  }
+
+  .nmsx-festive-title {
+    font-size: 6.8vw;
+  }
+}

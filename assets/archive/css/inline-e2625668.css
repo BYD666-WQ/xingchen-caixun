@@ -1,0 +1,69 @@
+.zonherjueshaziliao-header-title {
+    background: #00CED1;
+    color: black;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 6px 0;
+    letter-spacing: 2px;
+    }
+    .zonherjueshaziliao-yellow-text {
+    color: #ffe600;
+    font-weight: bold;
+    font-size: inherit;
+    letter-spacing: 2px;
+    }
+    .zonherjueshaziliao-header-title .zonherjueshaziliao-yellow-text {
+    font-size: inherit;
+    }
+    .zonherjueshaziliao-header-title .zonherjueshaziliao-site {
+    color: #fff;
+    font-size: inherit;
+    font-weight: bold;
+    }
+    .zonherjueshaziliao-table {
+    width: 100%;
+    border-collapse: collapse;
+    /* background: #fff; */
+    }
+    .zonherjueshaziliao-table th,
+    .zonherjueshaziliao-table td {
+    padding: 8px 0;
+    text-align: center;
+    font-size: clamp(1rem, 4.1vw, 1.3rem);
+    font-weight: bold;
+    width:16.6%
+    }
+
+    .zonherjueshaziliao-table td {
+        border: 1px solid #ddd;
+    }
+    .zonherjueshaziliao-table th {
+        background-color: #1685a9;
+        color: #ffffff;
+        font-size: 20px;
+        font-weight: bold;
+        border:1px solid #1685a9;
+    }
+
+    .zonherjueshaziliao-blue-text {
+    color: #2356d3;
+    font-weight: bold;
+    }
+    .zonherjueshaziliao-blue {
+    color: navy;
+    font-weight: bold;
+    }
+    .zonherjueshaziliao-red {
+    color: red;
+    font-weight: bold;
+    }
+    .zonherjueshaziliao-black {
+    color: black;
+    font-weight: bold;
+    }
+    .zonherjueshaziliao-white {
+    color: white;
+    font-weight: bold;
+    background: var(--ppc-primary-color);
+    }

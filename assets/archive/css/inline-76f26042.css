@@ -1,0 +1,237 @@
+/* ===== 全局样式重置 ===== */
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  ul,
+  li {
+    list-style: none;
+  }
+
+  /* ===== 广告Banner样式 ===== */
+  .ad-img-banner-container,
+  .ad-img-banner-wrapper,
+  .ad-img-banner-paragraph {
+    margin: 0;
+    padding: 0;
+  }
+
+  .ad-img-banner-container {
+    width: 100%;
+  }
+
+  .banner-link {
+    display: block;
+    text-decoration: none;
+    width: 100%;
+  }
+
+  .banner-image {
+    border: 0;
+    width: 100%;
+    height: auto;
+    display: block;
+    max-width: 100%;
+  }
+
+  /* ===== Tab导航样式 ===== */
+  #tabtuzhi118 {
+    padding: 0;
+    background: #fff;
+  }
+
+  #tabtuzhi118 div {
+    width: 100%;
+  }
+
+  #tabtuzhi118 .tuzhi118box {
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 24px;
+    color: #3e73fe;
+    line-height: 40px;
+  }
+
+  #tabtuzhi118 .tuzhi118box ul {
+    display: flex;
+    border-bottom: 3px solid #3e73fe;
+  }
+
+  #tabtuzhi118 .tuzhi118box li {
+    width: 50%;
+    padding: 5px 0;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+
+  #tabtuzhi118 .tuzhi118box li.hover {
+    color: #fff;
+    background: var(--ppc-primary-color);
+  }
+
+  #tabtuzhi118 .tuzhi118box li.hover font {
+    color: #fff !important;
+  }
+
+  /* ===== 文本样式 ===== */
+  .tabtuzhi118-txt font {
+    color: #f00;
+    font-weight: bold;
+  }
+
+  .tabtuzhi118-txt2 {
+    font-size: 24px;
+    color: #f00;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .tabtuzhi118-txt2 a {
+    background: #ff0;
+  }
+
+  .tabtuzhi118-pic {
+    padding-top: 10px;
+    text-align: center;
+  }
+
+  .tabtuzhi118-pic video {
+    max-width: 100%;
+  }
+
+  /* ===== 图库列表样式 ===== */
+  .tutu {
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+  }
+
+  .tutu td {
+    text-align: center;
+    font-size: 16px;
+  }
+
+  .tutu td.tutumore {
+    font-size: 28px;
+  }
+
+  .tutu td.tutumore img {
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  .tutu td a {
+    display: block;
+    line-height: 50px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 5px;
+    color: #333;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .tutu td a:hover {
+    background: #55dd88;
+  }
+
+  /* ===== 图库链接样式 ===== */
+  .tuku_a {
+    display: block;
+    line-height: 50px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 5px;
+    color: #333;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .tuku_a:hover {
+    background: #55dd88;
+  }
+
+  .tuku_a_item {
+    width: 33.33%;
+    text-align: center;
+    float: left;
+    font-size: clamp(1rem, 4.5vw, 1.5rem);
+    font-weight: bold;
+  }
+
+  /* ===== 主题配色 ===== */
+  .tuku_item_theme_2 {
+    color: #f00;
+    background: #ff0;
+  }
+
+  .tuku_item_theme_3 {
+    color: #ff0;
+    background: #f00;
+  }
+
+  .tuku_item_theme_4 {
+    color: #ff0;
+    background: #000;
+  }
+
+  /* ===== 响应式设计 ===== */
+  @media (max-width: 768px) {
+    .banner-image {
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  @media (max-width: 750px) {
+    #tabtuzhi118 {
+      padding: 5px;
+    }
+
+    #tabtuzhi118 .tuzhi118box {
+      width: 100%;
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
+
+    #tabtuzhi118 .tuzhi118box ul {
+      border-width: 2px;
+    }
+
+    #tabtuzhi118 .tuzhi118box li {
+      padding: 0;
+    }
+
+    .tabtuzhi118-txt2 {
+      font-size: 18px;
+    }
+
+    .tutu td {
+      font-size: 14px;
+    }
+
+    .tutu td.tutumore {
+      font-size: 18px;
+    }
+
+    .tutu td a {
+      line-height: 40px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .ad-img-banner-container {
+      padding: 2px;
+    }
+
+    .banner-image {
+      border-radius: 4px;
+    }
+  }
+
+  @media (max-width: 320px) {
+    .ad-img-banner-container {
+      padding: 1px;
+    }
+  }

@@ -1,0 +1,89 @@
+.gaoshou-bang-bbs1-container {
+    border: 2px solid var(--ppc-primary-color);
+    border-radius: 10px;
+    overflow: hidden;
+    font-family: 'Microsoft YaHei', sans-serif;
+  }
+
+  .gaoshou-bang-bbs1-header {
+    font-weight: bold;
+    text-align: center;
+  }
+
+  /* 新增：包裹所有 item 的容器 */
+  .gaoshou-bang-bbs1-items-wrapper {
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .gaoshou-bang-bbs1-item {
+    display: flex;
+    padding: 8px 12px;
+    border-top: 1px solid #eee;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin: 2px;
+    font-size: clamp(1rem, 4.8vw, 1.2rem);
+  }
+
+  .gaoshou-bang-bbs1-item span {
+    font-size: clamp(1rem, 4.8vw, 1.2rem);
+  }
+
+  @media (max-width: 480px) {
+    .gaoshou-bang-bbs1-item {
+      padding: 5px;
+    }
+  }
+
+  .gaoshou-bang-bbs1-tag {
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-weight: bold;
+  }
+
+  .gaoshou-bang-bbs1-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #e40505;
+  }
+
+  .gaoshou-bang-bbs1-highlight {
+    color: #e40505;
+    font-weight: bold;
+  }
+
+  .gaoshou-bang-bbs1-pink {
+    color: #ff00ff;
+    font-weight: bold;
+  }
+
+  .gaoshou-bang-bbs1-brand {
+    color: #000000;
+  }
+
+  .gaoshou-bang-bbs1-category-default {
+    color: #000000;
+  }
+
+  .gaoshou-bang-bbs1-category-blue {
+    color: #0000ff;
+  }
+
+  .gaoshou-bang-bbs1-category-green {
+    color: #008000;
+  }
+
+  .gaoshou-bang-bbs1-category-maroon {
+    color: #800000;
+  }
+
+  .gaoshou-bang-bbs1-category-olive {
+    color: #808000;
+  }
+
+  .gaoshou-bang-bbs1-stats {
+    color: #000000;
+  }

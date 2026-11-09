@@ -1,0 +1,103 @@
+/* .box{
+        background-color: #ffffff !important;
+        border: 1px solid #ffffff !important;
+        margin: 0 0 !important;
+        border-radius: 0px !important;
+    }
+    .baa{
+        background-image: linear-gradient(to right, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff, #ffffff);
+    } */
+  .swiper-wrapper {
+    overflow-x: unset !important;
+    height: fit-content !important;
+  }
+  .swiper-horiz {
+    border: 2px solid #e0af0f;
+    border-top: 2px solid #e0af0f;
+    border-radius: 5px;
+    margin: 5px auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  /* 指示标志改成圆形 */
+  .swiper-pagination-bullet {
+    border-radius: 50% !important;
+    width: 8px !important;
+    height: 8px !important;
+  }
+  .paomadeng-bar {
+    width: calc(100% - 10px);
+    /* max-width: 700px; */
+    margin: 1px 5px auto;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    height: 30px;
+    overflow: hidden;
+    background: #eaeaea;
+  }
+
+  .paomadeng-icon {
+    padding: 8px;
+    text-align: center;
+    font-size: 18px;
+    color: #e60000;
+    flex-shrink: 0;
+  }
+
+  .paomadeng-marquee {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .paomadeng-text {
+    white-space: nowrap;
+    font-size: clamp(10px, 4vw, 15px);
+    padding-left: 20%;
+    animation: marquee 12s linear infinite;
+    font-weight: 500;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-230%);
+    }
+  }
+
+  /* 大螢幕 */
+  @media (min-width: 680px) {
+    .paomadeng-text {
+      padding-left: 0%;
+      animation: marquee-large 15s linear infinite;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .paomadeng-text {
+      padding-left: 0%;
+      animation: marquee-large 17s linear infinite;
+    }
+  }
+
+  @keyframes marquee-large {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-110%);
+    }
+  }
+
+  .sihjioucaipiaoji-banner-title-bar {
+    width: 100%;
+    background: var(--ppc-primary-color);
+    color: #111010;
+    font-size: clamp(15px, 4.5vw, 20px);
+    font-weight: 600;
+    text-align: center;
+    padding: 2px 0;
+    letter-spacing: 2px;
+  }

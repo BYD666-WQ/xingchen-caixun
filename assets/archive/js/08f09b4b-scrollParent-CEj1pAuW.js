@@ -1,0 +1,1 @@
+function e(e,t){let o=e;for(;o&&o!==t&&1===o.nodeType;){const e=o.tagName;if("HTML"===e||"BODY"===e)break;if(/scroll|auto|overlay/i.test(getComputedStyle(o).overflowY))return o;o=o.parentElement}return t}export{e as g};

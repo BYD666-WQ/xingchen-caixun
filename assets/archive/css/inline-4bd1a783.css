@@ -1,0 +1,56 @@
+.sibuxiangzhongtetu-img-yxym .container,
+  .wxsm .wxsm_table tr td font:first-child {
+    font-size: 16px !important;
+  }
+  .sibuxiangzhongtetu-img-yxym {
+    font-size: 18px;
+    margin: 4.8px 0;
+    border: solid 1px #cfcfcf;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .sibuxiangzhongtetu-img-period-box {
+    background-color: var(--theme-color);
+  }
+  .sibuxiangzhongtetu-img-period-list {
+    height: 48px;
+    /* padding: 0 12px; */
+    overflow: auto;
+    width: 100%;
+  }
+  .sibuxiangzhongtetu-img-period-list .current-period {
+    background-color: #fff !important;
+    color: var(--theme-color);
+  }
+
+  .sibuxiangzhongtetu-img-period-list > div {
+    flex-shrink: 0;
+    width: 72px;
+    margin: 0px 0.2rem;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 20px
+  }
+
+  .sibuxiangzhongtetu-img-period-list .no-current {
+    background-color: #000;
+    color: #fff;
+  }
+  .sibuxiangzhongtetu-img-yxym img {
+    max-width: 100%;
+    height: auto;
+  }
+  .sibuxiangzhongtetu-img-yxym-img {
+    width: 100%;
+    height: auto;
+  }
+  @media only all and (max-width: 500px) {
+    .sibuxiangzhongtetu-img-period-list > div {
+      width: 62px !important;
+      font-size: 16px !important;
+    }
+  }

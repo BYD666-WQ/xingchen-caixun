@@ -1,0 +1,76 @@
+.gonggongshihjyu-container {
+        max-width: 750px;
+        margin: auto;
+        border: 3px solid #1fa21f;
+        background: #cfe8cf;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .gonggongshihjyu-header {
+        background: #e8d9a8;
+        text-align: center;
+        padding: 8px;
+        font-weight: bold;
+        font-size: clamp(16px, 3vw, 22px);
+    }
+
+    .gonggongshihjyu-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .gonggongshihjyu-table td {
+        border: 1px solid #9bbf9b;
+        padding: 6px;
+        text-align: center;
+        font-size: clamp(14px, 2.5vw, 18px);
+    }
+
+    .gonggongshihjyu-label {
+        background: #c9e0c9;
+        font-weight: bold;
+    }
+
+    .gonggongshihjyu-section-title {
+        color: red;
+        font-weight: bold;
+        font-size: clamp(16px, 3vw, 22px);
+        text-align: center;
+    }
+
+    .gonggongshihjyu-red {
+        color: red;
+        font-weight: bold;
+    }
+
+    .gonggongshihjyu-yellow {
+        background: yellow;
+        padding: 2px 4px;
+    }
+
+    .gonggongshihjyu-result-box {
+        background: #e8d9a8;
+        padding: 6px;
+        font-size: clamp(15px, 2.5vw, 20px);
+    }
+
+    .gonggongshihjyu-text-block {
+        padding: 8px;
+        font-size: clamp(14px, 2.5vw, 18px);
+        line-height: 1;
+    }
+    .gogongtaobr {
+        padding: 8px;
+        font-size: clamp(14px, 2.5vw, 18px);
+        line-height: 1.2;
+    }
+    .boimauzhong {
+        background: yellow;
+    }
+    .yangshi-table {
+        background: #e8d9a8;
+        text-align: center;
+        padding: 8px;
+        font-weight: bold;
+        font-size: clamp(14px, 3vw, 8px);
+    }

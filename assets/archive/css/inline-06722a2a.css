@@ -1,0 +1,46 @@
+.sevenxiaosevenma {
+    font-weight: bold;
+    font-size: clamp(0.9rem, 4vw, 1.2rem);
+}
+
+.sevenxiaosevenma-table {
+    border: 0;
+    border-spacing: 0;
+    background: #000;
+}
+
+.sevenxiaosevenma td {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 5px 0px;
+    box-sizing: border-box;
+    border: solid 1px #fff;
+    background-color: #F4F4F4;
+}
+
+.sevenxiaosevenma-left-td {
+    width: 45%;
+    text-align: left;
+    font-size: clamp(0.95rem, 4.2vw, 1.2rem);
+    color: black;
+}
+
+.sevenxiaosevenma-right-td {
+    width: 55%;
+    text-align: left;
+    font-size: clamp(0.95rem, 4.2vw, 1.2rem);
+    color: black;
+}
+
+.sevenxiaosevenma-content-td {
+    text-align: center;
+    font-size: clamp(1.1rem, 4.5vw, 1.5rem);
+    background: red;
+    padding: 5px;
+    border: 0px !important;
+    line-height: 36px;
+}
+
+.sevenxiaosevenma-result {
+    font-size: clamp(1.2rem, 4vw, 2rem);
+}

@@ -1,0 +1,41 @@
+:root {
+  /*主色调*/
+ 
+  /*页面宽度*/
+  --ppc-body-width: 737px;
+}
+
+#app {
+  max-width: var(--ppc-body-width);
+  margin: 0 auto !important;
+  box-sizing: content-box;
+  background: #fff;
+}
+ 
+
+ span {
+  
+    line-height: 26px;
+}
+ 
+.qiehuangleixingdiv {
+  background-image: url('../img/9f6ee3c7-BDB76B.png');
+  background-size: 100% 40px;
+  background-repeat: no-repeat;
+  height: 41px;
+  align-items: center;
+  color: #fff;
+}
+img {
+    border-style: none;
+    display: inline-block;
+}
+
+.addMargin {
+        margin-top: 0.3rem;
+    }
+    @media (max-width: 480px) {
+        .addMargin {
+        margin-top: 0.3rem;
+    }
+    }

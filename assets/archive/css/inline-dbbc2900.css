@@ -1,0 +1,89 @@
+.tencent-button {
+    padding: 4px 12px;
+    background-color: #2680eb;
+    border: none;
+    border-radius: 17px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+.tencent-banner {
+    
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: sans-serif;
+    background: #f7f7f7;
+    padding: 1px;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.tencent-left {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.tencent-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tencent-button {
+    flex-shrink: 0;
+    cursor: pointer;
+}.tie {
+  display: flex;
+  width: 100%;
+  height: 45px;
+  background: #fff;
+}
+
+.tie > div {
+  flex: 1 1 25%;
+  border-radius: 15px;
+  min-width: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  box-sizing: border-box;
+
+  font-size: 22px;
+  font-weight: 700;
+  color: #000;
+      /* background: #CC99FF; */
+  cursor: pointer;
+}
+
+
+.tie > div.active {
+     background: var(--theme-color);
+    color: #fff !important;
+}
+
+.tie > div img {
+  width: 18px !important;
+  max-width: 18px !important;
+  height: 18px !important;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+@media only screen and (max-width: 768px) {
+  .tie > div {
+    font-size: 20px !important;
+  }
+
+  .tie > div img {
+    width: 20px !important;
+    max-width: 20px !important;
+    height: 20px !important;
+    object-fit: contain !important;
+  }
+}
