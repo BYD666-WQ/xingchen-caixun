@@ -35,6 +35,22 @@
       });
     });
   }
+  api('data/manual-ziliao.json').then(function (zl) {
+    var box = document.getElementById('widgetBox43159');
+    if (!box || !zl || !zl.rows) return;
+    var inner = box.querySelector('.nmsx-festive-content');
+    if (!inner) return;
+    inner.innerHTML = zl.rows.map(function (r) {
+      var oe = r.oddEven === '\u53cc' ? '\u53cc\u6570' : '\u5355\u6570';
+      if (r.status === 'upcoming' || !r.result || !r.result.c) {
+        return '<div class="nmsx-festive-row"><span class="nmsx-festive-issue">\u65b0\u9999\u6e2f' + r.issue + '\u671f:\u5185\u5e55</span><span class="nmsx-festive-type">\u3010\u5f85\u5f00\u3011</span></div>';
+      }
+      return '<div class="nmsx-festive-row"><span class="nmsx-festive-issue">\u65b0\u9999\u6e2f' + r.issue + '\u671f:\u5185\u5e55</span>' +
+        '<span class="nmsx-festive-type">\u3010' + oe + '\u3011</span><span class="nmsx-festive-main">\u4e3b</span>' +
+        '<span class="nmsx-festive-zodiac">\u3010' + (r.threeZodiac || []).join('') + '\u3011</span><span>\u5f00</span>' +
+        '<span class="nmsx-festive-result">' + (r.result.z || '') + r.result.c + '</span><span class="nmsx-festive-accurate">\u51c6</span></div>';
+    }).join('');
+  }).catch(function () {});
   api('data/manual-draw.json').then(function (d) {
     var tie = $('.tie') || $('.tencent-banner .tie');
     var names = $a('.baomalaodaName');
