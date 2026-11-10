@@ -1,0 +1,68 @@
+/* 新彩种（可乐手动开奖）· 纯前端占位渲染：在「香港彩」前面插入 tab 与号码块
+   数据来自 data/manual-draw.json；标注「示例」直到接入 GitHub Actions 手动开奖 */
+(function () {
+  'use strict';
+  function base() { return location.pathname.indexOf('/pages/') >= 0 ? '../' : ''; }
+  function qsa(s, r) { return [].slice.call((r || document).querySelectorAll(s)); }
+  function findBlock(el) {
+    var n = el;
+    while (n && n !== document.body) {
+      if (n.querySelector && n.querySelector('.baomalaodaQi') && n.querySelectorAll('.baomalaodaMa').length >= 7) return n;
+      n = n.parentNode;
+    }
+    return null;
+  }
+  function nameOf(el) { return (el.textContent || '').replace(/\s+/g, ''); }
+  fetch(base() + 'data/manual-draw.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d) return;
+      var tie = document.querySelector('#widgetBox41362 .tie');
+      var names = qsa('.baomalaodaName');
+      if (!tie || !names.length) return;
+      var hkTab = null;
+      qsa('div', tie).forEach(function (t) { if (nameOf(t).indexOf('\u9999\u6e2f\u5f69') >= 0) hkTab = t; });
+      var hkBlock = findBlock(names[names.length - 2] || names[0]);
+      var hkNameEl = hkBlock ? hkBlock.querySelector('.baomalaodaName') : null;
+      if (!hkTab || !hkBlock || !hkNameEl) return;
+      // 1) 新 tab（放在香港彩前）
+      var tab = document.createElement('div');
+      tab.innerHTML = '<span style="font-weight:700">' + (d.name || '\u65b0\u5f69\u79cd') + '</span>';
+      tab.style.cursor = 'pointer';
+      hkTab.parentNode.insertBefore(tab, hkTab);
+      // 2) 新号码块（克隆香港彩块）
+      var block = hkBlock.cloneNode(true);
+      block.style.display = 'none';
+      var nm = block.querySelector('.baomalaodaName');
+      if (nm) nm.textContent = d.name || '\u65b0\u5f69\u79cd';
+      var qi = block.querySelector('.baomalaodaQi');
+      if (qi && d.issue) qi.textContent = String(d.issue);
+      var mas = block.querySelectorAll('.baomalaodaMa');
+      var xs = block.querySelectorAll('.baomalaodaXiao');
+      (d.nums || []).forEach(function (n, i) {
+        if (mas[i]) mas[i].textContent = n.c;
+        if (xs[i]) xs[i].textContent = n.z;
+      });
+      var tip = document.createElement('span');
+      tip.textContent = '\u793a\u4f8b';
+      tip.style.cssText = 'display:inline-block;margin-left:6px;padding:1px 6px;border-radius:3px;background:#d90000;color:#fff;font:11px/1.6 "Microsoft YaHei",Arial,sans-serif';
+      if (nm && nm.parentNode) nm.parentNode.insertBefore(tip, nm.nextSibling);
+      hkBlock.parentNode.insertBefore(block, hkBlock);
+      // 3) 点击切换
+      tab.addEventListener('click', function () {
+        qsa('.baomalaodaName').forEach(function (n) {
+          var b = findBlock(n);
+          if (b) b.style.display = (b === block) ? '' : 'none';
+        });
+        qsa('#widgetBox41362 .tie > div').forEach(function (t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        var target = document.getElementById('widgetBox41750');
+        if (target && target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      // 4) 默认仍显示新澳彩
+      qsa('.baomalaodaName').forEach(function (n) {
+        var b = findBlock(n);
+        if (b && b !== block) b.style.display = '';
+      });
+    });
+})();
