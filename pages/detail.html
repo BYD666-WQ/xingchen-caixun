@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>二级页 A · 骨架</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../assets/css/base.css">
+<script src="../assets/js/archive-map.js"></script>
+</head>
+<body>
+<div class="skel-bar"><div class="wrap">
+  <span>骨架预览 · 二级页 A</span>
+  <span>模块待存档确定</span>
+</div></div>
+<header class="skel-head"><div class="wrap">
+  <div class="skel-brand"><span class="dot"></span>新站-复刻<small>skeleton</small></div>
+  <nav class="skel-nav">
+    <a href="../index.html">首页</a>
+    <a href="detail.html" class="on">二级页 A</a>
+    <a href="info.html">二级页 B</a>
+  </nav>
+</div></header>
+<main class="wrap">
+  <h1>二级页 A（占位）</h1>
+  <p class="lead">用于开奖详情/号码明细一类页面，结构等存档 + 内容清单。</p>
+  <section class="panel"><h2>槽位</h2>
+    <div class="slots">
+      <div class="slot"><div class="idx">SLOT A1</div><div class="name">标题 + 面包屑</div><p class="desc">照存档原文</p><span class="src">待内容清单</span></div>
+      <div class="slot"><div class="idx">SLOT A2</div><div class="name">数据主区</div><p class="desc">号码/统计，字段照抄</p><span class="src">待内容清单</span></div>
+      <div class="slot"><div class="idx">SLOT A3</div><div class="name">历史表格</div><p class="desc">列名照抄存档</p><span class="src">待内容清单</span></div>
+      <div class="slot"><div class="idx">SLOT A4</div><div class="name">广告位（不复刻）</div><p class="desc">删除，不留占位</p><span class="src">task-2 硬约束</span></div>
+    </div>
+  </section>
+</main>
+<footer class="skel-foot"><div class="wrap">骨架 · 二级页 A</div></footer>
+<script src="../assets/js/site.js"></script>
+<script>App.mountSkeleton({base: '../', dataUrl: '../data/site-data.json'});</script>
+</body>
+</html>
