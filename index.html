@@ -87,6 +87,19 @@ details.xc-more .hitem{display:flex;justify-content:space-between;border-top:1px
 .zgrid div{border:1px solid #E6D7AD;background:#fff;border-radius:4px;text-align:center;padding:4px 2px;font-size:12px}
 .zgrid b{color:#E60012;font-size:16px;display:block}
 #tuku img{width:32%}
+</style><style id="xc-fix2">
+.block .hd{gap:6px;flex-wrap:nowrap;align-items:baseline}
+.block .hd b{font-size:19px;white-space:nowrap;overflow:visible;text-overflow:clip;flex:0 0 auto}
+.block .hd .time{font-size:14px;color:#666;white-space:nowrap;flex:0 0 auto}
+.block .hd .hist{font-size:13px;white-space:nowrap;flex:0 0 auto;margin-left:auto}
+.nm .row{gap:4px;overflow:hidden}
+.nm .row .iss{font-size:14px;padding:2px 5px}
+.nm .row .lab{font-size:14px;padding:1px 4px}
+.nm .row .zod2{font-size:15px}
+.nm .row .ok{font-size:14px;flex:0 0 auto;margin-left:auto}
+.nm .row span{white-space:nowrap}
+.hitem .st{min-width:76px;text-align:right;flex:0 0 auto}
+.zgrid div{font-size:12px}
 </style></head><body><div class="wrap">
 <div class="adslot">（广告位占位 · 保持比例）</div>
 <div class="notice"><b>本站数据仅供参考 · 开奖结果以官方公布为准</b><span class="view">查看</span></div>
@@ -225,7 +238,7 @@ body{font-size:18px}
     var hist=rows.slice(0,10).map(function(r){
       var c=r.result&&r.result.c,ok=(c&&c!=='NaN'&&r.status!=='upcoming');
       var nums=ok?((r.result&&r.result.nums)||[]):[];
-      return '<div class="hitem"><span>新港'+r.issue+'期</span><span>'+(ok?((r.threeZodiac||[]).join('')+' 开'+(r.result.z||'')+c):'待开')+'</span></div>';
+      return '<div class="hitem"><span>新港 '+r.issue+'期</span><span class="st">'+(ok?((r.threeZodiac||[]).join('')+' 开'+(r.result.z||'')+c):'待开')+'</span></div>';
     }).join('');
     var gl=rows.slice(0,8).map(function(r){
       var c=r.result&&r.result.c,ok=(c&&c!=='NaN'&&r.status!=='upcoming');
