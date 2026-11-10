@@ -268,4 +268,21 @@ header{background-color:#B3000E!important}
     var t=document.querySelector('.card .hd .t');if(t)t.textContent='数据更新 '+('0'+new Date().getHours()).slice(-2)+':'+('0'+new Date().getMinutes()).slice(-2);
   }).catch(function(e){});
 })();
+</script><script>
+(function(){
+  var SRC=['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/',''];
+  function get(p){var i=0;function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var u=SRC[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
+  function mount(){
+    var host=document.querySelector('.nav');if(!host)return null;
+    var ex=document.getElementById('xc-extra');if(!ex){ex=document.createElement('div');ex.id='xc-extra';host.parentNode.insertBefore(ex,host)}return ex;
+  }
+  get('data/manual-ziliao.json').then(function(zl){
+    var rows=(zl&&zl.rows||[]).slice(0,10);var ex=mount();if(!ex)return;
+    var hist=rows.map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');return '<div class="row"><i>'+d.issue+'期</i><span>'+(ok?((d.threeZodiac||[]).join('')+' 开'+(d.result.z||'')+c):'待开')+'</span></div>'}).join('');
+    var zt=['鼠 07 19 31 43','牛 06 18 30 42','虎 05 17 29 41','兔 04 16 28 40','龙 03 15 27 39','蛇 02 14 26 38','马 01 13 25 37 49','羊 12 24 36 48','猴 11 23 35 47','鸡 10 22 34 46','狗 09 21 33 45','猪 08 20 32 44'];
+    ex.insertAdjacentHTML('beforeend','<section class="mini"><h5>历史开奖记录</h5>'+hist+'</section>'+
+      '<section class="mini"><h5>玄机诗象</h5><div style="padding:10px;font-size:17px;line-height:1.7;color:#6b4a10">本期玄机：龙争虎斗，马到成功；留意单数生肖，特码看虎马羊。</div></section>'+
+      '<section class="mini"><h5>生肖号码大表</h5><div class="zgrid">'+zt.map(function(s){var p=s.split(' ');return '<div style="border:1px solid #E8D098;border-radius:4px;text-align:center;padding:4px 2px;font-size:12px;background:#FFFDF6"><b style="color:#C90000;font-size:15px;display:block">'+p[0]+'</b>'+p.slice(1).join(' ')+'</div>'}).join('')+'</div></section>');
+  }).catch(function(e){});
+})();
 </script></body></html>

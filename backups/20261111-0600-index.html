@@ -1,0 +1,271 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="color-scheme" content="light only">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>B1+ 华丽版</title><style>*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",Arial,sans-serif;padding-bottom:64px}
+.notice{text-align:center;font-size:13px;padding:6px;background:#FFF3C4;color:#8a3a00;border-bottom:1px solid #E8C86A}
+header{display:flex;align-items:center;padding:10px 12px;background:linear-gradient(#E60012,#C90000)}
+.logo{font:900 26px/1.15 "Microsoft YaHei";color:#FFD24D;text-shadow:1px 1px 0 #7A0000,-1px -1px 0 #7A0000,1px -1px 0 #7A0000,-1px 1px 0 #7A0000;letter-spacing:1px}
+.seal{margin-left:auto;border:1px solid #FFD24D;color:#FFD24D;border-radius:4px;font-size:12px;padding:4px 7px}
+.tabs{display:flex;gap:0;background:#FFFDF3;border-bottom:2px solid #E60012}
+.tabs a{flex:1;text-align:center;padding:9px 0;font-size:17px;font-weight:700;color:#8a4a00;border-right:1px solid #F0DCA8;text-decoration:none}
+.tabs a.on{background:#E60012;color:#FFD24D}
+.openbar{display:flex;align-items:center;gap:5px;padding:6px 6px;background:#FFF3C4;border-top:2px solid #E0B94A;border-bottom:2px solid #E0B94A}
+.ol{flex:0 0 56px;font:900 20px/1.05 "Microsoft YaHei";color:#C90000;text-align:center}
+.ol span{display:block;font-size:12px;color:#8a4a00;font-weight:700}
+.ob{display:flex;gap:4px;flex:1;min-width:0;align-items:center}
+.tile{flex:1 1 0;min-width:0;aspect-ratio:1;border-radius:4px;overflow:hidden;color:#fff;display:flex;flex-direction:column;text-align:center;border:1px solid rgba(0,0,0,.15)}
+.tile .num{flex:1;display:flex;align-items:center;justify-content:center;font:800 26px/1 "Microsoft YaHei"}
+.tile .zod{height:17px;line-height:17px;font-size:13px;background:rgba(0,0,0,.42)}
+.r{background:#E60012}.b{background:#1E5BC6}.g{background:#0F8A34}
+.plus{flex:0 0 8px;color:#C90000;font-weight:900;text-align:center;font-size:16px}
+.card{margin:8px 8px;background:#FFFDF3;border:2px solid #E0B94A;border-radius:5px;overflow:hidden}
+.card .hd{display:flex;align-items:baseline;gap:6px;padding:8px 10px;background:#E60012;border-bottom:2px solid #FFD24D}
+.card .hd b{font-size:24px;color:#FFD24D;font-weight:900}
+.card .hd .t{font-size:14px;color:#FFE9A8}
+.card .hd .h{margin-left:auto;font-size:15px;color:#FFD24D;font-weight:700}
+.balls{display:flex;gap:5px;padding:8px 10px;align-items:center}
+.balls .tile{width:48px;height:56px;flex:0 0 auto}
+.balls .tile .num{font-size:26px}
+.balls .tile .zod{height:18px;line-height:18px;font-size:14px}
+.next{display:flex;justify-content:space-between;align-items:center;padding:6px 10px 10px;font-size:15px;color:#6b4a10;border-top:1px dashed #E8D098}
+.next .rf{background:#FFD24D;color:#C90000;border-radius:4px;padding:5px 12px;font-size:15px;font-weight:800;border:1px solid #C9A227}
+.mini{margin:8px 8px;background:#FFFDF3;border:2px solid #E0B94A;border-radius:5px;overflow:hidden}
+.mini h5{margin:0;background:#E60012;color:#FFD24D;font:900 22px/1.9 "Microsoft YaHei";text-align:center;border-bottom:2px solid #FFD24D;letter-spacing:1px}
+.mini .row{display:flex;gap:6px;align-items:center;padding:8px 8px;border-top:1px dashed #E8D098;font-size:19px}
+.mini .row:first-of-type{border-top:0}
+.mini i{font-style:normal;background:#E60012;color:#fff;border-radius:3px;padding:2px 6px;font-size:15px;font-weight:700}
+.mini b{color:#C90000;font-size:16px}
+.mini u{margin-left:auto;text-decoration:none;background:#FFD24D;color:#C90000;border-radius:3px;padding:2px 8px;font-size:16px;font-weight:900;border:1px solid #C9A227}
+.nav{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;background:#8A0000;border-top:2px solid #FFD24D}
+.nav a{flex:1;text-align:center;line-height:56px;font-size:14px;color:#FFD24D;text-decoration:none;font-weight:700}
+.nav a.on{background:#C90000;color:#fff}.mini h5{background-image:linear-gradient(#E60012,#B3000E)!important;background-clip:border-box!important;-webkit-background-clip:border-box!important;color:#FFD24D!important;-webkit-text-fill-color:#FFD24D!important;text-shadow:0 1px 0 #7A0000}
+.openbar{padding:3px 4px!important;gap:3px!important}
+.openbar .ol{flex:0 0 48px!important;font-size:18px!important}
+.openbar .ol span{font-size:11px!important}
+.openbar .ob{gap:3px!important}
+.openbar .plus{flex:0 0 4px!important;font-size:14px!important}
+</style><style id="b1plus">
+/* 1 头部 */
+header{background:linear-gradient(#E60012,#B3000E)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 6px rgba(120,0,0,.35)!important;border-bottom:1px solid #FFD24D!important}
+.logo{color:transparent!important;-webkit-background-clip:text!important;background-clip:text!important;background-image:linear-gradient(#FFF3C0,#FFC93C)!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important;filter:drop-shadow(1px 1px 0 #7A0000) drop-shadow(-1px 1px 0 #7A0000)}
+.seal{border:1px solid #FFD24D!important;color:#FFD24D!important;background:rgba(0,0,0,.12)!important}
+/* 2 区块标题条 */
+.card .hd,.mini h5{background:linear-gradient(#E60012,#B3000E)!important;border-top:2px solid transparent!important;border-bottom:2px solid transparent!important;border-image:linear-gradient(90deg,#FFE9A8,#D4AF37,#FFE9A8) 1!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22)!important}
+.card .hd b,.mini h5{background-image:linear-gradient(#FFF3C0,#FFC93C)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;-webkit-text-fill-color:transparent!important}
+.mini h5{display:block}
+/* 3 号码方块 */
+.tile{background-image:linear-gradient(160deg,#FF3B30,#C00012)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 1px 2px rgba(0,0,0,.18)!important}
+.tile.b{background-image:linear-gradient(160deg,#2E86FF,#0B4EA2)!important}
+.tile.g{background-image:linear-gradient(160deg,#2ECC71,#0B7A3A)!important}
+.tile .num{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.55)!important}
+.tile .zod{background:linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.6))!important;color:#FFE9A8!important}
+/* 4 卡片 */
+.card,.mini{background-image:linear-gradient(#FFFDF6,#FFF3D6)!important;border:1px solid transparent!important;border-image:linear-gradient(160deg,#FFE9A8,#D4AF37,#FFE9A8) 1!important}
+/* 5 按钮 */
+.next .rf,.mini u{background-image:linear-gradient(#FFE9A8,#F5C542,#D4AF37)!important;color:#7A0000!important;border:1px solid #C9A227!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)!important;text-shadow:0 1px 0 rgba(255,255,255,.4)!important}
+.card .hd .h{color:#FFE9A8!important}
+/* 6 底部导航 */
+.nav{background-image:linear-gradient(#A80008,#6E0006)!important;border-top:2px solid #FFD24D!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.18)!important}
+.nav a{color:#FFD24D!important}
+.nav a.on{background-image:linear-gradient(#D4000F,#8A0006)!important;color:#fff!important}
+/* 期开条金边 */
+.openbar{border-top:2px solid transparent!important;border-bottom:2px solid transparent!important;border-image:linear-gradient(90deg,#FFE9A8,#D4AF37,#FFE9A8) 1!important}
+</style><style id="xc-darkfix">
+:root{color-scheme:light}
+html,body{background:#F5F1E6!important;color:#222!important;color-scheme:light!important;-webkit-text-size-adjust:100%}
+body *{color-scheme:light!important}
+header{background-color:#B3000E!important}
+.card,.mini,.block,.nm,.zl,.nav,.openbar{background-color:#FFFDF6!important}
+.nav{background-color:#8A0000!important}
+.openbar{background-color:#FFF3C4!important}
+.logo{color:#8A0000!important;-webkit-text-fill-color:#8A0000!important}
+.card .hd b,.mini h5{color:#8A0000!important;-webkit-text-fill-color:#8A0000!important}
+.mini i,.mini b,.mini span,.mini em,.mini u{color:#222!important;-webkit-text-fill-color:#222!important}
+.mini u,.nav .badge{background-color:#FFD24D!important;color:#8A0000!important;-webkit-text-fill-color:#8A0000!important;border:1px solid #C9A227!important}
+.nav .zhun{background-color:#FFD24D!important;color:#8A0000!important;-webkit-text-fill-color:#8A0000!important;border:2px solid #C9A227!important}
+.next .rf{background-color:#FFD24D!important;color:#8A0000!important;-webkit-text-fill-color:#8A0000!important;border:1px solid #C9A227!important}
+.nav a{color:#FFE9A8!important;-webkit-text-fill-color:#FFE9A8!important}
+.nav a.on{color:#fff!important;-webkit-text-fill-color:#fff!important}
+@supports (-webkit-background-clip:text){
+ .logo,.card .hd b,.mini h5{background-image:linear-gradient(#FFF3C0,#FFC93C)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;color:transparent!important}
+ .mini h5,.card .hd b{-webkit-text-fill-color:transparent!important}
+}
+@media (prefers-color-scheme:dark){
+ :root{color-scheme:light}
+ html,body{background:#F5F1E6!important;color:#222!important}
+ header,.nav,.card,.mini,.openbar{color-scheme:light!important}
+}
+</style><style id="xc-openbar-final2">
+.openbar{padding:3px!important;gap:2px!important;display:flex;align-items:center}
+.openbar .ol{flex:0 0 52px!important;width:52px!important;text-align:center;white-space:nowrap;line-height:1.15!important}
+.openbar .ol b{display:block;font-size:15px!important;font-weight:700!important;color:#C90000!important;-webkit-text-fill-color:#C90000!important;white-space:nowrap}
+.openbar .ol span{display:block;font-size:12px!important;color:#C90000!important;-webkit-text-fill-color:#C90000!important;white-space:nowrap;font-weight:700!important}
+.openbar .ob{gap:1px!important;display:flex;align-items:center;flex:1 1 auto;min-width:0}
+.openbar .tile{flex:1 1 0!important;min-width:0!important;width:auto!important;height:34px!important;aspect-ratio:auto!important}
+.openbar .tile .num{font-size:18px!important;font-weight:800!important;line-height:1!important}
+.openbar .tile .zod{height:12px!important;font-size:12px!important;line-height:12px!important}
+.openbar .plus{flex:0 0 8px!important;display:inline-block!important;font-size:14px!important;color:#C90000!important;text-align:center}
+</style><style id="xc-ob3">
+.openbar{width:100%!important;box-sizing:border-box!important;overflow:hidden!important}
+.openbar .tile{border:0!important;box-shadow:none!important}
+.openbar .ob{overflow:hidden!important}
+</style><style id="xc-ob4">
+.openbar{padding:3px!important;box-sizing:border-box!important;overflow:hidden!important;width:100%!important}
+.openbar .ol{flex:0 0 48px!important;width:48px!important}
+.openbar .plus{flex:0 0 6px!important}
+.openbar .tile{flex:1 1 0!important;min-width:0!important;border:0!important}
+.openbar .refresh,.openbar .bar{flex:0 0 4px!important}
+</style><style id="xc-f4">
+.openbar .plus{flex:0 0 24px!important;font-size:24px!important;font-weight:700!important;color:#8A0000!important;-webkit-text-fill-color:#8A0000!important;margin:0 4px!important;line-height:1!important}
+.next .rf,.nav .badge,.nav .zhun,.mini u{background:#FFD24D!important;background-image:none!important;color:#8A0000!important;-webkit-text-fill-color:#8A0000!important;background-clip:border-box!important;-webkit-background-clip:border-box!important;border:1px solid #B8860B!important;box-shadow:none!important}
+.nav .zhun{border-radius:50%!important;border-width:2px!important}
+@media (forced-colors: active){.zhun,.rf,.badge,u{forced-color-adjust:none!important;color:#8A0000!important;background:#FFD24D!important}}
+</style><style id="xc-f6">
+.card .hd{display:flex!important;flex-wrap:wrap!important;align-items:baseline!important;gap:4px 8px!important}
+.card .hd b{font-size:20px!important;white-space:nowrap!important;flex:0 0 auto!important}
+.card .hd .time{font-size:13px!important;white-space:nowrap!important}
+.card .hd .h{font-size:13px!important;white-space:nowrap!important;margin-left:auto!important}
+#xc-cd{flex:0 0 100%!important;order:9;font-size:12px!important}
+.openbar .ol{flex:0 0 48px!important;width:48px!important;overflow:hidden!important}
+.openbar .ob{flex:1 1 auto!important;min-width:0!important;gap:1px!important}
+.openbar .ol{margin-right:2px!important}
+.card .balls{display:flex!important;gap:4px!important;align-items:center!important}
+.card .balls .tile{flex:1 1 0!important;min-width:0!important;width:auto!important}
+.card .balls .plus{flex:0 0 10px!important;text-align:center}
+.tabs a,.tabs .tab{display:flex!important;align-items:center!important;justify-content:center;gap:6px}
+.tabs img.badge-svg{width:34px;height:34px;flex:0 0 34px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 1px #D4AF37}
+</style><style id="xc-f7">
+.openbar .ol{display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;flex:0 0 48px!important;width:48px!important;overflow:hidden!important;border-right:1px solid rgba(0,0,0,.12)!important;box-sizing:border-box!important}
+.openbar .ol b{font-size:15px!important;line-height:1.1!important}
+.openbar .ol span{font-size:11px!important;line-height:1.1!important}
+.openbar .ob{flex:1 1 auto!important;min-width:0!important}
+</style><style id="xc-f8">
+.tabs .tab,.tabs a{gap:4px!important;overflow:visible!important}
+.tabs svg.badge-svg{width:34px!important;height:34px!important;min-width:34px!important;display:block!important;flex:0 0 34px!important;opacity:1!important;visibility:visible!important}
+.openbar .ol{max-width:48px!important;width:48px!important;overflow:hidden!important;font-size:12px!important;letter-spacing:-.2px!important}
+.openbar .ol b{font-size:12px!important;line-height:1.2!important;letter-spacing:-.2px!important}
+.openbar .ol span{font-size:10px!important;line-height:1.2!important}
+.openbar .ob{margin-left:4px!important}
+</style><style id="xc-f9">
+.mini .row{display:flex!important;justify-content:space-between!important;align-items:center!important;width:100%!important;box-sizing:border-box}
+.mini .row i,.mini .row b,.mini .row span,.mini .row em,.mini .row u{flex:0 0 auto}
+.mini .row em{margin-left:auto!important;text-align:right}
+.mini .row span{margin-right:auto!important}
+.nav a[href="gallery.html"]{}
+</style><style id="xc-f10">
+.tabs .badge-img{width:28px!important;height:28px!important;display:block!important;flex:0 0 28px!important}
+.tabs svg.badge-svg{display:none!important}
+</style><style id="xc-cd-gold">
+#xc-cd{font-size:18px!important;font-weight:800!important;color:#FFD24D!important;-webkit-text-fill-color:#FFD24D!important;background:none!important;text-shadow:0 1px 0 rgba(120,0,0,.6)!important}
+</style><style id="xc-skeleton">
+.sk{display:inline-block;border-radius:3px;background:linear-gradient(90deg,#EEE5D2,#F7F1E3,#EEE5D2);background-size:200% 100%;animation:skm 1.2s linear infinite}
+@keyframes skm{0%{background-position:0 0}100%{background-position:-200% 0}}
+</style></head><body><div class="notice">本站数据仅供参考 · 开奖结果以官方公布为准</div>
+<header><div class="logo">新港摇钱树</div><div class="seal">正版</div></header>
+<nav class="tabs"><a class="on">新港</a><a>新澳</a><a>香港</a></nav>
+<div class="openbar"><div class="ol"><b>314期开</b><span>开奖记录</span></div><div class="ob"><div class="tile r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div></div></div>
+<section class="card"><div class="hd"><b>新港第313期</b><span class="t">19:07</span><span class="h">历史记录</span></div><div class="balls"><div class="tile r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div></div><div class="next"><span>明天 21:34 开奖</span><span class="rf">刷新</span></div></section>
+
+<section class="mini" id="nm-skeleton"><h5>内幕 · 单双③肖</h5><div class="row"><i class="sk" style="width:52px;height:14px"></i><b class="sk" style="width:44px;height:14px;margin-left:6px"></b><span class="sk" style="width:86px;height:14px;margin-left:6px"></span><em class="sk" style="width:60px;height:14px;margin-left:auto"></em></div><div class="row"><i class="sk" style="width:52px;height:14px"></i><b class="sk" style="width:44px;height:14px;margin-left:6px"></b><span class="sk" style="width:86px;height:14px;margin-left:6px"></span><em class="sk" style="width:60px;height:14px;margin-left:auto"></em></div><div class="row"><i class="sk" style="width:52px;height:14px"></i><b class="sk" style="width:44px;height:14px;margin-left:6px"></b><span class="sk" style="width:86px;height:14px;margin-left:6px"></span><em class="sk" style="width:60px;height:14px;margin-left:auto"></em></div><div class="row"><i class="sk" style="width:52px;height:14px"></i><b class="sk" style="width:44px;height:14px;margin-left:6px"></b><span class="sk" style="width:86px;height:14px;margin-left:6px"></span><em class="sk" style="width:60px;height:14px;margin-left:auto"></em></div><div class="row"><i class="sk" style="width:52px;height:14px"></i><b class="sk" style="width:44px;height:14px;margin-left:6px"></b><span class="sk" style="width:86px;height:14px;margin-left:6px"></span><em class="sk" style="width:60px;height:14px;margin-left:auto"></em></div><div class="row"><i class="sk" style="width:52px;height:14px"></i><b class="sk" style="width:44px;height:14px;margin-left:6px"></b><span class="sk" style="width:86px;height:14px;margin-left:6px"></span><em class="sk" style="width:60px;height:14px;margin-left:auto"></em></div><div class="row"><i class="sk" style="width:52px;height:14px"></i><b class="sk" style="width:44px;height:14px;margin-left:6px"></b><span class="sk" style="width:86px;height:14px;margin-left:6px"></span><em class="sk" style="width:60px;height:14px;margin-left:auto"></em></div><div class="row"><i class="sk" style="width:52px;height:14px"></i><b class="sk" style="width:44px;height:14px;margin-left:6px"></b><span class="sk" style="width:86px;height:14px;margin-left:6px"></span><em class="sk" style="width:60px;height:14px;margin-left:auto"></em></div><div class="row"><i class="sk" style="width:52px;height:14px"></i><b class="sk" style="width:44px;height:14px;margin-left:6px"></b><span class="sk" style="width:86px;height:14px;margin-left:6px"></span><em class="sk" style="width:60px;height:14px;margin-left:auto"></em></div><div class="row"><i class="sk" style="width:52px;height:14px"></i><b class="sk" style="width:44px;height:14px;margin-left:6px"></b><span class="sk" style="width:86px;height:14px;margin-left:6px"></span><em class="sk" style="width:60px;height:14px;margin-left:auto"></em></div><div class="row"><i class="sk" style="width:52px;height:14px"></i><b class="sk" style="width:44px;height:14px;margin-left:6px"></b><span class="sk" style="width:86px;height:14px;margin-left:6px"></span><em class="sk" style="width:60px;height:14px;margin-left:auto"></em></div><div class="row"><i class="sk" style="width:52px;height:14px"></i><b class="sk" style="width:44px;height:14px;margin-left:6px"></b><span class="sk" style="width:86px;height:14px;margin-left:6px"></span><em class="sk" style="width:60px;height:14px;margin-left:auto"></em></div></section><div class="nav"><a class="on">首页</a><a>资料大全</a><a>规律走势</a><a>寻宝</a><a href="gallery.html">图库</a></div><script>
+(function(){
+  var SRC=['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/',''];
+  function get(p){var i=0;function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var u=SRC[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
+  function extra(){var host=document.querySelector('.nav');if(!host)return;document.querySelectorAll('section.mini, .mini').forEach(function(m){var t=(m.innerText||'');if(t.indexOf('内幕')>=0)m.remove()});var ex=document.getElementById('xc-extra');if(!ex){ex=document.createElement('div');ex.id='xc-extra';host.parentNode.insertBefore(ex,host)}return ex}
+  Promise.all([get('data/manual-draw.json'),get('data/manual-ziliao.json')]).then(function(r){
+    var md=r[0]||{},zl=r[1]||{},rows=(zl.rows||[]).slice(0,12);
+    var ex=extra();if(!ex)return;
+    var nmi=rows.map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');
+      if(!ok)return '<div class="row"><i>'+d.issue+'期</i><b>【待开】</b></div>';
+      return '<div class="row"><i>'+d.issue+'期</i><b>【'+(d.oddEven==='双'?'双数':'单数')+'】</b><span>主【'+((d.threeZodiac||[]).join(''))+'】</span><em>开'+(d.result.z||'')+c+'</em><u>准</u></div>';}).join('');
+    var pool=[];rows.forEach(function(d){(d.threeZodiac||[]).forEach(function(z){if(pool.indexOf(z)<0)pool.push(z)})});
+    pool=pool.concat(['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪']).slice(0,7);
+    var hn=(md.nums||[]).map(function(x){return x.c});
+    var zli=[7,5,3,2,1].map(function(n){return '<div class="row"><i>'+n+'肖</i><span>'+pool.slice(0,n).join('')+'</span><em class="code">码:'+hn.slice(0,n).join('.')+'</em></div>'}).join('');
+    var his=rows.slice(0,10).map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');return '<div class="row"><i>'+d.issue+'期</i><span>'+(ok?((d.threeZodiac||[]).join('')+' 开'+(d.result.z||'')+c):'待开')+'</span></div>'}).join('');
+    var gl=rows.slice(0,8).map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');return '<div class="row"><i>'+d.issue+'期</i><span>'+(d.oddEven==='双'?'双数':'单数')+'</span><em>'+(ok?('主'+((d.threeZodiac||[]).join(''))+' 开'+(d.result.z||'')+c):'待开')+'</em></div>'}).join('');
+    var gal=[];var tabsImgs=['assets/theme/tabs/xianggang.webp','assets/theme/tabs/xin-aocai.webp','assets/theme/tabs/xianggang.webp'];
+  function addBadge(a,i){var old=a.querySelector('svg,img');if(old)old.remove();var im=document.createElement('img');im.className='badge-img';im.alt='';im.src=tabsImgs[i];im.style.cssText='width:28px;height:28px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid #F6C65B;margin-right:5px';a.insertBefore(im,a.firstChild)}
+  document.querySelectorAll('.tabs a, .tabs .tab').forEach(addBadge);
+  // 清空块
+  document.querySelectorAll('body > div, body > section, main > *, .wrap > *').forEach(function(e){
+    if(e.id==='xc-extra')return;var r=e.getBoundingClientRect();if(r.height>24&&r.height<400){var t=(e.innerText||'').trim();if(!t&&!e.querySelector('img,svg'))e.style.display='none'}
+  });
+ }
+ setTimeout(go,400);setTimeout(go,1400);setTimeout(go,2600);
+})();
+</script><script id="xc-tabs-cd">
+(function(){
+  var TIME_TABLE={'新港':'21:34','新澳':'21:30','香港':'21:30'};window.__TIME_TABLE=TIME_TABLE;
+  var SRC=['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/',''];
+  function get(p){var i=0;function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var u=SRC[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
+  var WD=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+  function p2(x){return (x<10?'0':'')+x}
+  function nextDate(hm,days){var n=new Date();var a=String(hm).split(':');var t=new Date(n.getFullYear(),n.getMonth(),n.getDate(),parseInt(a[0],10),parseInt(a[1],10),0);if(days&&days.length){for(var i=0;i<14;i++){if(days.indexOf(t.getDay())>=0&&t>n)return t;t=new Date(t.getTime()+864e5)}return t}if(t<=n)t=new Date(t.getTime()+864e5);return t}
+  var DAYS={'新港':[0,1,2,3,4,5,6],'新澳':[0,1,2,3,4,5,6],'香港':[2,4,6]};
+  function hmOf(kind){return TIME_TABLE[kind]}
+  function kindOf(k){return k==='hk'?'香港':(k==='newmo'?'新澳':'新港')}
+  var R=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46];
+  function tiles(arr){return (arr||[]).map(function(x){var n=parseInt(x.c,10);var cls=R.indexOf(n)>=0?'r':([3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48].indexOf(n)>=0?'b':'g');return '<div class="tile '+cls+'"><div class="num">'+x.c+'</div><div class="zod">'+(x.z||'')+'</div></div>';}).join('')}
+  function ballHtml(arr){return tiles((arr||[]).slice(0,6))+'<span class="plus">+</span>'+tiles((arr||[]).slice(6))}
+  var D={},KEYS=['newhk','newmo','hk'],LABEL={newhk:'新港',newmo:'新澳彩',hk:'香港彩'};
+  function buildCards(){
+    var base=document.querySelector('.card');if(!base)return;base.id='blk-newhk';
+    var parent=base.parentNode;
+    ['newmo','hk'].forEach(function(k){
+      if(document.getElementById('blk-'+k))return;
+      var c=base.cloneNode(true);c.id='blk-'+k;c.style.display='none';
+      c.querySelector('.hd b').textContent=LABEL[k]+'第';
+      parent.insertBefore(c,base.nextSibling);
+    });
+  }
+  function fill(){
+    KEYS.forEach(function(k){
+      var c=document.getElementById('blk-'+k);if(!c)return;var d=D[k]||{};var hm=TIME_TABLE[LABEL[k]==='新澳彩'?'新澳':(LABEL[k]==='香港彩'?'香港':'新港')];
+      var b=c.querySelector('.hd b');if(b&&d.issue)b.textContent=LABEL[k]+'第'+String(d.issue).slice(-3)+'期';
+      var bb=c.querySelector('.balls');if(bb&&d.nums)bb.innerHTML=ballHtml(d.nums);
+      var t=c.querySelector('.hd .t');if(t)t.textContent='数据更新 '+p2(new Date().getHours())+':'+p2(new Date().getMinutes());
+      var nx=c.querySelector('.next span');if(nx){var nd=nextDate(hm,DAYS[kindOf(k)]);nx.textContent='第'+((parseInt(String(d.issue).slice(-3),10)||0)+1)+'期 · '+(nd.getMonth()+1)+'月'+nd.getDate()+'日 '+WD[nd.getDay()]+' '+hm}
+      var cd=c.querySelector('.xc-cd');if(!cd){cd=document.createElement('span');cd.className='xc-cd';c.querySelector('.hd').appendChild(cd)}
+      cd.id='xc-cd-'+k;
+    });
+  }
+  function tick(){
+    KEYS.forEach(function(k){
+      var e=document.getElementById('xc-cd-'+k);if(!e)return;var hm=TIME_TABLE[LABEL[k]==='新澳彩'?'新澳':(LABEL[k]==='香港彩'?'香港':'新港')];
+      var n=new Date();var t=nextDate(hm,DAYS[kindOf(k)]);var left=Math.floor((t-n)/1000);
+      e.textContent='距开奖 '+p2(Math.floor(left/3600))+':'+p2(Math.floor(left%3600/60))+':'+p2(left%60);
+    });
+  }
+  function show(k){
+    var d=D[k]||{};
+    KEYS.forEach(function(x){var c=document.getElementById('blk-'+x);if(c)c.style.display=(x===k?'':'none')});
+    var box=document.querySelector('.openbar .ob');if(box&&d.nums)box.innerHTML=ballHtml(d.nums);
+    document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.classList.toggle('on',i===KEYS.indexOf(k))});
+  }
+  window.__xcShow=show;
+  Promise.all([get('data/manual-draw.json'),get('data/draw.json')]).then(function(r){
+    var md=r[0]||{},dr=r[1]||{};var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});
+    D={newhk:md,newmo:by.Macau,hk:by.HongKong};
+    buildCards();fill();tick();setInterval(tick,1000);
+    document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.addEventListener('click',function(){show(KEYS[i])})});
+    show('newhk');
+  }).catch(function(e){console.log('[tt]',e&&e.message)});
+})();
+</script><script>
+(function(){
+  var SRC=['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/',''];
+  function get(p){var i=0;function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var u=SRC[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
+  get('data/manual-ziliao.json').then(function(zl){
+    var rows=(zl&&zl.rows||[]).slice(0,12);if(!rows.length)return;
+    var html=rows.map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');
+      if(!ok)return '<div class="row"><i>'+d.issue+'期</i><b>【待开】</b></div>';
+      return '<div class="row"><i>'+d.issue+'期</i><b>【'+(d.oddEven==='双'?'双数':'单数')+'】</b><span>主【'+((d.threeZodiac||[]).join(''))+'】</span><em>开'+(d.result.z||'')+c+'</em><u>准</u></div>';}).join('');
+    // 删除所有旧「内幕」块
+    document.querySelectorAll('section.mini').forEach(function(m){if((m.innerText||'').indexOf('内幕')>=0)m.remove()});
+    var sec=document.createElement('section');sec.className='mini';sec.id='nm-final';
+    sec.innerHTML='<h5>内幕 · 单双③肖</h5>'+html;
+    var host=document.getElementById('xc-extra')||document.querySelector('.nav');
+    host.parentNode.insertBefore(sec,host);
+    // 数据更新时间
+    var t=document.querySelector('.card .hd .t');if(t)t.textContent='数据更新 '+('0'+new Date().getHours()).slice(-2)+':'+('0'+new Date().getMinutes()).slice(-2);
+  }).catch(function(e){});
+})();
+</script></body></html>
