@@ -574,6 +574,8 @@
           return '<button data-tab="' + nm + '" style="flex:1;min-height:42px;border:1px solid #d8ccb4;border-radius:8px;background:#fff;color:#333;font:700 14px \'Microsoft YaHei\',Arial,sans-serif">' + nm + '</button>';
         }).join('') + '</div>' +
         '<button id="xc-a-more" style="margin-top:6px;min-height:38px;border:0;border-radius:8px;background:#f3ede1;color:#7a5c1e;font:700 13px \'Microsoft YaHei\',Arial,sans-serif;padding:0 14px">\u5c55\u5f00\u8d44\u6599 / \u5185\u5e55 / \u5386\u53f2</button>';
+      var navBanner = document.querySelector('#widgetBox41365 span[style*="font-size: 25px"], #widgetBox41365 span');
+      if (navBanner && (navBanner.textContent || '').indexOf('\u65b0\u6fb3') >= 0) navBanner.textContent = '\u5f69\u79cd\u5f00\u5956';
       var app = document.getElementById('app') || document.body;
       app.insertBefore(box, app.firstChild);
       // 折叠：资料区表、内幕模块、折叠长列表
