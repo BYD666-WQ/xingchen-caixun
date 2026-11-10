@@ -320,4 +320,33 @@
         }
       }).catch(function () {});
   })();
+
+  // 资料区（单双③肖）改为新香港数据，保持原结构样式；移除原站外链行
+  (function () {
+    fetch(base() + 'data/manual-ziliao.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || !d.rows || !d.rows.length) return;
+        var box = document.getElementById('widgetBox43159');
+        if (!box) return;
+        var inner = box.querySelector('.nmsx-festive-content');
+        if (!inner) return;
+        var title = box.querySelector('.nmsx-festive-title');
+        if (title) title.textContent = '\u9999\u6e2f\u6447\u94b1\u6811\u3010\u5355\u53cc\u2462\u8096\u3011';
+        inner.innerHTML = d.rows.map(function (it) {
+          var oe = it.oddEven === '\u5355' ? '\u5355\u6570' : '\u53cc\u6570';
+          var zs = (it.threeZodiac || []).join('');
+          var res = it.result ? (it.result.z + it.result.c) : '';
+          return '<div class="nmsx-festive-row">' +
+            '<span class="nmsx-festive-issue">\u65b0\u9999\u6e2f' + it.issue + '\u671f:\u5185\u5e55</span>' +
+            '<span class="nmsx-festive-type">\u3010' + oe + '\u3011</span>' +
+            '<span class="nmsx-festive-main">\u4e3b</span>' +
+            '<span class="nmsx-festive-zodiac">\u3010' + zs + '\u3011</span>' +
+            '<span>\u5f00</span>' +
+            '<span class="nmsx-festive-result">' + res + '</span>' +
+            '<span class="nmsx-festive-accurate">\u51c6</span>' +
+            '</div>';
+        }).join('');
+      }).catch(function () {});
+  })();
 })();

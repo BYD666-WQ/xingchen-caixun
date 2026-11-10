@@ -72,6 +72,12 @@ td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
   <label>页脚免责声明</label><textarea id="c-disclaimer" style="min-height:80px"></textarea>
 </div></details></div>
 
+<div class="panel"><details><summary>⑥ 资料区（单双③肖）</summary><div class="body">
+  <label>每行一条：期号 单双 三肖 开奖号（例：313 单 狗马猴 43）</label>
+  <textarea id="zl-bulk" style="min-height:140px" placeholder="313 单 狗马猴 43"></textarea>
+  <p style="font-size:12px;color:#888;margin:6px 0 0">保存后资料区会整体替换成这里的内容（期号会显示为「新香港X期:内幕」）。</p>
+</div></details></div>
+
 <div class="panel"><details><summary>④ 发布与历史版本</summary><div class="body">
   <label>GitHub PAT（只需一次，fine-grained：本仓库 Contents 读写）</label>
   <input id="token" type="password" autocomplete="off" placeholder="粘贴 fine-grained PAT">
@@ -156,6 +162,7 @@ async function loadAll(){
   $('g-name').value=dr.name||''; $('g-issue').value=dr.issue||''; $('g-drawtime').value=dr.drawTime||'';
   $('g-dailytime').value=dr.dailyTime||'21:34';
   $('g-nums').value=(dr.nums||[]).map(function(n){return n.c}).join(' ');
+  try { var zl = BACKEND === 'worker' ? (cfg.files['ziliao']||{}) : await fetch(RAW+'data/manual-ziliao.json?t='+t).then(function(r){return r.ok?r.json():{}}); window.__ZL=zl; renderZl(zl); } catch(e){}
   $('p-issue').value=pl.issue||''; $('p-oe').value=pl.oddEven||'单'; $('p-zs').value=(pl.threeZodiac||[]).join(' ');
   $('p-note').value=pl.note||'';
   renderPreview(); renderHistory();
@@ -163,6 +170,13 @@ async function loadAll(){
 function renderPreview(){
   var list=parseNums($('g-nums').value);
   $('preview').innerHTML=list.map(function(c){var a=attrsOf(c);return '<span class="ball" style="background:'+ballColor(a.c)+'">'+c+'<i>'+(a.w||'')+'/'+(a.z||'')+'</i></span>'}).join('');
+}
+function renderZl(zl){
+  var rows=(zl&&zl.rows)||[]; window.__ZL=zl||{rows:[]};
+  $('zl-bulk').value=rows.map(function(r){
+    var zs=(r.threeZodiac||[]).join('');
+    return r.issue+' '+r.oddEven+' '+zs+' '+((r.result&&r.result.c)||'');
+  }).join('\n');
 }
 function renderHistory(){
   var tb=$('hist-tbl').querySelector('tbody');var h=(draw&&draw.history)||[];
@@ -220,14 +234,22 @@ async function save(){
   var btn=$('btn-save');btn.disabled=true;btn.textContent='提交中…';
   try{
     var copy={brand:$('c-brand').value.trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
+    var zlRows = String($('zl-bulk').value||'').split('\n').map(function(l){return l.trim()}).filter(Boolean).map(function(l){
+      var p=l.replace(/,/g,' ').split(/\s+/).filter(Boolean);
+      var issue=parseInt(p.shift(),10); var oe=p.shift()==='双'?'双':'单'; var zs=String(p.shift()||'').slice(0,3).split('');
+      var res=p.shift()||''; var at=attrsOf(res);
+      return {issue:issue,oddEven:oe,threeZodiac:zs,result:{c:pad(parseInt(res,10)),z:at.z||''},text:'内幕【提前公开】',status:'live',updated:new Date().toISOString()};
+    });
+    var newZl={name:newDraw.name,rows:zlRows,updated:new Date().toISOString()};
     if (BACKEND === 'worker') {
-      await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'hongkong-draw',data:newDraw})});
+      await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'ziliao',data:newZl})});
       await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'play',data:newPlay})});
       await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'site-copy',data:copy})});
     } else {
       await saveFile('data/manual-draw.json',newDraw,'CMS: update draw');
       await saveFile('data/manual-play.json',newPlay,'CMS: update play');
       await saveFile('data/site-copy.json',copy,'CMS: update site copy');
+      await saveFile('data/manual-ziliao.json',newZl,'cms: update ziliao');
     }
     Msg('已提交，约 1-2 分钟生效（正在自动确认…）',true);
     poll();
