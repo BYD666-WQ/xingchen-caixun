@@ -65,7 +65,7 @@
         ? App.status.css + ' stylesheet(s) imported -> 见 pages/archive-preview.html'
         : 'none (等待 import_archive.py)') + nl +
       'data-json      : ' + App.status.data + nl +
-      'module-slots   : ' + App.status.slots + ' (骨架占位，等 hacker 抓取报告 + researcher 内容清单)';
+      'module-slots   : ' + App.status.slots + ' (骨架占位，等 来源处理 抓取报告 + 内容 内容清单)';
   }
 
   global.App = App;

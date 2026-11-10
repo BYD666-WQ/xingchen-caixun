@@ -1,6 +1,6 @@
 {
   "updated": "2026-11-10 06:28",
-  "source": "hacker 中转 data/ziliao-entries-<type>.json × 4（2026-11-09 抓；zlapi pageSize=100，前 200 条=2 页拼）",
+  "source": "来源处理 中转 data/ziliao-entries-<type>.json × 4（2026-11-09 抓；zlapi pageSize=100，前 200 条=2 页拼）",
   "note": "数据量大（55k 行），拆成 per-tab 文件按需加载；本文件只放索引",
   "totals": {
     "catalogCategories": 630,
@@ -73,7 +73,7 @@
   ],
   "_notes": {
     "load": "按 tab 加载对应 file；缺失分类 key 不出现 → 空态",
-    "partial": "香港彩 87/87、快乐8 142/142 完整；新澳彩/老澳彩 partial，hacker 还在 6 小时门控轮换补",
+    "partial": "香港彩 87/87、快乐8 142/142 完整；新澳彩/老澳彩 partial，来源处理 还在 6 小时门控轮换补",
     "compatibility": "byCategory 值从 {name,total,rows} 改为行数组（dev 原 schema），分类名放 categories"
   }
 }

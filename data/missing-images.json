@@ -1,6 +1,6 @@
 {
   "updated": "2026-11-10 05:15",
   "count": 0,
-  "note": "142 张图已全部本地化：guilv 112 张（按 ruleType/期号 目录）+ tuku 30 张（按原 URL 目录），本机已同步到 dev-workspace\\新站-复刻\\assets\\img\\。原 89 条 basename 冲突已由 hacker 修复（guilv-images.json）。",
+  "note": "142 张图已全部本地化：guilv 112 张（按 ruleType/期号 目录）+ tuku 30 张（按原 URL 目录），本机已同步到 站点根目录\\assets\\img\\。原 89 条 basename 冲突已由 来源处理 修复（guilv-images.json）。",
   "items": []
 }
