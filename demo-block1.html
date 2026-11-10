@@ -18,7 +18,7 @@
 /* tab 药丸 */
 .tabs{display:flex;gap:8px;padding:6px 10px 10px}
 .tab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#fff;border:1px solid #E3DCC9;border-radius:999px;padding:8px 0;font-size:15px;font-weight:700;color:#333}
-.tab .ico{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8fbf3f,#2f7d1f);border:1px solid #d5cba9}
+.tab .ico{width:22px;height:22px;border-radius:50%;border:1px solid #d5cba9;object-fit:cover;background:#eee}
 .tab.on{background:#fff;border-color:#F6C65B;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .tab.on .ico{background:radial-gradient(circle at 35% 35%,#ff8a8a,#E60012)}
 /* 期开条 */
@@ -28,36 +28,43 @@
 .openbar .balls{display:flex;align-items:center;gap:6px;flex:1;flex-wrap:nowrap}
 .openbar .refresh{width:34px;display:flex;align-items:center;justify-content:center;background:#FFD24D;border-radius:6px;color:#B30000;font-weight:700;font-size:13px;writing-mode:vertical-rl;letter-spacing:2px}
 /* 方形球瓷砖 */
-.tile{width:64px;height:64px;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;color:#fff;text-align:center}
+.tile{width:52px;height:52px;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;color:#fff;text-align:center}
+.tile.sm{width:34px;height:34px;border-radius:5px}
+.tile.sm .num{font-size:16px}
+.tile.sm .zod{height:10px;font-size:9px}
+.openbar .balls{gap:3px}
+.openbar{padding:8px 6px;gap:4px}
+.openbar .left{padding:2px 4px;font-size:12px}
+.openbar .refresh{width:26px;font-size:11px}
 .tile .num{flex:1;display:flex;align-items:center;justify-content:center;font:900 26px/1 "Microsoft YaHei",Arial,sans-serif}
-.tile .zod{height:18px;display:flex;align-items:center;justify-content:center;font-size:12px;background:rgba(0,0,0,.22)}
+.tile .zod{height:22px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;background:rgba(0,0,0,.42)}
 .tile.r{background:#E71607}.tile.b{background:#2383E9}.tile.g{background:#1FB61D}
 .plus{align-self:center;color:#C8A24A;font-weight:900;font-size:18px}
 /* 开奖块 */
 .block{background:#fff;border:1px solid #F1D9A6;border-radius:6px;margin:10px;overflow:hidden}
-.block .hd{display:flex;align-items:baseline;gap:10px;padding:8px 10px 4px;background:#fff}
-.block .hd b{font-size:20px;font-weight:900;color:#222}
+.block .hd{display:flex;align-items:baseline;gap:10px;padding:8px 10px 4px;background:#fff;text-align:left}
+.block .hd b{font-size:22px;font-weight:900;color:#222}
 .block .hd .time{margin-left:auto;color:#888;font-size:15px}
 .block .hd .hist{color:#E60012;font-size:16px;font-weight:700}
 .block .balls{display:flex;align-items:center;gap:6px;padding:4px 10px 8px}
-.block .next{display:flex;align-items:center;justify-content:space-between;padding:0 10px 10px;font-size:14px;color:#333}
+.block .next{display:flex;align-items:center;justify-content:space-between;padding:2px 10px 10px;font-size:14px;color:#333;width:100%}
 .block .next .rf{background:#F5A623;color:#fff;border-radius:6px;padding:5px 12px;font-size:14px}
 </style></head><body><div class="wrap">
 <div class="adslot">（广告位占位 · 保持比例，不搬内容）</div>
 <div class="notice"><b>本站数据仅供参考 · 开奖结果以官方公布为准</b><span class="view">查看</span></div>
 <div class="logo-row"><div class="logo">新港摇钱树<small>.com</small></div><div class="seal">正版<br>数据</div></div>
-<div class="tabs"><div class="tab on"><span class="ico"></span>新港</div><div class="tab"><span class="ico"></span>新澳</div><div class="tab"><span class="ico"></span>香港</div></div>
+<div class="tabs"><div class="tab on"><img class="ico" src="assets/theme/横幅/20fc08e3-O1CN01EANGzj5wuIE0K8mW__2210608478800.webp">新港</div><div class="tab"><img class="ico" src="assets/theme/横幅/10690118-O1CN01eflHywgN2dK0K8mW__2210608478800.webp">新澳</div><div class="tab"><img class="ico" src="assets/theme/横幅/3874e63c-O1CN01JHUSMjOzFrK0K8mW__2210608478800.webp">香港</div></div>
 <div class="openbar">
   <div class="left">314期开<span>开奖记录</span></div>
   <div class="balls">
-    <div class="tile r"><div class="num">13</div><div class="zod">马</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile b"><div class="num">09</div><div class="zod">狗</div></div><div class="tile b"><div class="num">37</div><div class="zod">马</div></div><div class="tile r"><div class="num">34</div><div class="zod">鸡</div></div><div class="tile g"><div class="num">44</div><div class="zod">猪</div></div><span class="plus">+</span><div class="tile b"><div class="num">31</div><div class="zod">鼠</div></div>
+    <div class="tile sm r"><div class="num">13</div><div class="zod">马</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile b"><div class="num">09</div><div class="zod">狗</div></div><div class="tile b"><div class="num">37</div><div class="zod">马</div></div><div class="tile r"><div class="num">34</div><div class="zod">鸡</div></div><div class="tile g"><div class="num">44</div><div class="zod">猪</div></div><span class="plus">+</span><div class="tile b"><div class="num">31</div><div class="zod">鼠</div></div>
   </div>
   <div class="refresh">刷新</div>
 </div>
 <div class="block">
   <div class="hd"><b>新港第313期</b><span class="time">18:11:37</span><span class="hist">历史记录</span></div>
   <div class="balls">
-    <div class="tile r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div>
+    <div class="tile sm r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div>
   </div>
   <div class="next"><span>新港第314期: 11月11日 星期三 21:34</span><span class="rf">刷新</span></div>
 </div>
