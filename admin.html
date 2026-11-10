@@ -279,7 +279,13 @@ $('btn-rand').addEventListener('click',function(){
   $('g-nums').value=pick.map(function(n){return pad(n)}).join(' ');renderPreview();
 });
 $('btn-calc').addEventListener('click',renderPreview);
-$('g-nums').addEventListener('input',function(){ updateNumsHint(); renderPreview(); });
+$('g-nums').addEventListener('input',function(){
+  var raw=$('g-nums').value.replace(/[^0-9]/g,'');
+  if(raw.length===14 && $('g-nums').value.replace(/[0-9]/g,'').replace(/\s/g,'').length===0){
+    $('g-nums').value=(raw.match(/.{1,2}/g)||[]).join(' ');
+  }
+  updateNumsHint(); renderPreview();
+});
 $('g-nums').addEventListener('paste',function(e){
   var t=(e.clipboardData||window.clipboardData).getData('text')||'';
   var s=t.replace(/[^0-9]/g,'');
