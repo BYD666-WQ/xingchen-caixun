@@ -130,7 +130,7 @@ async function saveFile(path,obj,msg){
     try{ return await putFile(path,obj,msg); }
     catch(e){
       var m=String(e.message||'');
-      if(attempt===0 && (m.indexOf('409')>=0 || m.toLowerCase().indexOf('sha')>=0 && m.indexOf('does not match')>=0)){
+      if(attempt===0 && (e.status===409 || e.status===422)){
         await new Promise(function(r){setTimeout(r,800)});
         continue;
       }
@@ -140,7 +140,7 @@ async function saveFile(path,obj,msg){
 }
 var PAGES='https://byd666-wq.github.io/xingchen-caixun/';
 var RAW='https://raw.githubusercontent.com/'+REPO+'/'+BRANCH+'/';
-var draw=null, play=null;
+var draw=null, play=null, LOADED=false;
 function $(id){return document.getElementById(id)}
 function Msg(t,ok){var m=$('msg');m.style.display='block';m.style.background=ok?'#0b7a45':'#a33';m.textContent=t;clearTimeout(m._t);m._t=setTimeout(function(){m.style.display='none'},6000)}
 function pad(n){return (n<10?'0':'')+n}
@@ -149,8 +149,8 @@ function attrsOf(num){var k=pad(parseInt(num,10));return ATTRS[k]||{}}
 function parseNums(s){return String(s||'').trim().replace(/,/g,' ').split(/\s+/).filter(Boolean).map(function(x){return pad(parseInt(x,10))})}
 function numsWithAttrs(list){return list.map(function(c){var a=attrsOf(c);return {c:c,z:a.z||'',color:a.c||'',wuxing:a.w||''}})}
 function token(){return localStorage.getItem(KEY)||''}
-async function api(url,opt){opt=opt||{};opt.headers=Object.assign({'Authorization':'Bearer '+token(),'Accept':'application/vnd.github+json'},opt.headers||{});var r=await fetch(url,opt);var j=null;try{j=await r.json()}catch(e){}if(!r.ok)throw new Error((j&&j.message)||('HTTP '+r.status));return j}
-async function getFileSha(path){try{var j=await api('https://api.github.com/repos/'+REPO+'/contents/'+path+'?ref='+BRANCH);return j.sha}catch(e){return null}}
+async function api(url,opt){opt=opt||{};opt.headers=Object.assign({'Authorization':'Bearer '+token(),'Accept':'application/vnd.github+json'},opt.headers||{});var r=await fetch(url,opt);var j=null;try{j=await r.json()}catch(e){}if(!r.ok){var err=new Error((j&&j.message)||('HTTP '+r.status));err.status=r.status;throw err}return j}
+async function getFileSha(path){try{var j=await api('https://api.github.com/repos/'+REPO+'/contents/'+path+'?ref='+BRANCH);return j.sha}catch(e){if(e.status===404)return null;throw e}}
 async function putFile(path,obj,msg){"use strict";
   var content=btoa(unescape(encodeURIComponent(JSON.stringify(obj,null,1))));
   var sha=await getFileSha(path);
@@ -180,7 +180,7 @@ async function loadAll(){
   }
   $('c-brand').value=cp.brand||'香港摇钱树'; $('c-slogan').value=cp.slogan||'官方开奖信息';
   $('c-notice').value=cp.notice||''; $('c-disclaimer').value=cp.disclaimer||'数据来自官方公开信息，仅供参考。';
-  draw=dr;play=pl;
+  draw=dr;play=pl;LOADED=true;
   $('g-name').value=dr.name||''; $('g-issue').value=dr.issue||''; $('g-drawtime').value=dr.drawTime||'';
   $('g-dailytime').value=dr.dailyTime||'21:34';
   $('g-nums').value=(dr.nums||[]).map(function(n){return n.c}).join(' ');
@@ -237,12 +237,15 @@ async function rollback(sha){
 }
 async function save(){
   if(!token()){Msg('请先保存密钥（页面顶部）',false);setState('缺少密钥');return}
+  if(!LOADED){Msg('未载入成功，禁止保存（请刷新页面）',false);setState('载入失败');return}
   var nums=parseNums($('g-nums').value);
   if(nums.length!==7)return Msg('开奖号码必须 7 个（6+1），当前 '+nums.length+' 个',false);
-  var zs=parseNums($('p-zs').value);
-  if(zs.length!==3)return Msg('三肖必须 3 个',false);
+  var zsRaw = String($('p-zs').value || '').replace(/[\s,，、]+/g, '');
+  if (!/^[鼠牛虎兔龙蛇马羊猴鸡狗猪]{3}$/.test(zsRaw)) return Msg('三肖必须是 3 个生肖（例：狗马猴）', false);
+  var zs = zsRaw.split('');
   // 校验通过后再存 token
   localStorage.setItem(KEY,token());
+  if ((draw&&draw.history||[]).length>0 && String($('zl-bulk').value||'').trim()===''){return Msg('历史/资料区为空，已阻止保存（防止误清空）',false)}
   var newDraw={
     name:$('g-name').value.trim()||'新香港',
     issue:parseInt($('g-issue').value,10)||1,
@@ -367,5 +370,6 @@ if (BACKEND === 'worker') {
     Msg('已退出登录',true); $('btn-logout').style.display='none';
   });
 }
-loadAll().then(commitList).catch(function(e){Msg('载入失败：'+e.message,false)});
+function setSaveEnabled(on){['btn-save','btn-save-bar','btn-save-top'].forEach(function(id){var b=$(id);if(b)b.disabled=!on})}
+loadAll().then(function(){LOADED=true;setSaveEnabled(true);commitList()}).catch(function(e){LOADED=false;setSaveEnabled(false);Msg('载入失败，已禁用保存：'+e.message,false)});
 </script></body></html>

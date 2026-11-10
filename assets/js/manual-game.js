@@ -25,15 +25,10 @@
       if (!num) continue;
       var xiao = t.parentNode ? t.parentNode.querySelector('.baomalaodaXiao') : null;
       if (!xiao) continue;
-      if (xiao.getAttribute('data-xc-labeled') === '1') continue;
-      var raw = (xiao.textContent || '').replace(/\s+/g, '');
-      var z = raw.replace(/[^\u4e00-\u9fa5]/g, '').slice(0, 2);
-      if (!z) continue;
       var key2 = ('0' + num).slice(-2);
       var at = (typeof XC_ATTRS === 'object') ? XC_ATTRS[key2] : null;
-      var w = at ? at.w : '';
-      xcSetBallLabel(xiao, z, w);
-      xiao.setAttribute('data-xc-labeled', '1');
+      if (!at) continue;
+      xcSetBallLabel(xiao, at.z, at.w);
     }
   }
 
