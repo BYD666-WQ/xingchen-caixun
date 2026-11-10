@@ -446,6 +446,18 @@
         box.textContent = '\u8ddd\u5f00\u5956 ' + (days > 0 ? (days + '\u5929') : '') + pad(hh) + ':' + pad(mm) + ':' + pad(ss);
       }
     }
+    function hideArchiveCd() {
+      var nodes = document.querySelectorAll('span,div,i,em');
+      for (var i = 0; i < nodes.length; i++) {
+        var el = nodes[i];
+        if (el.children.length) continue;
+        var t = (el.textContent || '').trim();
+        if (t.indexOf('\u8ddd\u5f00\u5956') === 0 && !(el.closest && el.closest('.xc-cd-all'))) {
+          el.style.display = 'none';
+        }
+      }
+    }
+    setTimeout(hideArchiveCd, 900); setTimeout(hideArchiveCd, 2000); setInterval(hideArchiveCd, 2000);
     setTimeout(tickAll, 700); setTimeout(tickAll, 1800); setInterval(tickAll, 1000);
     document.addEventListener('click', function () { setTimeout(tickAll, 120); });
   })();
