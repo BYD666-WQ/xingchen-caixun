@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.github.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
 <title>星辰彩讯 · 手动开奖管理</title>
 <link rel="stylesheet" href="assets/css/site.css">
 <style>
@@ -17,7 +18,7 @@ button:disabled{opacity:.6}
 </style><script>if(window.top!==window.self){window.top.location=window.self.location}</script>
 </head><body><div class="wrap">
 <h1>手动开奖 · 新彩种</h1>
-<div class="hint">需要一次性粘贴 GitHub fine-grained PAT。建 token 时选：<br>① Repository access: Only select repositories → BYD666-WQ/xingchen-caixun<br>② Permissions: Contents: Read and write（只给这一项；读用于取 sha）<br>③ Expiration: 90 天<br>token 只存本机 localStorage，不会上传本站；但同一浏览器其他 byd666-wq.github.io 页面也能读到，公用电脑用完点「清除本机 token」。</div>
+<div class="hint">需要一次性粘贴 GitHub fine-grained PAT。建 token 时选：<br>① Repository access: Only select repositories → BYD666-WQ/xingchen-caixun<br>② Permissions: Contents: Read and write（只给这一项；读用于取 sha）<br>③ Expiration: 90 天<br>token 只存在你自己的浏览器里（本机 localStorage），我们看不到、也不会上传；但同一浏览器其他 byd666-wq.github.io 页面也能读到，公用电脑用完点「清除本机 token」。</div>
 <label>PAT</label><input id="token" type="password" autocomplete="off" placeholder="github_pat_...">
 <button id="clear" type="button" style="background:#8a6d3b;margin-top:8px">清除本机 token</button>
 <label>期号</label><input id="issue" placeholder="如 2">
@@ -35,6 +36,7 @@ button:disabled{opacity:.6}
 </div>
 <script>
 (function(){
+  if(window.top!==window.self){var w=document.createElement('div');w.style.cssText='padding:20px;font:16px/1.6 Arial,sans-serif;color:#a33';w.textContent='⛔ 本页面不允许被嵌入其他网站显示，请在浏览器中直接打开本地址。';document.body.replaceChildren(w);return;}
   var REPO='BYD666-WQ/xingchen-caixun', PATH='data/manual-draw.json', KEY='xc-gh-pat';
   var $=function(id){return document.getElementById(id)};
   var tok=$('token'); tok.value=localStorage.getItem(KEY)||'';
