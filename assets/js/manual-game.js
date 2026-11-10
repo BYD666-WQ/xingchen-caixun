@@ -447,4 +447,18 @@
     setTimeout(tickAll, 700); setTimeout(tickAll, 1800); setInterval(tickAll, 1000);
     document.addEventListener('click', function () { setTimeout(tickAll, 120); });
   })();
+
+  // 资料区排版修正：单行不换行 + 三肖居中 + 行内容整体居中
+  (function () {
+    var st = document.createElement('style');
+    st.id = 'xc-ziliao-align';
+    st.textContent = [
+      '.nmsx-festive-row{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;white-space:nowrap;font-size:13px;gap:2px}',
+      '.nmsx-festive-row>span{text-align:center;letter-spacing:0}',
+      '.nmsx-festive-zodiac{display:inline-flex;justify-content:center;align-items:center;text-align:center;letter-spacing:0;margin:0 2px}',
+      '.nmsx-festive-issue{font-size:12.5px}',
+      '.nmsx-festive-result{min-width:auto}'
+    ].join('');
+    document.head.appendChild(st);
+  })();
 })();
