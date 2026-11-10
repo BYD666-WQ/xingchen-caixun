@@ -217,6 +217,7 @@ body{font-size:18px}
 </script><script>
 (function(){
   function paint(){
+    if(window.__painted)return;window.__painted=1;
     var d=window.__D||{};
     var rows=(d.zl&&d.zl.rows||[]);var md=d.md||{};
     var host=document.querySelector('.text')||document.querySelector('.nav');
@@ -241,7 +242,7 @@ body{font-size:18px}
       '<details class="xc-more"><summary>生肖号码大表</summary><div class="body"><div class="zgrid">'+zgrid+'</div></div></details>';
     host.parentNode.insertBefore(wrap,host);
     var t=document.getElementById('tuku');
-    if(t){var box=t.querySelector('div');if(box&&box.children.length<6){
+    if(t){var box=t.querySelector('div');if(box&&box.children.length<3){
       ['0b7daed9-49123sbx20240609.webp','5bea6564-gengxin.webp','cac68a23-49123sbx20240609.webp'].forEach(function(n){var im=document.createElement('img');im.src='assets/theme/图库缩略/'+n;im.style.cssText='width:32%;border:1px solid #F6C65B;border-radius:4px';box.appendChild(im)});
     }}
     var hd=document.querySelector('#blk-newhk .hd .time');
