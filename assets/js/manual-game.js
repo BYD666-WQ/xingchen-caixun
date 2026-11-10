@@ -4,19 +4,23 @@
   'use strict';
 
   // 数据直读：raw.githubusercontent 主源（提交秒级生效，无需构建）→ 本地 Pages 副本兜底
+  // 三源数据直读：jsDelivr（主，purge 快）→ raw.githubusercontent（次）→ Pages 本地（兜底）
+  var XC_JD = 'https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/';
   var XC_RAW = 'https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/';
-  function xcRawBase() { return XC_RAW; }
+  function xcVer() { return Math.floor(Date.now() / 60000); }
   async function fetchJSON(path) {
+    var sources = [XC_JD, XC_RAW, base()];
     for (var i = 0; i < 3; i++) {
-      try {
-        var r = await fetch(xcRawBase() + path + '?v=' + Date.now(), { cache: 'no-store' });
-        if (r.ok) return await r.json();
-      } catch (e) {}
-      try {
-        var r2 = await fetch(base() + path + '?t=' + Date.now(), { cache: 'no-store' });
-        if (r2.ok) return await r2.json();
-      } catch (e2) {}
-      await new Promise(function (res) { setTimeout(res, 300 * (i + 1)); });
+      for (var s = 0; s < sources.length; s++) {
+        try {
+          var r = await fetch(sources[s] + path + '?v=' + xcVer(), { cache: 'no-store' });
+          if (r.ok) {
+            var j = await r.json();
+            if (j) return j;
+          }
+        } catch (e) {}
+      }
+      await new Promise(function (res) { setTimeout(res, 400 * (i + 1)); });
     }
     return null;
   }
