@@ -18,7 +18,7 @@
 /* tab 药丸 */
 .tabs{display:flex;gap:8px;padding:6px 10px 10px}
 .tab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#fff;border:1px solid #E3DCC9;border-radius:999px;padding:8px 0;font-size:15px;font-weight:700;color:#333}
-.tab .ico{width:22px;height:22px;border-radius:50%;border:1px solid #d5cba9;object-fit:cover;background:#eee}
+.tab .ico{width:28px;height:28px;border-radius:50%;border:1px solid #d5cba9;object-fit:cover;object-position:center;background:#fff}
 .tab.on{background:#fff;border-color:#F6C65B;box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .tab.on .ico{background:radial-gradient(circle at 35% 35%,#ff8a8a,#E60012)}
 /* 期开条 */
@@ -29,13 +29,13 @@
 .openbar .refresh{width:34px;display:flex;align-items:center;justify-content:center;background:#FFD24D;border-radius:6px;color:#B30000;font-weight:700;font-size:13px;writing-mode:vertical-rl;letter-spacing:2px}
 /* 方形球瓷砖 */
 .tile{width:52px;height:52px;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;color:#fff;text-align:center}
-.tile.sm{width:34px;height:34px;border-radius:5px}
+.tile.sm{width:30px;height:30px;border-radius:4px}
 .tile.sm .num{font-size:16px}
 .tile.sm .zod{height:10px;font-size:9px}
-.openbar .balls{gap:3px}
-.openbar{padding:8px 6px;gap:4px}
-.openbar .left{padding:2px 4px;font-size:12px}
-.openbar .refresh{width:26px;font-size:11px}
+.openbar .balls{gap:4px}
+.openbar{padding:8px 4px;gap:4px}
+.openbar .left{width:52px;padding:2px 2px;font-size:12px;flex:0 0 52px}
+.openbar .refresh{width:16px;font-size:0;background:#FFD24D;border-radius:4px}
 .tile .num{flex:1;display:flex;align-items:center;justify-content:center;font:900 26px/1 "Microsoft YaHei",Arial,sans-serif}
 .tile .zod{height:22px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;background:rgba(0,0,0,.42)}
 .tile.r{background:#E71607}.tile.b{background:#2383E9}.tile.g{background:#1FB61D}
