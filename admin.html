@@ -21,7 +21,7 @@ input,select,textarea{width:100%;min-height:42px;padding:8px 10px;border:1px sol
 textarea{min-height:110px;font-family:Consolas,monospace;font-size:13px}
 button{min-height:44px;border:0;border-radius:6px;background:var(--g);color:#fff;font-size:15px;font-weight:700;padding:0 16px}
 button.gray{background:#6b7a72}
-button.small{min-height:36px;font-size:13px;padding:0 10px}
+button.small{min-height:40px;font-size:13px;padding:0 12px}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .balls{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .ball{width:40px;height:40px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
@@ -45,7 +45,8 @@ td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
   <label>当前期号</label><input id="g-issue" inputmode="numeric">
   <label>开奖时间文案</label><input id="g-drawtime">
   <label>每天几点开奖（倒计时用，HH:MM）</label><input id="g-dailytime" inputmode="numeric">
-  <label>开奖号码（6 个正码 + 1 个特别号，空格分隔）</label><input id="g-nums">
+  <label>开奖号码（6 个正码 + 1 个特别号）</label><input id="g-nums" placeholder="可整串粘贴，如 07 12 23 34 45 06 18">
+  <div id="nums-hint" style="font-size:12px;color:#888;margin-top:4px">支持整串粘贴自动拆分（空格/逗号/14 位连写均可）</div>
   <div class="row"><button class="small gray" id="btn-rand">随机一键开</button><button class="small gray" id="btn-calc">重新计算生肖/波色</button></div>
   <div class="balls" id="preview"></div>
 </div></details></div>
@@ -181,9 +182,9 @@ function renderZl(zl){
 function renderHistory(){
   var tb=$('hist-tbl').querySelector('tbody');var h=(draw&&draw.history)||[];
   tb.innerHTML=h.map(function(row,i){
-    return '<tr><td><input data-hi="'+i+'" data-k="issue" value="'+row.issue+'" style="min-height:36px;width:80px"></td>'+
-      '<td><input data-hi="'+i+'" data-k="nums" value="'+row.nums.map(function(n){return n.c}).join(' ')+'" style="min-height:36px;font-size:13px"></td>'+
-      '<td><button class="small gray" data-del="'+i+'">删</button></td></tr>';
+    return '<tr><td><input data-hi="'+i+'" data-k="issue" value="'+row.issue+'" style="min-height:40px;width:80px"></td>'+
+      '<td><input data-hi="'+i+'" data-k="nums" value="'+row.nums.map(function(n){return n.c}).join(' ')+'" style="min-height:40px;font-size:13px"></td>'+
+      '<td><button class="small gray" data-del="'+i+'" style="min-width:40px">删</button></td></tr>';
   }).join('');
   tb.querySelectorAll('input').forEach(function(inp){inp.addEventListener('change',function(){
     var i=+inp.getAttribute('data-hi'),k=inp.getAttribute('data-k');
@@ -278,7 +279,23 @@ $('btn-rand').addEventListener('click',function(){
   $('g-nums').value=pick.map(function(n){return pad(n)}).join(' ');renderPreview();
 });
 $('btn-calc').addEventListener('click',renderPreview);
-$('g-nums').addEventListener('input',renderPreview);
+$('g-nums').addEventListener('input',function(){ updateNumsHint(); renderPreview(); });
+$('g-nums').addEventListener('paste',function(e){
+  var t=(e.clipboardData||window.clipboardData).getData('text')||'';
+  var s=t.replace(/[^0-9]/g,'');
+  if(s.length>=14 && t.replace(/\s/g,'').length<=14){
+    e.preventDefault();
+    $('g-nums').value=(s.match(/.{1,2}/g)||[]).slice(0,7).join(' ');
+    updateNumsHint(); renderPreview();
+  }
+});
+function updateNumsHint(){
+  var h=$('nums-hint'); if(!h) return;
+  var n=parseNums($('g-nums').value).length;
+  h.style.color = n===7 ? '#0b7a45' : '#a33';
+  h.textContent = n===7 ? ('已识别 7 个号码：'+$('g-nums').value.trim()) : ('已识别 '+n+'/7 个，还差 '+(7-n)+' 个');
+}
+updateNumsHint();
 $('btn-addhist').addEventListener('click',function(){draw.history=draw.history||[];draw.history.unshift({issue:(parseInt($('g-issue').value,10)||1)-1,nums:numsWithAttrs(parseNums($('g-nums').value))});renderHistory()});
 $('btn-bulk').addEventListener('click',function(){
   var lines=$('hist-bulk').value.split('\n').map(function(l){return l.trim()}).filter(Boolean);
