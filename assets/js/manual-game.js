@@ -384,4 +384,50 @@
         }).join('');
       }).catch(function () {});
   })();
+  // 全彩种倒计时：每块按自己的下一期时间算，统一「距开奖 HH:MM:SS」
+  (function () {
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    function targetOf(block) {
+      var nodes = block.querySelectorAll('*');
+      for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].children.length) continue;
+        var t = (nodes[i].textContent || '').replace(/\s+/g, '');
+        var m = t.match(/(\d{1,2})\u6708(\d{1,2})\u65e5[^0-9]{0,6}(\d{1,2})[:：](\d{2})/);
+        if (m) {
+          var now = new Date();
+          var d = new Date(now.getFullYear(), parseInt(m[1], 10) - 1, parseInt(m[2], 10), parseInt(m[3], 10), parseInt(m[4], 10), 0);
+          if (d.getTime() < now.getTime() - 86400000) d = new Date(d.getTime() + 365 * 86400000);
+          return d;
+        }
+      }
+      return null;
+    }
+    function tickAll() {
+      var names = document.querySelectorAll('.baomalaodaName');
+      for (var i = 0; i < names.length; i++) {
+        var b = names[i];
+        while (b && b !== document.body) {
+          if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) break;
+          b = b.parentNode;
+        }
+        if (!b) continue;
+        var box = b.querySelector('.xc-cd-all');
+        if (!box) {
+          box = document.createElement('span');
+          box.className = 'xc-cd-all';
+          box.style.cssText = 'display:block;max-width:720px;margin:2px auto 6px;padding:0 12px;font:700 13px/1.7 "Microsoft YaHei",Arial,sans-serif;color:#c0392b';
+          b.parentNode.insertBefore(box, b.nextSibling);
+        }
+        var target = targetOf(b);
+        if (!target) { box.textContent = ''; continue; }
+        var left = Math.floor((target.getTime() - Date.now()) / 1000);
+        if (left < 0) left = 0;
+        var days = Math.floor(left / 86400);
+        var hh = Math.floor((left % 86400) / 3600), mm = Math.floor((left % 3600) / 60), ss = left % 60;
+        box.textContent = '\u8ddd\u5f00\u5956 ' + (days > 0 ? (days + '\u5929') : '') + pad(hh) + ':' + pad(mm) + ':' + pad(ss);
+      }
+    }
+    setTimeout(tickAll, 700); setTimeout(tickAll, 1800); setInterval(tickAll, 1000);
+    document.addEventListener('click', function () { setTimeout(tickAll, 120); });
+  })();
 })();
