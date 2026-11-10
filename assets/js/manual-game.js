@@ -506,13 +506,13 @@
     fetch(base() + 'data/manual-ziliao.json?t=' + Date.now(), { cache: 'no-store' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (z) {
-        var table = document.querySelector('table.sevenxiaosevenma');
-        if (table && z && z.rows && z.rows.length) {
+        var tables = document.querySelectorAll('table.sevenxiaosevenma');
+        if (tables.length && z && z.rows && z.rows.length) {
           var pool = [];
           z.rows.forEach(function (row) { (row.threeZodiac || []).forEach(function (zz) { if (pool.indexOf(zz) < 0) pool.push(zz); }); });
           var base_ = pool.concat(['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪']).slice(0, 7);
           var latest = z.rows.find(function (r) { return r.status !== 'upcoming'; }) || z.rows[0];
-          var tbody = table.querySelector('tbody') || table;
+          var tbodies = [].slice.call(tables).map(function (tb) { return tb.querySelector('tbody') || tb; });
           function rowHtml(label, n) {
             var zs = base_.slice(0, n).map(function (zz) { return '<span>' + zz + '</span>'; }).join('');
             return '<tr><td class="sevenxiaosevenma-left-td">' + label + ':<span class="sevenxiaosevenma-custome-text" style="font-size:clamp(1rem,4vw,1.4rem);color:#c00">' + zs + '</span></td></tr>';
@@ -523,7 +523,8 @@
             return '<tr><td class="sevenxiaosevenma-left-td">' + label + ':<span class="sevenxiaosevenma-custome-text" style="font-size:clamp(1rem,4vw,1.4rem);color:#c00">' + zs + '</span>' +
               (codes ? '<span style="margin-left:6px;color:#666;font-size:12px">\u7801:' + codes + '</span>' : '') + '</td></tr>';
           }
-          tbody.innerHTML = rowHtml2('\u65b0\u9999\u6e2f' + latest.issue + '\u671f\u4e03\u8096', 7) + rowHtml2('\u4e94\u8096', 5) + rowHtml2('\u4e09\u8096', 3) + rowHtml2('\u4e8c\u8096', 2) + rowHtml2('\u4e00\u8096', 1);
+          var htmlRows = rowHtml2('\u65b0\u9999\u6e2f' + latest.issue + '\u671f\u4e03\u8096', 7) + rowHtml2('\u4e94\u8096', 5) + rowHtml2('\u4e09\u8096', 3) + rowHtml2('\u4e8c\u8096', 2) + rowHtml2();
+          tbodies.forEach(function (tb) { tb.innerHTML = htmlRows; });
         }
       }).catch(function () {});
     function dropHappy8() {
@@ -540,7 +541,20 @@
         }
       }
     }
+    function dropBlockByName(nm) {
+      var names = document.querySelectorAll('.baomalaodaName');
+      for (var j = 0; j < names.length; j++) {
+        if ((names[j].textContent || '').replace(/\s+/g, '') === nm) {
+          var b = names[j];
+          while (b && b !== document.body) { if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) break; b = b.parentNode; }
+          if (b && b.parentNode) b.parentNode.removeChild(b);
+          return;
+        }
+      }
+    }
+    function dropLaoo() { dropBlockByName('\u8001\u6fb3\u5f69'); }
     setTimeout(dropHappy8, 1200); setTimeout(dropHappy8, 2600);
+    setTimeout(dropLaoo, 1400); setTimeout(dropLaoo, 2800);
   })();
 
   // 版式 A（清爽版）：大标题 → 一排最新开奖 → 4 彩种按钮；资料/内幕/历史默认收起
