@@ -1,4 +1,4 @@
-/* \u661f\u8fb0\u5f69\u8baf \u00b7 \u4ea4\u4e92\u5c42\uff08\u7eaf\u524d\u7aef\uff0c\u8865\u56de SPA \u4e22\u5931\u7684\u4e8b\u4ef6\uff09
+/* \u9999\u6e2f\u6447\u94b1\u6811 \u00b7 \u4ea4\u4e92\u5c42\uff08\u7eaf\u524d\u7aef\uff0c\u8865\u56de SPA \u4e22\u5931\u7684\u4e8b\u4ef6\uff09
    tab \u5207\u6362 / \u5012\u8ba1\u65f6 / \u5237\u65b0 / \u5386\u53f2\u8bb0\u5f55 / \u79fb\u52a8\u7aef\u70b9\u51fb\u533a */
 (function () {
   'use strict';
@@ -262,7 +262,7 @@
 (function () {
   function scrub() {
     try {
-      var brand = '\u661f\u8fb0\u5f69\u8baf';
+      var brand = '\u9999\u6e2f\u6447\u94b1\u6811';
       var all = document.querySelectorAll('.ziliaokl, .amcz-black, [class*="yuming"], [class*="amcz"]');
       for (var i = 0; i < all.length; i++) {
         var el = all[i];
@@ -315,7 +315,7 @@
   };
   function cleanTitle(t) {
     t = String(t || '').replace(/\s+/g, ' ').trim();
-    t = t.replace(/49782|49782\.com/g, '\u661f\u8fb0\u5f69\u8baf');
+    t = t.replace(/49782|49782\.com/g, '\u9999\u6e2f\u6447\u94b1\u6811');
     t = t.replace(/[\[\u3010\u300a\u300c]?\s*\d{2,4}\s*\u671f[\s\S]*$/, '');
     t = t.replace(/[\u3010\u300a\u300c][^\u3011\u300b\u300d\u300f]{0,8}$/, '');
     t = t.replace(/[\s\u00b7,.:;\uff0c\u3002\uff1a\uff1b]+$/, '');
