@@ -158,6 +158,7 @@
       for (var j = 0; j < hists.length; j++) {
         hists[j].style.cursor = 'pointer';
         hists[j].addEventListener('click', function (e) {
+          try { if (window.XC_NEWHK_HISTORY) window.XC_NEWHK_HISTORY(window.__XC_HISTORY || []); } catch (err) {}
           e.preventDefault();
           if (window.XC_INTERACTIONS && window.XC_INTERACTIONS.openHistory) window.XC_INTERACTIONS.openHistory('\u65b0\u9999\u6e2f');
         });
@@ -197,5 +198,34 @@
       }
     }
     scrub(); setInterval(scrub, 500);
+  })();
+
+  // 新香港历史开奖面板
+  (function () {
+    function show(list) {
+      var old = document.getElementById('xc-mhist');
+      if (old) old.remove();
+      var box = document.createElement('div');
+      box.id = 'xc-mhist';
+      box.style.cssText = 'position:fixed;inset:0;z-index:10005;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:12px';
+      var inner = '<div style="background:#fff;border-radius:8px;max-width:92vw;max-height:78vh;overflow:auto;padding:10px 12px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;font:700 15px/2 \'Microsoft YaHei\',Arial,sans-serif;color:#1f3b8a">' +
+        '<span>新香港 · 历史开奖</span><button id="xc-mhist-x" style="width:40px;height:40px;border:0;background:none;font-size:20px">\u00d7</button></div>' +
+        '<table style="border-collapse:collapse;font:13px/1.6 \'Microsoft YaHei\',Arial,sans-serif">' +
+        '<tr style="color:#666"><th style="padding:4px 8px;text-align:left">\u671f\u53f7</th><th style="padding:4px 8px;text-align:left">\u5f00\u5956\u53f7\u7801</th></tr>';
+      list.forEach(function (h) {
+        var balls = (h.nums || []).map(function (n) {
+          var col = n.color === '\u7ea2' ? '#e71607' : (n.color === '\u84dd' ? '#2873e6' : '#1fb61d');
+          return '<span style="display:inline-block;min-width:26px;text-align:center;margin:2px;padding:2px 4px;border-radius:4px;background:' + col + ';color:#fff;font-weight:700">' + n.c + '<i style="display:block;font-style:normal;font-size:10px;font-weight:400">' + (n.wuxing || '') + '/' + (n.z || '') + '</i></span>';
+        }).join('');
+        inner += '<tr><td style="padding:6px 8px;border-top:1px solid #eee">' + h.issue + ' \u671f</td><td style="padding:6px 8px;border-top:1px solid #eee">' + balls + '</td></tr>';
+      });
+      inner += '</table></div>';
+      box.innerHTML = inner;
+      document.body.appendChild(box);
+      box.addEventListener('click', function (e) { if (e.target === box) box.remove(); });
+      document.getElementById('xc-mhist-x').addEventListener('click', function () { box.remove(); });
+    }
+    window.XC_NEWHK_HISTORY = show;
   })();
 })();
