@@ -1826,7 +1826,7 @@ color: black!important;
     font-weight: bold;
     padding: 2px 0px 4px 0px;
     /* text-shadow: 1px 1px 1px #ffffff; */
-}</style></div></div></div><div id="widgetBox41365" class=""><div class="marge-dom" id="widgetContainer41365" data-wgt-id="41365" data-wgt-name="新港摇钱树-首页-彩种导航"><div class="box111 pad"><div class="qiehuangleixingdiv addMargin" style="display: flex; justify-content: center; align-items: center; color: white;"><b><font size="4" style="display: flex; align-items: center; justify-content: center;"><span style="font-size: 25px;">新澳门六合彩</span></font></b></div></div><div style="display: none;"><style>:root {
+}</style></div></div></div><div id="widgetBox41365" class=""><div class="marge-dom" id="widgetContainer41365" data-wgt-id="41365" data-wgt-name="新港摇钱树-首页-彩种导航"><div class="box111 pad"><div class="qiehuangleixingdiv addMargin" style="display: flex; justify-content: center; align-items: center; color: white;"><b><font size="4" style="display: flex; align-items: center; justify-content: center;"><span style="font-size: 25px;">彩种开奖</span></font></b></div></div><div style="display: none;"><style>:root {
   /*主色调*/
  
   /*页面宽度*/
@@ -3448,7 +3448,7 @@ font-size: 19pt;
     document.querySelectorAll('.baomalaodaName').forEach(function(n){
       var b=blk(n); if(!b) return;
       var key=(n.textContent||'').replace(/\s+/g,'');
-      if(seen[key]){ b.style.display='none'; } else { seen[key]=1; }
+      if(!key || seen[key]){ b.style.display='none'; } else { seen[key]=1; }
     });
   }
   function collapseGaps(){
@@ -3466,7 +3466,7 @@ font-size: 19pt;
     var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});
     var xa=blkByName('新澳彩'); if(xa&&by.Macau)fill(xa.b,by.Macau.issue,by.Macau.nums);
     var hk=blkByName('香港彩'); if(hk&&by.HongKong)fill(hk.b,by.HongKong.issue,by.HongKong.nums);
-    fixNemi(zl); dedupeCd(); dedupeBlocks(); collapseGaps();
+    fixNemi(zl); dedupeCd(); dedupeBlocks();
     // 清 logo 数字
     document.querySelectorAll('.xc-logo,.xc-footer-brand').forEach(function(e){e.textContent='新港摇钱树'});
     document.title='新港摇钱树';
