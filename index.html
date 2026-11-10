@@ -156,8 +156,9 @@ h1{background:linear-gradient(#c32323,#8f1414);color:#ffe08a !important;font-siz
       nm.innerHTML=rows.slice(0,6).map(function(r){
         var c=r.result&&r.result.c;
         var ok=(c&&c!=='NaN');
+        if(!ok) return '<div class="nrow"><b>新港'+r.issue+'期</b> <span style="color:#a33">【待开】</span></div>';
         return '<div class="nrow"><b>新港'+r.issue+'期</b> '+(r.oddEven==='双'?'【双数】':'【单数】')+
-          ' 主【'+(r.threeZodiac||[]).join('')+'】 '+(ok?('开 '+r.result.z+c+' <b>准</b>'):'<span style="color:#a33">待开</span>')+'</div>';
+          ' 主【'+(r.threeZodiac||[]).join('')+'】 开 '+r.result.z+c+' <b>准</b></div>';
       }).join('');
     }
     // 历史开奖（最近 10 期）
