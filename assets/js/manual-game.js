@@ -6,6 +6,7 @@
   var XC_SHOW_WUXING = (localStorage.getItem('xc:showWuxing') !== '0');
   function xcSetBallLabel(xiao, zodiac, wuxing) {
     if (!xiao) return;
+    xiao.setAttribute('data-xc-labeled', '1');
     var z = String(zodiac || '').trim();
     if (!z) return;
     var html = '<b style="font-size:13px;font-weight:700;line-height:1.15">' + z + '</b>';
@@ -24,6 +25,7 @@
       if (!num) continue;
       var xiao = t.parentNode ? t.parentNode.querySelector('.baomalaodaXiao') : null;
       if (!xiao) continue;
+      if (xiao.getAttribute('data-xc-labeled') === '1') continue;
       var raw = (xiao.textContent || '').replace(/\s+/g, '');
       var z = raw.replace(/[^\u4e00-\u9fa5]/g, '').slice(0, 2);
       if (!z) continue;
@@ -31,6 +33,7 @@
       var at = (typeof XC_ATTRS === 'object') ? XC_ATTRS[key2] : null;
       var w = at ? at.w : '';
       xcSetBallLabel(xiao, z, w);
+      xiao.setAttribute('data-xc-labeled', '1');
     }
   }
 
