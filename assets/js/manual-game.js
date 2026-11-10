@@ -422,12 +422,18 @@
           b = b.parentNode;
         }
         if (!b) continue;
-        var box = b.querySelector('.xc-cd-all');
-        if (!box) {
+        if (!window.__xcCdCleaned) {
+          var olds = document.querySelectorAll('.xc-cd-all');
+          for (var oi = 0; oi < olds.length; oi++) { if (olds[oi].parentNode) olds[oi].parentNode.removeChild(olds[oi]); }
+          window.__xcCdCleaned = 1;
+        }
+        var box = b.__xcCdBox;
+        if (!box || !box.parentNode) {
           box = document.createElement('span');
           box.className = 'xc-cd-all';
           box.style.cssText = 'display:block;max-width:720px;margin:2px auto 6px;padding:0 12px;font:700 13px/1.7 "Microsoft YaHei",Arial,sans-serif;color:#c0392b';
           b.parentNode.insertBefore(box, b.nextSibling);
+          b.__xcCdBox = box;
         }
         var target = targetOf(b);
         if (!target) { box.textContent = ''; continue; }
