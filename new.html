@@ -42,12 +42,11 @@ h1{background:linear-gradient(#c32323,#8f1414);color:#ffe08a !important;font-siz
 #bottomnav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:#8a6d3b;text-decoration:none}
 #bottomnav a i{font-style:normal;font-size:16px;line-height:1}
 #bottomnav a.on{color:#b51f1f;font-weight:700}
-body{padding-bottom:64px !important}
 #wrap{padding-bottom:70px}
 @media (prefers-color-scheme: dark){html,body{background:#f5efd8 !important;color:#333 !important}}
 
-#nemi,#hist,#guilv,#tuku,#more-sec{margin-top:14px;background:#fffdf3;border:1px solid #d9c48a;border-radius:10px;padding:10px}
-#nemi h2,#hist h2,#guilv h2,#tuku h2,#more-sec h2{background:linear-gradient(#d42d2d,#a81212) !important;color:#ffe08a !important;margin:-10px -10px 8px !important;padding:8px 0 !important;border-radius:8px 8px 0 0 !important;text-align:center;font-size:16px}
+#nemi,#hist,#more-sec{margin-top:14px;background:#fffdf3;border:1px solid #d9c48a;border-radius:10px;padding:10px}
+#nemi h2,#hist h2,#more-sec h2{background:linear-gradient(#d42d2d,#a81212) !important;color:#ffe08a !important;margin:-10px -10px 8px !important;padding:8px 0 !important;border-radius:8px 8px 0 0 !important;text-align:center;font-size:16px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .nrow{border:1px solid #e6d7ad;border-radius:6px;padding:6px;font-size:12px;background:#fff}
 .nrow b{color:#b51f1f}
@@ -63,9 +62,6 @@ body{padding-bottom:64px !important}
 .zrow .code{color:#666 !important;font-size:12px;margin-left:4px;font-weight:400}
 .pending{color:#a33;font-weight:700}
 .err{color:#a33;text-align:center;padding:8px}
-
-body,#wrap{padding-bottom:84px !important}
-#guilv h2,#tuku h2{background:linear-gradient(#d42d2d,#a81212) !important;color:#ffe08a !important;margin:-10px -10px 8px !important;padding:8px 0 !important;border-radius:8px 8px 0 0 !important;text-align:center;font-size:16px !important}
 </style></head><body><div id="wrap">
 <h1>新港摇钱树</h1>
 <div class="sub">官方开奖信息 · 每 30 秒刷新</div>
@@ -139,24 +135,43 @@ body,#wrap{padding-bottom:84px !important}
     [7,5,3,2,1].forEach(function(n){
       out.push('<div class="zrow"><span class="iss">'+n+'肖</span><span class="zs">'+pool.slice(0,n).map(function(z){return '<span>'+z+'</span>';}).join('')+'</span><span class="code">码:'+hn.slice(0,n).join('.')+'</span></div>');
     });
-    document.getElementById('zl').innerHTML = out.length ? out.join('') : '<div class="err">资料加载中…</div>';
-    var hs = document.getElementById('hs');
-    if (hs) {
-      var his = [];
-      if (manual && manual.nums) his.push({ t: '\u65b0\u6e2f', issue: manual.issue, nums: manual.nums });
-      if (draw && draw.games) { draw.games.forEach(function (g) { if (g.rule === 'MacauOld' || g.rule === 'Happy8') return; his.push({ t: g.rule === 'Macau' ? '\u65b0\u6fb3' : '\u9999\u6e2f', issue: g.issue, nums: g.nums }); }); }
-      hs.innerHTML = his.slice(0, 10).map(function (x) {
-        return '<div class="hitem"><span>' + x.t + ' \u7b2c' + x.issue + '\u671f</span><span>' + (x.nums || []).slice(0, 7).map(function (n) { return n.c; }).join(' ') + '</span></div>';
+    out.push('<div class="zrow" style="border-top:1px solid #e6d7ad;margin-top:4px"></div>');
+    var OUT_TMP=[];
+    rows.slice(0,6).forEach(function(r){
+      var c=r.result&&r.result.c;
+      if(!c||c==='NaN'||r.status==='upcoming'){ out.push('<div class="zrow"><span class="iss">新港'+r.issue+'期</span><span class="pending">【待开】</span></div>'); return; }
+      var hn = (manual.nums||[]).map(function(x){return x.c;});
+      var codes = (r.status==='live' && String(r.issue)===String(manual.issue)) ? hn.join('.') : '';
+      out.push('<div class="zrow"><span class="iss">新港'+r.issue+'期</span><span class="zs">'+ (r.threeZodiac||[]).map(function(z){return '<span>'+z+'</span>';}).join('') +'</span>'+(codes?'<span class="code">码:'+codes+'</span>':'')+'</div>');
+    });
+    document.getElementById('zl').innerHTML = out.length? out.join('') : '<div class="err">资料加载中…</div>';
+    var gl=document.getElementById('gl');
+    if(gl){ gl.innerHTML=(rows.slice(0,8).map(function(r){
+      var c=r.result&&r.result.c; var ok=(c&&c!=='NaN'&&r.status!=='upcoming');
+      return '<div class="hitem"><span>新港'+r.issue+'期 '+(r.oddEven==='双'?'双数':'单数')+' '+((r.threeZodiac||[]).join(''))+'</span><span>'+(ok?('开 '+r.result.z+c):'待开')+'</span></div>';
+    }).join('')) || '<div class="err">暂无数据</div>'; }
+    // 内幕九宫格
+    var nm=document.getElementById('nm');
+    if(nm){
+      nm.innerHTML=rows.slice(0,6).map(function(r){
+        var c=r.result&&r.result.c;
+        var ok=(c&&c!=='NaN');
+        if(!ok) return '<div class="nrow"><b>新港'+r.issue+'期</b> <span style="color:#a33">【待开】</span></div>';
+        return '<div class="nrow"><b>新港'+r.issue+'期</b> '+(r.oddEven==='双'?'【双数】':'【单数】')+
+          ' 主【'+(r.threeZodiac||[]).join('')+'】 开 '+r.result.z+c+' <b>准</b></div>';
       }).join('');
     }
-    var gl = document.getElementById('gl');
-    if (gl) {
-      gl.innerHTML = rows.slice(0, 8).map(function (r) {
-        var c = r.result && r.result.c; var ok = (c && c !== 'NaN' && r.status !== 'upcoming');
-        return '<div class="hitem"><span>\u65b0\u6e2f' + r.issue + '\u671f ' + (r.oddEven === '\u53cc' ? '\u53cc\u6570' : '\u5355\u6570') + ' ' + ((r.threeZodiac || []).join('')) + '</span><span>' + (ok ? ('\u5f00 ' + r.result.z + c) : '\u5f85\u5f00') + '</span></div>';
+    // 历史开奖（最近 10 期）
+    var hs=document.getElementById('hs');
+    if(hs){
+      var his=[];
+      if(draw.games){ draw.games.forEach(function(g){ if(g.rule==='MacauOld'||g.rule==='Happy8') return; his.push({t:g.rule==='Macau'?'新澳':'香港',issue:g.issue,nums:g.nums}); }); }
+      if(manual.nums) his.unshift({t:'新港',issue:manual.issue,nums:manual.nums});
+      hs.innerHTML=his.slice(0,10).map(function(x){
+        return '<div class="hitem"><span>'+x.t+' 第'+x.issue+'期</span><span>'+ (x.nums||[]).slice(0,7).map(function(n){return n.c}).join(' ')+'</span></div>';
       }).join('');
     }
-// 每卡历史入口
+    // 每卡历史入口
     Array.prototype.forEach.call(document.querySelectorAll('#panels .card'),function(c){
       if(c.querySelector('.hlink')) return;
       var d=document.createElement('div'); d.className='hlink';
