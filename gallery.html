@@ -1,0 +1,17 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="color-scheme" content="light only"><meta name="viewport" content="width=device-width,initial-scale=1"><title>图库 · 新港摇钱树</title><style>
+:root{color-scheme:light}html,body{margin:0;background:#F5F1E6;color:#222;font-family:"Microsoft YaHei",Arial,sans-serif;-webkit-text-size-adjust:100%}
+header{display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(#E60012,#B3000E);color:#FFD24D;font-weight:900;font-size:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+header a{margin-left:auto;color:#FFD24D;font-size:14px;text-decoration:none;border:1px solid #FFD24D;border-radius:4px;padding:3px 8px}
+h1{font-size:18px;color:#8A0000;margin:10px 12px 6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px 80px}
+.grid figure{margin:0;background:linear-gradient(#FFFDF6,#FFF3D6);border:1px solid #C8A24A;border-radius:5px;overflow:hidden}
+.grid img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover}
+.grid figcaption{font-size:12px;color:#8a6a3a;text-align:center;padding:5px 2px}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:99;padding:16px}
+#lb.on{display:flex}#lb img{max-width:100%;max-height:90%;border:2px solid #FFD24D;border-radius:6px}
+.nav{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;background:linear-gradient(#A80008,#6E0006);border-top:2px solid #FFD24D}
+.nav a{flex:1;text-align:center;line-height:56px;font-size:14px;color:#FFD24D;text-decoration:none;font-weight:700}
+.nav a.on{background:linear-gradient(#D4000F,#8A0006);color:#fff}
+</style></head><body><header>新港摇钱树 · 图库<a href="index.html">返回首页</a></header><h1>图库（点击查看大图）</h1><div class="grid" id="g"></div><div id="lb"><img id="lbi" alt=""></div>
+<div class="nav"><a href="index.html">首页</a><a href="index.html">资料大全</a><a href="index.html">规律走势</a><a href="index.html">寻宝</a><a class="on" href="gallery.html">图库</a></div>
+<script>(function(){var imgs=["64d4b287-tjb311.webp","b554f6c9-tjb313.jpg","0b7daed9-49123sbx20240609.webp","cac68a23-49123sbx20240609.webp","5bea6564-gengxin.webp","cbcc671c-tjb310.webp"];var g=document.getElementById('g');g.innerHTML=imgs.map(function(n,i){return '<figure><img loading="lazy" src="assets/theme/图库缩略/'+n+'" alt="图'+(i+1)+'"><figcaption>图库 '+(i+1)+'</figcaption></figure>'}).join('');var lb=document.getElementById('lb'),lbi=document.getElementById('lbi');g.addEventListener('click',function(e){if(e.target.tagName==='IMG'){lbi.src=e.target.src;lb.classList.add('on')}});lb.addEventListener('click',function(){lb.classList.remove('on')})})()</script></body></html>
