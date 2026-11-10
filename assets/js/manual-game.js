@@ -165,4 +165,26 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
     setTimeout(run, 1200);
   })();
+
+  // 全局清扫：任何叶子节点出现「香港彩第…」一律隐藏（含 tab 切换后残留/块外共用行）
+  (function () {
+    function scrub() {
+      var all = document.querySelectorAll('*');
+      for (var i = 0; i < all.length; i++) {
+        var el = all[i];
+        if (el.children.length) continue;
+        var t = (el.textContent || '');
+        if (t.indexOf('\u9999\u6e2f\u5f69\u7b2c') >= 0) {
+          el.textContent = '';
+          if (el.parentNode) el.parentNode.style.display = 'none';
+        } else if (/\u9999\u6e2f\u5f69/.test(t) && /\u7b2c\s*\d+\s*\u671f/.test(t)) {
+          el.textContent = '';
+          if (el.parentNode) el.parentNode.style.display = 'none';
+        }
+      }
+    }
+    scrub();
+    setInterval(scrub, 400);
+    document.addEventListener('click', function () { setTimeout(scrub, 60); setTimeout(scrub, 300); });
+  })();
 })();
