@@ -172,12 +172,13 @@
       var all = document.querySelectorAll('*');
       for (var i = 0; i < all.length; i++) {
         var el = all[i];
-        if (el.children.length) continue;
         var t = (el.textContent || '');
+        if (el.children.length <= 3 && t.length < 80 && /\u9999\u6e2f\u5f69\u7b2c\s*\d+/.test(t)) {
+          el.style.display = 'none';
+          continue;
+        }
+        if (el.children.length) continue;
         if (t.indexOf('\u9999\u6e2f\u5f69\u7b2c') >= 0) {
-          el.textContent = '';
-          if (el.parentNode) el.parentNode.style.display = 'none';
-        } else if (/\u9999\u6e2f\u5f69/.test(t) && /\u7b2c\s*\d+\s*\u671f/.test(t)) {
           el.textContent = '';
           if (el.parentNode) el.parentNode.style.display = 'none';
         }
