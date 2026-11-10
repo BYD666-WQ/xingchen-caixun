@@ -61,7 +61,26 @@
           el.textContent = '距开奖 ' + p(h) + ':' + p(m) + ':' + p(s);
         }
         tick(); setInterval(tick, 1000);
-      })();
+        // 玩法块（单双 + 三肖），样式沿用现资料栏目
+  fetch(base() + 'data/manual-play.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (p) {
+      if (!p) return;
+      var app = document.getElementById('app');
+      var anchor = document.getElementById('widgetBox41750');
+      if (!app || !anchor) return;
+      var box = document.createElement('div');
+      box.style.cssText = 'margin:10px auto;max-width:720px;background:#fffef5;border:1px solid #d8ccb4;border-radius:5px;overflow:hidden';
+      var zs = (p.threeZodiac || []).join('');
+      box.innerHTML =
+        '<div style="background:linear-gradient(#f52c17,#d60000);color:#ffd75e;text-align:center;font:700 17px/2.2 \'Microsoft YaHei\',Arial,sans-serif">' + (p.name || '') + '【单双\u2462肖】</div>' +
+        '<div style="padding:8px 12px;font:700 15px/1.9 \'Microsoft YaHei\',Arial,sans-serif;color:#333">' +
+        '<div>' + (p.issue || '') + '期:内幕【' + (p.oddEven || '') + '数】主【' + zs + '】</div>' +
+        '<div style="color:#a33;font-weight:400;font-size:13px">' + (p.note || '') + '</div>' +
+        '</div>';
+      anchor.parentNode.insertBefore(box, anchor.nextSibling);
+    });
+})();
       // 3) 点击切换
       tab.addEventListener('click', function () {
         qsa('.baomalaodaName').forEach(function (n) {
