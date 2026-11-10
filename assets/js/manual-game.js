@@ -293,4 +293,31 @@
       open();
     }, true);
   })();
+
+  // 系统文案（站名/标语/公告/免责）· 读 data/site-copy.json，缺省保持现状
+  (function () {
+    fetch(base() + 'data/site-copy.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (c) {
+        if (!c) return;
+        if (c.brand) {
+          var logo = document.querySelector('.xc-logo');
+          if (logo) logo.textContent = c.brand;
+          var fb = document.querySelector('.xc-footer-brand');
+          if (fb) fb.textContent = c.brand;
+          if (document.title) document.title = c.brand + (document.title.split('\u00b7')[1] ? ' \u00b7 ' + document.title.split('\u00b7')[1] : '');
+        }
+        if (c.disclaimer) {
+          var notes = document.querySelectorAll('.xc-footer-note');
+          if (notes.length) notes[0].textContent = c.disclaimer;
+        }
+        if (c.notice) {
+          var bar = document.createElement('div');
+          bar.style.cssText = 'background:#fff3cd;color:#8a6d3b;text-align:center;font:12px/2 \'Microsoft YaHei\',Arial,sans-serif;padding:0 8px';
+          bar.textContent = c.notice;
+          var top = document.querySelector('.topbar') || document.querySelector('header');
+          if (top && top.parentNode) top.parentNode.insertBefore(bar, top.nextSibling);
+        }
+      }).catch(function () {});
+  })();
 })();
