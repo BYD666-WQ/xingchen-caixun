@@ -153,6 +153,8 @@ header{background-color:#B3000E!important}
 </style><style id="xc-f10">
 .tabs .badge-img{width:28px!important;height:28px!important;display:block!important;flex:0 0 28px!important}
 .tabs svg.badge-svg{display:none!important}
+</style><style id="xc-cd-big">
+#xc-cd{font-size:18px!important;font-weight:700!important;color:#C90000!important;-webkit-text-fill-color:#C90000!important;background:none!important}
 </style></head><body><div class="notice">本站数据仅供参考 · 开奖结果以官方公布为准</div>
 <header><div class="logo">新港摇钱树</div><div class="seal">正版</div></header>
 <nav class="tabs"><a class="on">新港</a><a>新澳</a><a>香港</a></nav>
@@ -165,6 +167,8 @@ header{background-color:#B3000E!important}
 </section>
 <div class="nav"><a class="on">首页</a><a>资料大全</a><a>规律走势</a><a>寻宝</a><a href="gallery.html">图库</a></div><script>
 (function(){
+  var TIME_TABLE={newhk:'21:34',newmo:'21:30',hk:'21:30'};
+  window.__TIME_TABLE=TIME_TABLE;
   var SRC=['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/',''];
   function get(p){var i=0;function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var u=SRC[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
   function extra(){var host=document.querySelector('.nav');if(!host)return;document.querySelectorAll('section.mini, .mini').forEach(function(m){var t=(m.innerText||'');if(t.indexOf('内幕')>=0)m.remove()});var ex=document.getElementById('xc-extra');if(!ex){ex=document.createElement('div');ex.id='xc-extra';host.parentNode.insertBefore(ex,host)}return ex}
@@ -216,7 +220,7 @@ header{background-color:#B3000E!important}
     document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.addEventListener('click',function(){show(['newhk','newmo','hk'][i])})});
     // 倒计时
     var hd=document.querySelector('.card .hd');if(hd&&!document.querySelector('#xc-cd')){var s=document.createElement('span');s.id='xc-cd';s.className='xc-cd';s.style.cssText='margin-left:8px;font-size:13px;color:#8A0000;font-weight:700';hd.appendChild(s)}
-    function tick(){var e=document.getElementById('xc-cd');if(!e)return;var n=new Date();var t=new Date(n.getFullYear(),n.getMonth(),n.getDate(),21,34,0);if(t<=n)t=new Date(t.getTime()+864e5);var left=Math.floor((t-n)/1000);function p(x){return (x<10?'0':'')+x}e.textContent='距开奖 '+p(Math.floor(left/3600))+':'+p(Math.floor(left%3600/60))+':'+p(left%60)}
+    function tick(){var e=document.getElementById('xc-cd');if(!e)return;var n=new Date();var hm=(TIME_TABLE.newhk||'21:34').split(':');var t=new Date(n.getFullYear(),n.getMonth(),n.getDate(),parseInt(hm[0],10),parseInt(hm[1],10),0);if(t<=n)t=new Date(t.getTime()+864e5);var left=Math.floor((t-n)/1000);function p(x){return (x<10?'0':'')+x}e.textContent='距开奖 '+p(Math.floor(left/3600))+':'+p(Math.floor(left%3600/60))+':'+p(left%60)}
     tick();setInterval(tick,1000);
   }).catch(function(){});
 })();
