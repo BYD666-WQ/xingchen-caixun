@@ -34,6 +34,12 @@ td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
 <header><b>香港摇钱树 · 内容管理</b><span id="who" style="font-size:12px;opacity:.9"></span></header>
 <div class="wrap">
 
+<div class="panel" id="login-panel" style="display:none"><details open><summary>🔐 登录</summary><div class="body">
+  <label>后台密码</label><input id="pw" type="password" autocomplete="off" placeholder="输入密码">
+  <div class="row"><button id="btn-login">登录</button><button class="gray" id="btn-logout" style="display:none">退出登录</button></div>
+  <p style="font-size:12px;color:#888;margin:8px 0 0">登录态保存在 HttpOnly cookie，12 小时有效；密码不会出现在浏览器里。</p>
+</div></details></div>
+
 <div class="panel"><details open><summary>① 彩种配置</summary><div class="body">
   <label>彩种名称（tab 与标题）</label><input id="g-name">
   <label>当前期号</label><input id="g-issue" inputmode="numeric">
@@ -82,6 +88,8 @@ td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
 </div>
 <div id="msg"></div>
 <script>
+var WORKER_BASE = ''; // 例：https://xingchen-cms.xxx.workers.dev（部署 Worker 后填这里）
+var BACKEND = WORKER_BASE ? 'worker' : 'contents';
 var ATTRS = {"10":{"z":"鸡","c":"蓝","w":"火"},"11":{"z":"猴","c":"绿","w":"火"},"12":{"z":"羊","c":"红","w":"金"},"13":{"z":"马","c":"红","w":"金"},"14":{"z":"蛇","c":"蓝","w":"水"},"15":{"z":"龙","c":"蓝","w":"水"},"16":{"z":"兔","c":"绿","w":"木"},"17":{"z":"虎","c":"绿","w":"木"},"18":{"z":"牛","c":"红","w":"火"},"19":{"z":"鼠","c":"红","w":"火"},"20":{"z":"猪","c":"蓝","w":"土"},"21":{"z":"狗","c":"绿","w":"土"},"22":{"z":"鸡","c":"绿","w":"水"},"23":{"z":"猴","c":"红","w":"水"},"24":{"z":"羊","c":"红","w":"木"},"25":{"z":"马","c":"蓝","w":"木"},"26":{"z":"蛇","c":"蓝","w":"金"},"27":{"z":"龙","c":"绿","w":"金"},"28":{"z":"兔","c":"绿","w":"土"},"29":{"z":"虎","c":"红","w":"土"},"30":{"z":"牛","c":"红","w":"水"},"31":{"z":"鼠","c":"蓝","w":"水"},"32":{"z":"猪","c":"绿","w":"火"},"33":{"z":"狗","c":"绿","w":"火"},"34":{"z":"鸡","c":"红","w":"金"},"35":{"z":"猴","c":"红","w":"金"},"36":{"z":"羊","c":"蓝","w":"土"},"37":{"z":"马","c":"蓝","w":"土"},"38":{"z":"蛇","c":"绿","w":"木"},"39":{"z":"龙","c":"绿","w":"木"},"40":{"z":"兔","c":"红","w":"火"},"41":{"z":"虎","c":"蓝","w":"火"},"42":{"z":"牛","c":"蓝","w":"金"},"43":{"z":"鼠","c":"绿","w":"金"},"44":{"z":"猪","c":"绿","w":"水"},"45":{"z":"狗","c":"红","w":"水"},"46":{"z":"鸡","c":"红","w":"木"},"47":{"z":"猴","c":"蓝","w":"木"},"48":{"z":"羊","c":"蓝","w":"火"},"49":{"z":"马","c":"绿","w":"火"},"01":{"z":"马","c":"红","w":"水"},"02":{"z":"蛇","c":"红","w":"火"},"03":{"z":"龙","c":"蓝","w":"火"},"04":{"z":"兔","c":"蓝","w":"金"},"05":{"z":"虎","c":"绿","w":"金"},"06":{"z":"牛","c":"绿","w":"土"},"07":{"z":"鼠","c":"红","w":"土"},"08":{"z":"猪","c":"红","w":"木"},"09":{"z":"狗","c":"蓝","w":"木"}};
 var REPO='BYD666-WQ/xingchen-caixun', BRANCH='main', KEY='xc-gh-pat';
 var CMS_BACKEND='contents'; // contents | gh-actions（B 方案留口，未实现时走 contents）
@@ -121,11 +129,27 @@ async function putFile(path,obj,msg){"use strict";
   var payload={message:msg,content:content,branch:BRANCH};if(sha)payload.sha=sha;
   await api('https://api.github.com/repos/'+REPO+'/contents/'+path,{method:'PUT',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'}});
 }
+async function wfetch(path, opt) {
+  opt = opt || {}; opt.credentials = 'include';
+  opt.headers = Object.assign({ 'content-type': 'application/json' }, opt.headers || {});
+  var r = await fetch(WORKER_BASE + path, opt);
+  var j = null; try { j = await r.json(); } catch (e) {}
+  if (!r.ok) throw new Error((j && j.error) || ('HTTP ' + r.status));
+  return j;
+}
 async function loadAll(){
   var t=Date.now();
-  var dr=await fetch(RAW+'data/manual-draw.json?t='+t).then(function(r){return r.json()});
-  var pl=await fetch(RAW+'data/manual-play.json?t='+t).then(function(r){return r.ok?r.json():{}}).catch(function(){return{}});
-  var cp={};try{cp=await fetch(RAW+'data/site-copy.json?t='+t).then(function(r){return r.ok?r.json():{}})}catch(e){}
+  var dr, pl, cp = {};
+  if (BACKEND === 'worker') {
+    var cfg = await wfetch('/api/config');
+    dr = cfg.files['hongkong-draw']; pl = cfg.files['play'] || {}; cp = cfg.files['site-copy'] || {};
+  } else {
+    dr = await fetch(RAW + 'data/manual-draw.json?t=' + t).then(function (r) { return r.json(); });
+  }
+  if (BACKEND !== 'worker') {
+    pl = await fetch(RAW + 'data/manual-play.json?t=' + t).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
+    try { cp = await fetch(RAW + 'data/site-copy.json?t=' + t).then(function (r) { return r.ok ? r.json() : {}; }); } catch (e) {}
+  }
   $('c-brand').value=cp.brand||'香港摇钱树'; $('c-slogan').value=cp.slogan||'官方开奖信息';
   $('c-notice').value=cp.notice||''; $('c-disclaimer').value=cp.disclaimer||'数据来自官方公开信息，仅供参考。';
   draw=dr;play=pl;
@@ -195,10 +219,16 @@ async function save(){
   var newPlay={name:newDraw.name,issue:newDraw.issue,oddEven:$('p-oe').value,threeZodiac:zs,note:$('p-note').value.trim(),status:'live',updated:new Date().toISOString()};
   var btn=$('btn-save');btn.disabled=true;btn.textContent='提交中…';
   try{
-    await saveFile('data/manual-draw.json',newDraw,'CMS: update draw');
-    await saveFile('data/manual-play.json',newPlay,'CMS: update play');
     var copy={brand:$('c-brand').value.trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
-    await saveFile('data/site-copy.json',copy,'CMS: update site copy');
+    if (BACKEND === 'worker') {
+      await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'hongkong-draw',data:newDraw})});
+      await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'play',data:newPlay})});
+      await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'site-copy',data:copy})});
+    } else {
+      await saveFile('data/manual-draw.json',newDraw,'CMS: update draw');
+      await saveFile('data/manual-play.json',newPlay,'CMS: update play');
+      await saveFile('data/site-copy.json',copy,'CMS: update site copy');
+    }
     Msg('已提交，约 1-2 分钟生效（正在自动确认…）',true);
     poll();
     draw=newDraw;play=newPlay;renderPreview();
@@ -243,5 +273,19 @@ $('btn-save').addEventListener('click',save);
 $('btn-clear').addEventListener('click',function(){localStorage.removeItem(KEY);$('token').value='';Msg('已清除本机 token',true)});
 $('btn-refresh').addEventListener('click',function(){loadAll().then(function(){Msg('已重新载入线上数据',true)})});
 $('token').value=token();
+if (BACKEND === 'worker') {
+  $('login-panel').style.display = '';
+  $('btn-login').addEventListener('click', async function(){
+    var b=this; b.disabled=true; b.textContent='登录中…';
+    try { await wfetch('/api/login',{method:'POST',body:JSON.stringify({password:$('pw').value})});
+      Msg('登录成功',true); $('btn-logout').style.display=''; loadAll().then(commitList).catch(function(){});
+    } catch(e){ Msg('登录失败：'+e.message,false); }
+    b.disabled=false; b.textContent='登录';
+  });
+  $('btn-logout').addEventListener('click', async function(){
+    try { await wfetch('/api/logout',{method:'POST',body:'{}'}); } catch(e){}
+    Msg('已退出登录',true); $('btn-logout').style.display='none';
+  });
+}
 loadAll().then(commitList).catch(function(e){Msg('载入失败：'+e.message,false)});
 </script></body></html>
