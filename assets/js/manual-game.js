@@ -486,4 +486,40 @@
       if (!box) return;
       box.innerHTML = '<div id="xc-banner-num">' + String(num).slice(0, 12) + '</div>';
     }).catch(function () {});
+
+  // 资料区「七肖/五肖/三肖/二肖/一肖」换新香港数据 + 移除快乐8开奖块/tab
+  (function () {
+    fetch(base() + 'data/manual-ziliao.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (z) {
+        var table = document.querySelector('table.sevenxiaosevenma');
+        if (table && z && z.rows && z.rows.length) {
+          var pool = [];
+          z.rows.forEach(function (row) { (row.threeZodiac || []).forEach(function (zz) { if (pool.indexOf(zz) < 0) pool.push(zz); }); });
+          var base_ = pool.concat(['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪']).slice(0, 7);
+          var latest = z.rows.find(function (r) { return r.status !== 'upcoming'; }) || z.rows[0];
+          var tbody = table.querySelector('tbody') || table;
+          function rowHtml(label, n) {
+            var zs = base_.slice(0, n).map(function (zz) { return '<span>' + zz + '</span>'; }).join('');
+            return '<tr><td class="sevenxiaosevenma-left-td">' + label + ':<span class="sevenxiaosevenma-custome-text" style="font-size:clamp(1rem,4vw,1.4rem);color:#c00">' + zs + '</span></td></tr>';
+          }
+          tbody.innerHTML = rowHtml('\u65b0\u9999\u6e2f' + latest.issue + '\u671f\u4e03\u8096', 7) + rowHtml('\u4e94\u8096', 5) + rowHtml('\u4e09\u8096', 3) + rowHtml('\u4e8c\u8096', 2) + rowHtml('\u4e00\u8096', 1);
+        }
+      }).catch(function () {});
+    function dropHappy8() {
+      var tabs = document.querySelectorAll('#widgetBox41362 .tie > div');
+      for (var i = 0; i < tabs.length; i++) { if ((tabs[i].textContent || '').indexOf('\u5feb\u4e508') >= 0) { tabs[i].parentNode.removeChild(tabs[i]); break; } }
+      var names = document.querySelectorAll('.baomalaodaName');
+      for (var j = 0; j < names.length; j++) {
+        if ((names[j].textContent || '').replace(/\s+/g, '') === '\u5feb\u4e508') {
+          var b = names[j];
+          while (b && b !== document.body) { if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) break; b = b.parentNode; }
+          if (b && b.parentNode) b.parentNode.removeChild(b);
+          var cd = document.querySelector('.xc-cd-all');
+          break;
+        }
+      }
+    }
+    setTimeout(dropHappy8, 1200); setTimeout(dropHappy8, 2600);
+  })();
 })();
