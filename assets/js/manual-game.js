@@ -182,11 +182,22 @@
       }
       t(); setInterval(t, 1000);
     }
+    function isInNewHk(el) {
+      var b = el;
+      while (b && b !== document.body) {
+        if (b.querySelector && b.querySelectorAll && b.querySelectorAll('.baomalaodaMa').length >= 7) {
+          var nm = b.querySelector('.baomalaodaName');
+          return !!(nm && (nm.textContent || '').indexOf('\u65b0\u9999\u6e2f') >= 0);
+        }
+        b = b.parentNode;
+      }
+      return false;
+    }
     function scrub() {
       var all = document.querySelectorAll('*');
       for (var i = 0; i < all.length; i++) {
         var el = all[i], t = (el.textContent || '');
-        if (el.children.length <= 5 && t.length < 140 && /\u9999\u6e2f\u5f69\u7b2c\s*\d+/.test(t)) {
+        if (isInNewHk(el) && !el.querySelector('.baomalaodaName') && el.children.length <= 5 && t.length < 140 && /\u9999\u6e2f\u5f69\u7b2c\s*\d+/.test(t)) {
           if (el.getAttribute('data-xc-fixed') === '1') continue;
           el.setAttribute('data-xc-fixed', '1');
           el.textContent = '\u65b0\u9999\u6e2f\u7b2c2\u671f: \u6bcf\u5929 21:34  ';
