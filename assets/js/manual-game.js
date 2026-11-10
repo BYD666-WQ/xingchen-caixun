@@ -3,6 +3,25 @@
 (function () {
   'use strict';
 
+  // 数据直读：raw.githubusercontent 主源（提交秒级生效，无需构建）→ 本地 Pages 副本兜底
+  var XC_RAW = 'https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/';
+  function xcRawBase() { return XC_RAW; }
+  async function fetchJSON(path) {
+    for (var i = 0; i < 3; i++) {
+      try {
+        var r = await fetch(xcRawBase() + path + '?v=' + Date.now(), { cache: 'no-store' });
+        if (r.ok) return await r.json();
+      } catch (e) {}
+      try {
+        var r2 = await fetch(base() + path + '?t=' + Date.now(), { cache: 'no-store' });
+        if (r2.ok) return await r2.json();
+      } catch (e2) {}
+      await new Promise(function (res) { setTimeout(res, 300 * (i + 1)); });
+    }
+    return null;
+  }
+
+
   var XC_SHOW_WUXING = (localStorage.getItem('xc:showWuxing') !== '0');
   function xcSetBallLabel(xiao, zodiac, wuxing) {
     if (!xiao) return;
@@ -327,8 +346,8 @@
 
   // 系统文案（站名/标语/公告/免责）· 读 data/site-copy.json，缺省保持现状
   (function () {
-    fetch(base() + 'data/site-copy.json?t=' + Date.now(), { cache: 'no-store' })
-      .then(function (r) { return r.ok ? r.json() : null; })
+    fetchJSON('data/site-copy.json')
+      .then(function (j) { return j; })
       .then(function (c) {
         if (!c) return;
         if (c.brand) {
@@ -624,5 +643,43 @@
         });
       });
     });
+  })();
+
+  // draw.json 直读：刷新各彩种块的期号与号码（不用等 Pages 构建）
+  (function () {
+    var MAP = { '\u65b0\u6fb3\u5f69': 'Macau', '\u8001\u6fb3\u5f69': 'MacauOld', '\u9999\u6e2f\u5f69': 'HongKong', '\u5feb\u4e508': 'Happy8' };
+    function colorOf(c) {
+      var n = parseInt(c, 10);
+      var R = [1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46], B = [3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
+      return R.indexOf(n) >= 0 ? '#e71607' : (B.indexOf(n) >= 0 ? '#2873e6' : '#1fb61d');
+    }
+    async function refreshDraw() {
+      var d = await fetchJSON('data/draw.json');
+      if (!d || !d.games) return;
+      var byRule = {};
+      d.games.forEach(function (g) { byRule[g.rule] = g; });
+      document.querySelectorAll('.baomalaodaName').forEach(function (n) {
+        var nm = (n.textContent || '').replace(/\s+/g, '');
+        var rule = MAP[nm];
+        if (!rule || !byRule[rule]) return;
+        var b = n;
+        while (b && b !== document.body) { if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) break; b = b.parentNode; }
+        if (!b) return;
+        var qi = b.querySelector('.baomalaodaQi');
+        if (qi && byRule[rule].issue) qi.textContent = byRule[rule].issue;
+        var tiles = b.querySelectorAll('.baomalaodaMa');
+        var nums = byRule[rule].nums || [];
+        for (var i = 0; i < tiles.length && i < nums.length; i++) {
+          var t = tiles[i].parentNode;
+          var c = String(nums[i].c || '').replace(/^0?(\d)$/, '0$1');
+          tiles[i].textContent = (c.length === 1 ? '0' + c : c);
+          if (t) t.style.background = colorOf(c);
+          var zs = t ? t.querySelector('.baomalaodaXiao') : null;
+          if (zs) zs.textContent = nums[i].z || zs.textContent;
+        }
+      });
+    }
+    setTimeout(refreshDraw, 1500);
+    setInterval(refreshDraw, 60000);
   })();
 })();
