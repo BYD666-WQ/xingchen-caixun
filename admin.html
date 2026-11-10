@@ -66,20 +66,20 @@ td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
   <label>玩法文案</label><input id="p-note">
 </div></details></div>
 
-<div class="panel"><details><summary>⑤ 系统文案</summary><div class="body">
+<div class="panel"><details><summary>④ 系统文案</summary><div class="body">
   <label>站名</label><input id="c-brand" placeholder="香港摇钱树">
   <label>标语</label><input id="c-slogan" placeholder="官方开奖信息">
   <label>公告条（留空不显示）</label><input id="c-notice" placeholder="如：本站数据仅供参考">
   <label>页脚免责声明</label><textarea id="c-disclaimer" style="min-height:80px"></textarea>
 </div></details></div>
 
-<div class="panel"><details><summary>⑥ 资料区（单双③肖）</summary><div class="body">
+<div class="panel"><details><summary>⑤ 资料区（单双③肖）</summary><div class="body">
   <label>每行一条：期号 单双 三肖 开奖号（例：313 单 狗马猴 43）</label>
   <textarea id="zl-bulk" style="min-height:140px" placeholder="313 单 狗马猴 43"></textarea>
   <p style="font-size:12px;color:#888;margin:6px 0 0">保存后资料区会整体替换成这里的内容（期号会显示为「新香港X期:内幕」）。</p>
 </div></details></div>
 
-<div class="panel"><details><summary>④ 发布与历史版本</summary><div class="body">
+<div class="panel"><details><summary>⑥ 发布与历史版本</summary><div class="body">
   <label>GitHub PAT（只需一次，fine-grained：本仓库 Contents 读写）</label>
   <input id="token" type="password" autocomplete="off" placeholder="粘贴 fine-grained PAT">
   <div class="row">
@@ -169,6 +169,7 @@ async function loadAll(){
   renderPreview(); renderHistory();
 }
 function renderPreview(){
+  if (typeof updateNumsHint === 'function') updateNumsHint();
   var list=parseNums($('g-nums').value);
   $('preview').innerHTML=list.map(function(c){var a=attrsOf(c);return '<span class="ball" style="background:'+ballColor(a.c)+'">'+c+'<i>'+(a.w||'')+'/'+(a.z||'')+'</i></span>'}).join('');
 }
