@@ -137,6 +137,13 @@ header{background-color:#B3000E!important}
 .openbar .ol b{font-size:15px!important;line-height:1.1!important}
 .openbar .ol span{font-size:11px!important;line-height:1.1!important}
 .openbar .ob{flex:1 1 auto!important;min-width:0!important}
+</style><style id="xc-f8">
+.tabs .tab,.tabs a{gap:4px!important;overflow:visible!important}
+.tabs svg.badge-svg{width:34px!important;height:34px!important;min-width:34px!important;display:block!important;flex:0 0 34px!important;opacity:1!important;visibility:visible!important}
+.openbar .ol{max-width:48px!important;width:48px!important;overflow:hidden!important;font-size:12px!important;letter-spacing:-.2px!important}
+.openbar .ol b{font-size:12px!important;line-height:1.2!important;letter-spacing:-.2px!important}
+.openbar .ol span{font-size:10px!important;line-height:1.2!important}
+.openbar .ob{margin-left:4px!important}
 </style></head><body><div class="notice">本站数据仅供参考 · 开奖结果以官方公布为准</div>
 <header><div class="logo">新港摇钱树</div><div class="seal">正版</div></header>
 <nav class="tabs"><a class="on">新港</a><a>新澳</a><a>香港</a></nav>
@@ -151,7 +158,7 @@ header{background-color:#B3000E!important}
 (function(){
   var SRC=['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/',''];
   function get(p){var i=0;function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var u=SRC[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
-  function extra(){var host=document.querySelector('.nav');if(!host)return;var ex=document.getElementById('xc-extra');if(!ex){ex=document.createElement('div');ex.id='xc-extra';host.parentNode.insertBefore(ex,host)}return ex}
+  function extra(){var host=document.querySelector('.nav');if(!host)return;document.querySelectorAll('section.mini, .mini').forEach(function(m){var t=(m.innerText||'');if(t.indexOf('内幕')>=0)m.remove()});var ex=document.getElementById('xc-extra');if(!ex){ex=document.createElement('div');ex.id='xc-extra';host.parentNode.insertBefore(ex,host)}return ex}
   Promise.all([get('data/manual-draw.json'),get('data/manual-ziliao.json')]).then(function(r){
     var md=r[0]||{},zl=r[1]||{},rows=(zl.rows||[]).slice(0,12);
     var ex=extra();if(!ex)return;
