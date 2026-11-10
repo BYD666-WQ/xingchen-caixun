@@ -74,8 +74,8 @@ h1{font:900 27px/1.3 "Microsoft YaHei",Arial,sans-serif;color:#c0392b;text-align
       cards.push('<div class="card '+(state.tab===key?'':'hide')+'"><h2>'+name+' 第'+issue+'期</h2>'+extra+'<div class="balls">'+balls(nums)+'</div>'+(daily?'<div class="cd">'+cdText(daily)+'</div>':'')+'</div>');
     }
     card('newhk','新港',manual.issue,manual.nums,manual.drawTime?('<div class="meta">'+manual.drawTime+'</div>'):'',manual.dailyTime);
-    if(byRule.Macau) card('newmo','新澳',byRule.Macau.issue,byRule.Macau.nums,'','');
-    if(byRule.HongKong) card('hk','香港',byRule.HongKong.issue,byRule.HongKong.nums,'','');
+    if(byRule.Macau) card('newmo','新澳',byRule.Macau.issue,byRule.Macau.nums,'<div class="meta">每天 21:30</div>','21:30');
+    if(byRule.HongKong) card('hk','香港',byRule.HongKong.issue,byRule.HongKong.nums,'<div class="meta">每天 21:30</div>','21:30');
     if(!cards.length) cards.push('<div class="err">数据获取中…</div>');
     document.getElementById('panels').innerHTML=cards.join('');
     Array.prototype.forEach.call(document.querySelectorAll('#panels .card'),function(c,i){ c.style.display = (['newhk','newmo','hk'][i]===state.tab)?'':'none'; });
@@ -84,7 +84,9 @@ h1{font:900 27px/1.3 "Microsoft YaHei",Arial,sans-serif;color:#c0392b;text-align
     rows.slice(0,6).forEach(function(r){
       var c=r.result&&r.result.c;
       if(!c||c==='NaN'||r.status==='upcoming'){ out.push('<div class="zrow"><span class="iss">新港'+r.issue+'期</span><span class="pending">【待开】</span></div>'); return; }
-      out.push('<div class="zrow"><span class="iss">新港'+r.issue+'期</span><span class="zs">'+ (r.threeZodiac||[]).map(function(z){return '<span>'+z+'</span>';}).join('') +'</span><span class="code">码:'+((draw.games&&0)||'')+'</span></div>');
+      var hn = (manual.nums||[]).map(function(x){return x.c;});
+      var codes = (r.status==='live' && String(r.issue)===String(manual.issue)) ? hn.join('.') : '';
+      out.push('<div class="zrow"><span class="iss">新港'+r.issue+'期</span><span class="zs">'+ (r.threeZodiac||[]).map(function(z){return '<span>'+z+'</span>';}).join('') +'</span>'+(codes?'<span class="code">码:'+codes+'</span>':'')+'</div>');
     });
     document.getElementById('zl').innerHTML = out.length? out.join('') : '<div class="err">资料加载中…</div>';
     var foot=document.querySelector('.upd');
