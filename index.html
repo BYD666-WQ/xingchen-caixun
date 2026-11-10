@@ -265,7 +265,7 @@ body{font-size:18px}
     var hist=rows.slice(0,10).map(function(r){
       var c=r.result&&r.result.c,ok=(c&&c!=='NaN'&&r.status!=='upcoming');
       var nums=ok?((r.result&&r.result.nums)||[]):[];
-      return '<div class="hitem"><span>新港 '+r.issue+'期</span><span class="st">'+(ok?((r.threeZodiac||[]).join('')+' 开'+(r.result.z||'')+c):'待开')+'</span></div>';
+      return '<div class="hitem"><span>新港 '+r.issue+'期&nbsp;</span><span class="st">'+(ok?((r.threeZodiac||[]).join('')+' 开'+(r.result.z||'')+c):'待开')+'</span></div>';
     }).join('');
     var gl=rows.slice(0,8).map(function(r){
       var c=r.result&&r.result.c,ok=(c&&c!=='NaN'&&r.status!=='upcoming');
