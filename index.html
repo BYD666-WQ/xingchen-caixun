@@ -160,7 +160,7 @@ header{background-color:#B3000E!important}
     var his=rows.slice(0,10).map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');return '<div class="row"><i>'+d.issue+'期</i><span>'+(ok?((d.threeZodiac||[]).join('')+' 开'+(d.result.z||'')+c):'待开')+'</span></div>'}).join('');
     var gl=rows.slice(0,8).map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');return '<div class="row"><i>'+d.issue+'期</i><span>'+(d.oddEven==='双'?'双数':'单数')+'</span><em>'+(ok?('主'+((d.threeZodiac||[]).join(''))+' 开'+(d.result.z||'')+c):'待开')+'</em></div>'}).join('');
     var gal=['64d4b287-tjb311.webp','b554f6c9-tjb313.jpg','0b7daed9-49123sbx20240609.webp','cac68a23-49123sbx20240609.webp','5bea6564-gengxin.webp','cbcc671c-tjb310.webp'].map(function(n){return '<img src="assets/theme/图库缩略/'+n+'" style="width:31%;border:1px solid #C8A24A;border-radius:4px">'}).join('');
-    ex.innerHTML='<div style="height:320px"></div><section class="mini"><h5>内幕 · 单双③肖</h5>'+nmi+'</section>'+
+    ex.innerHTML='<section class="mini"><h5>内幕 · 单双③肖</h5>'+nmi+'</section>'+
       '<section class="mini"><h5>资料大全</h5>'+zli+'</section>'+
       '<section class="mini"><h5>图库</h5><div style="display:flex;flex-wrap:wrap;gap:4px;padding:8px">'+gal+'</div></section>'+
       '<section class="mini"><h5>历史开奖记录</h5>'+his+'</section>'+
