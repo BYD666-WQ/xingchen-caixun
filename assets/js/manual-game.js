@@ -1,4 +1,4 @@
-/* 新彩种（可乐手动开奖）· 纯前端占位渲染：在「香港彩」前面插入 tab 与号码块
+/* 新彩种（手动开奖）· 纯前端占位渲染：在「香港彩」前面插入 tab 与号码块
    数据来自 data/manual-draw.json；标注「示例」直到接入 GitHub Actions 手动开奖 */
 (function () {
   'use strict';
