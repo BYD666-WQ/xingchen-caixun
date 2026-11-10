@@ -64,6 +64,19 @@
         }
       });
       hkBlock.parentNode.insertBefore(block, hkBlock);
+      // 2.4) 下一期行（宽松匹配，覆盖克隆来的其它彩种文案）
+      (function () {
+        var nextIssue = (parseInt(d.issue, 10) || 1) + 1;
+        var target = (d.name || '\u65b0\u9999\u6e2f') + '\u7b2c' + nextIssue + '\u671f: ' + (d.drawTime || '\u6bcf\u5929 21:34');
+        var els = block.querySelectorAll('*');
+        for (var i = 0; i < els.length; i++) {
+          var el = els[i];
+          if (el.children.length) continue;
+          var t = (el.textContent || '').trim();
+          if (/\u7b2c\s*\d+\s*\u671f\s*[:\uff1a]/.test(t)) { el.textContent = target; }
+          else if (/\u7b2c\s*\d+\s*\u671f/.test(t) && t.length < 40) { el.textContent = target; }
+        }
+      })();
       // 2.5) 下一期行 + 倒计时（必须覆盖克隆来的香港彩文本）
       (function () {
         var nextIssue = (parseInt(d.issue, 10) || 1) + 1;
