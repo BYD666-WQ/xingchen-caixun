@@ -389,6 +389,7 @@
     function pad(n) { return (n < 10 ? '0' : '') + n; }
     function targetOf(block) {
       var nodes = block.querySelectorAll('*');
+      var hhmm = null;
       for (var i = 0; i < nodes.length; i++) {
         if (nodes[i].children.length) continue;
         var t = (nodes[i].textContent || '').replace(/\s+/g, '');
@@ -396,9 +397,19 @@
         if (m) {
           var now = new Date();
           var d = new Date(now.getFullYear(), parseInt(m[1], 10) - 1, parseInt(m[2], 10), parseInt(m[3], 10), parseInt(m[4], 10), 0);
-          if (d.getTime() < now.getTime() - 86400000) d = new Date(d.getTime() + 365 * 86400000);
+          while (d.getTime() <= now.getTime()) d = new Date(d.getTime() + 86400000);
           return d;
         }
+        if (!hhmm) {
+          var m2 = t.match(/(\d{1,2})[:：](\d{2})/);
+          if (m2) hhmm = [parseInt(m2[1], 10), parseInt(m2[2], 10)];
+        }
+      }
+      if (hhmm) {
+        var n2 = new Date();
+        var t2 = new Date(n2.getFullYear(), n2.getMonth(), n2.getDate(), hhmm[0], hhmm[1], 0);
+        while (t2.getTime() <= n2.getTime()) t2 = new Date(t2.getTime() + 86400000);
+        return t2;
       }
       return null;
     }
