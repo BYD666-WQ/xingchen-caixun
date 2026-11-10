@@ -113,6 +113,11 @@ header{background-color:#B3000E!important}
 .openbar .plus{flex:0 0 6px!important}
 .openbar .tile{flex:1 1 0!important;min-width:0!important;border:0!important}
 .openbar .refresh,.openbar .bar{flex:0 0 4px!important}
+</style><style id="xc-f4">
+.openbar .plus{flex:0 0 24px!important;font-size:24px!important;font-weight:700!important;color:#8A0000!important;-webkit-text-fill-color:#8A0000!important;margin:0 4px!important;line-height:1!important}
+.next .rf,.nav .badge,.nav .zhun,.mini u{background:#FFD24D!important;background-image:none!important;color:#8A0000!important;-webkit-text-fill-color:#8A0000!important;background-clip:border-box!important;-webkit-background-clip:border-box!important;border:1px solid #B8860B!important;box-shadow:none!important}
+.nav .zhun{border-radius:50%!important;border-width:2px!important}
+@media (forced-colors: active){.zhun,.rf,.badge,u{forced-color-adjust:none!important;color:#8A0000!important;background:#FFD24D!important}}
 </style></head><body><div class="notice">本站数据仅供参考 · 开奖结果以官方公布为准</div>
 <header><div class="logo">新港摇钱树</div><div class="seal">正版</div></header>
 <nav class="tabs"><a class="on">新港</a><a>新澳</a><a>香港</a></nav>
@@ -159,5 +164,20 @@ header{background-color:#B3000E!important}
   ob.querySelectorAll('.tile').forEach(function(t){t.classList.add('ob-tile');t.style.flex='1 1 0';t.style.minWidth='0';t.style.border='0';t.style.boxShadow='none';t.style.width='auto'});
  }
  setTimeout(fix,300);setTimeout(fix,1200);setTimeout(fix,2500);
+})();
+</script><script>
+(function(){
+ function go(){
+  // tab 徽章
+  function lotus(bg){return '<svg viewBox="0 0 34 34" width="34" height="34"><circle cx="17" cy="17" r="16" fill="'+bg+'" stroke="#fff" stroke-width="2"/><g fill="#fff"><path d="M17 8c2 3 2 6 0 9-2-3-2-6 0-9z"/><path d="M9 13c3 1 5 4 5 7-3-1-5-4-5-7z"/><path d="M25 13c-3 1-5 4-5 7 3-1 5-4 5-7z"/><path d="M8 20c3 0 6 1 8 3-3 1-6 0-8-3z"/><path d="M26 20c-3 0-6 1-8 3 3 1 6 0 8-3z"/><path d="M17 24c2 0 4 1 5 3H12c1-2 3-3 5-3z"/></g></svg>'}
+  function bauhinia(bg){return '<svg viewBox="0 0 34 34" width="34" height="34"><circle cx="17" cy="17" r="16" fill="'+bg+'" stroke="#fff" stroke-width="2"/><g fill="#fff"><path d="M17 7c2 4 3 8 1 12-3-3-3-8-1-12z"/><path d="M10 12c3 1 6 4 6 8-4-1-6-4-6-8z"/><path d="M24 12c-3 1-6 4-6 8 4-1 6-4 6-8z"/><path d="M8 20c3-1 7 0 9 3-3 2-7 1-9-3z"/><path d="M26 20c-3-1-7 0-9 3 3 2 7 1 9-3z"/><circle cx="17" cy="24" r="3"/></g></svg>'}
+  var icons=[bauhinia('#E60012'),lotus('#1FB61D'),bauhinia('#6A2C91')];
+  document.querySelectorAll('.tabs a, .tabs .tab').forEach(function(a,i){if(!icons[i])return;if(a.querySelector('svg'))return;var s=document.createElement('span');s.style.cssText='display:inline-flex;vertical-align:middle;margin-right:6px';s.innerHTML=icons[i];a.insertBefore(s,a.firstChild)});
+  // 清空块
+  document.querySelectorAll('body > div, body > section, main > *, .wrap > *').forEach(function(e){
+    if(e.id==='xc-extra')return;var r=e.getBoundingClientRect();if(r.height>24&&r.height<400){var t=(e.innerText||'').trim();if(!t&&!e.querySelector('img,svg'))e.style.display='none'}
+  });
+ }
+ setTimeout(go,400);setTimeout(go,1400);setTimeout(go,2600);
 })();
 </script></body></html>
