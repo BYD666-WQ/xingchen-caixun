@@ -334,6 +334,10 @@
         var title = box.querySelector('.nmsx-festive-title');
         if (title) title.textContent = '\u9999\u6e2f\u6447\u94b1\u6811\u3010\u5355\u53cc\u2462\u8096\u3011';
         inner.innerHTML = d.rows.map(function (it) {
+          if (it.status === 'upcoming') {
+            return '<div class="nmsx-festive-row"><span class="nmsx-festive-issue">\u65b0\u9999\u6e2f' + it.issue + '\u671f:\u5185\u5e55</span>' +
+              '<span class="nmsx-festive-type">\u3010\u63d0\u524d\u516c\u5f00\u3011</span><span class="ziliaokl">\u70b9\u51fb\u67e5\u770b</span></div>';
+          }
           var oe = it.oddEven === '\u5355' ? '\u5355\u6570' : '\u53cc\u6570';
           var zs = (it.threeZodiac || []).join('');
           var res = it.result ? (it.result.z + it.result.c) : '';
