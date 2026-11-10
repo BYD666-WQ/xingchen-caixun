@@ -674,7 +674,8 @@
     function txt(el) { return (el.textContent || '').replace(/\s+/g, ''); }
     function drop(name) {
       document.querySelectorAll('.baomalaodaName').forEach(function (n) {
-        if (txt(n) === name) {
+        var tn = txt(n);
+        if (tn === name || tn.indexOf(name) >= 0) {
           var b = n;
           while (b && b !== document.body) { if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) break; b = b.parentNode; }
           if (b && b.parentNode) b.parentNode.removeChild(b);
@@ -682,8 +683,11 @@
       });
     }
     function fixTabs() {
-      var tie = document.querySelector('#widgetBox41362 .tie');
-      if (!tie) return;
+      var ties = [].slice.call(document.querySelectorAll('.tie'));
+      if (!ties.length) return;
+      ties.forEach(function (tie) { fixTabsIn(tie); });
+    }
+    function fixTabsIn(tie) {
       var tabs = [].slice.call(tie.children);
       tabs.forEach(function (t) {
         var s = txt(t);
