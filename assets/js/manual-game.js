@@ -452,7 +452,7 @@
         var el = nodes[i];
         if (el.children.length) continue;
         var t = (el.textContent || '').trim();
-        if (t.indexOf('\u8ddd\u5f00\u5956') === 0 && !(el.closest && el.closest('.xc-cd-all'))) {
+        if ((t.indexOf('\u8ddd\u5f00\u5956') === 0 || t.indexOf('\u539f\u5f00\u5956') === 0) && !(el.closest && el.closest('.xc-cd-all'))) {
           el.style.display = 'none';
         }
       }
