@@ -1,339 +1,75 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light">
-<title>区块对齐 · 全块</title>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#F5F1E6;font-family:"Microsoft YaHei",Arial,sans-serif;color:#222;padding-bottom:64px}
-.wrap{max-width:720px;margin:0 auto}
-.adslot{height:52px;background:#EFE7CE;display:flex;align-items:center;justify-content:center;color:#b9a97c;font-size:12px;border-bottom:1px solid #e3d9bd}
-.notice{display:flex;align-items:center;gap:8px;background:#F7F7F7;padding:6px 10px;font-size:14px;color:#E60012}
-.notice b{flex:1;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.notice .view{background:#2680EB;color:#fff;border-radius:999px;padding:3px 14px;font-size:12px}
-.logo-row{display:flex;align-items:center;padding:8px 10px 6px}
-.logo{font:900 30px/1.1 "Microsoft YaHei",Arial,sans-serif;color:#F60829}
-.logo small{font-size:18px;color:#1E5BC6;font-weight:900}
-.seal{margin-left:auto;background:#E60012;color:#fff;border:2px solid #F0C860;border-radius:6px;font-size:14px;font-weight:900;padding:5px 7px;text-align:center;line-height:1.2}
-.tabs{display:flex;gap:8px;padding:6px 10px 10px}
-.tab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#fff;border:1px solid #E3DCC9;border-radius:999px;padding:8px 0;font-size:15px;font-weight:700;color:#333}
-.tab .ico{width:20px;height:20px;border-radius:50%;background:#fff;border:1px solid #d5cba9;position:relative;display:inline-block;font-size:0}
-.tab .ico::after{content:'';position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%}
-.tab:nth-child(1) .ico::after{background:#E60012}
-.tab:nth-child(2) .ico::after{background:#2383E9}
-.tab:nth-child(3) .ico::after{background:#1FB61D}
-.tab.on{border-color:#F6C65B;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.openbar{display:flex;align-items:center;gap:3px;padding:4px 4px;width:100%;box-sizing:border-box;background:#FFF3C4;border-top:1px solid #F6C65B;border-bottom:1px solid #F6C65B}
-.openbar .left{flex:0 0 44px;font-size:11px;line-height:1.05;text-align:center;background:#FFE58A;border-radius:4px;color:#B30000;font-weight:700;padding:2px 0}
-.openbar .left span{display:block;font-size:10px;font-weight:400}
-.openbar .balls{display:flex;align-items:center;gap:3px;flex:1 1 0;min-width:0}
-.openbar .refresh{flex:0 0 8px;font-size:0;background:#FFD24D;border-radius:3px;align-self:stretch}
-.tile{border-radius:8px;overflow:hidden;display:flex;flex-direction:column;color:#fff;text-align:center}
-.openbar .tile{flex:1 1 0;min-width:0;aspect-ratio:1}
-.tile .num{flex:1;display:flex;align-items:center;justify-content:center;font:900 26px/1 "Microsoft YaHei",Arial,sans-serif}
-.tile .zod{height:20px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;background:rgba(0,0,0,.42)}
-.openbar .tile .num{font-size:clamp(13px,4.2vw,18px)}
-.openbar .tile .zod{height:9px;font-size:8px;background:rgba(0,0,0,.35)}
-.tile.r{background:#E71607}.tile.b{background:#2383E9}.tile.g{background:#1FB61D}
-.plus{align-self:center;color:#C8A24A;font-weight:900;font-size:16px;flex:0 0 8px;text-align:center}
-.block{background:#fff;border:1px solid #F1D9A6;border-radius:6px;margin:8px 10px;overflow:hidden}
-.block .hd{display:flex;align-items:baseline;gap:8px;padding:8px 10px 4px}
-.block .hd b{font-size:22px;font-weight:900}
-.block .hd .time{font-size:18px;color:#666;margin-left:6px}
-.block .hd .hist{margin-left:auto;color:#E60012;font-size:16px;font-weight:700}
-.block .balls{display:flex;align-items:center;gap:6px;padding:4px 10px 8px}
-.block .balls .tile{width:52px;height:56px}
-.block .next{display:flex;align-items:center;justify-content:space-between;padding:2px 10px 10px;font-size:14px}
-.block .next .rf{background:#F5A623;color:#fff;border-radius:6px;padding:5px 12px}
-/* 内幕区 */
-.nm{background:#FFF9E8;border:2px solid #E60012;border-radius:8px;margin:8px 10px;overflow:hidden}
-.nm .h{background:linear-gradient(#F0412A,#D90000);color:#fff;text-align:center;font:900 22px/2.2 "Microsoft YaHei",Arial,sans-serif}
-.nm .row{display:flex;align-items:center;gap:6px;padding:5px 8px;border-top:1px dashed #F0D9A8;font-size:13px}
-.nm .row .iss{background:#E60012;color:#fff;border-radius:4px;padding:2px 6px;font-weight:700;font-size:12px}
-.nm .row .lab{background:#E60012;color:#fff;border-radius:3px;padding:1px 5px;font-size:12px}
-.nm .row .zod2{color:#222;font-weight:700}
-.nm .row .ok{margin-left:auto;background:#FFE58A;color:#B30000;border-radius:3px;padding:1px 6px;font-weight:700;font-size:12px}
-.nm .row .pend{margin-left:auto;color:#C90000;font-weight:700}
-/* 资料区 */
-.zl{background:linear-gradient(#FFF7E3,#FFE8B8);border:2px solid #F6C65B;border-radius:8px;margin:8px 10px;overflow:hidden}
-.zl .h{background:#B7B98F;color:#fff;text-align:center;font:900 20px/2.1 "Microsoft YaHei",Arial,sans-serif}
-.zl .g{background:#FFF4D7;color:#B30000;font-weight:700;font-size:14px;padding:4px 10px}
-.zl .row{display:flex;align-items:center;gap:6px;padding:5px 10px;border-top:1px dashed #E6D7AD;font-size:13px}
-.zl .row .n{color:#B30000;font-weight:900;font-size:15px}
-.zl .row .zs span{color:#E60012;font-weight:900;font-size:15px;margin-right:4px}
-.zl .row .code{margin-left:auto;color:#555;font-size:12px}
-/* 底栏 */
-.nav{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;background:#fff;border-top:1px solid #E6D7AD;align-items:flex-end;z-index:9}
-.nav a{flex:1;text-align:center;font-size:11px;color:#555;text-decoration:none;padding-bottom:4px}
-.nav .badge{display:block;width:26px;height:24px;margin:0 auto 1px;border-radius:4px;background:linear-gradient(#FFF3C4,#FFD24D);color:#B30000;font:900 13px/24px Arial;border:1px solid #E0C060}
-.nav .zhun{display:block;margin:-16px auto 1px;width:46px;height:46px;border-radius:50%;background:#1FB61D;color:#fff;font:900 16px/40px "Microsoft YaHei";border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)}
-.text{font-size:12px;color:#888;padding:6px 10px}
-</style><style id="xc-overflow-fix">
-.block .hd{display:flex;flex-wrap:nowrap;align-items:baseline;gap:6px}
-.block .hd b{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto}
-.block .hd .time{font-size:17px;white-space:nowrap;flex:0 0 auto;color:#666}
-.block .hd .hist{font-size:17px;white-space:nowrap;flex:0 0 auto}
-.nm .row{flex-wrap:nowrap;white-space:nowrap;overflow:hidden}
-.nm .row .iss{flex:0 0 auto;font-size:15px;padding:2px 6px}
-.nm .row .lab{flex:0 0 auto;font-size:15px;padding:1px 5px}
-.nm .row .zod2{flex:0 0 auto;font-size:17px}
-.zl .row{flex-wrap:nowrap;overflow:hidden}
-.zl .row .n{flex:0 0 auto}
-.zl .row .zs{flex:0 0 auto;white-space:nowrap}
-.zl .row .zs span{margin-right:1px}
-.zl .row .code{flex:0 0 auto;margin-left:auto;font-size:14px}
-details.xc-more{background:linear-gradient(#FFF7E3,#FFE8B8);border:1px solid #F6C65B;border-radius:8px;margin:8px 10px;overflow:hidden}
-details.xc-more>summary{background:#B7B98F;color:#fff;font-weight:900;font-size:22px;text-align:center;line-height:2;list-style:none;cursor:pointer}
-details.xc-more .body{padding:6px 10px}
-details.xc-more .hitem{display:flex;justify-content:space-between;border-top:1px dashed #E6D7AD;padding:6px 0;font-size:17px}
-.zgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-.zgrid div{border:1px solid #E6D7AD;background:#fff;border-radius:4px;text-align:center;padding:4px 2px;font-size:12px}
-.zgrid b{color:#E60012;font-size:16px;display:block}
-#tuku img{width:32%}
-</style><style id="xc-fix2">
-.block .hd{gap:6px;flex-wrap:nowrap;align-items:baseline}
-.block .hd b{font-size:19px;white-space:nowrap;overflow:visible;text-overflow:clip;flex:0 0 auto}
-.block .hd .time{font-size:14px;color:#666;white-space:nowrap;flex:0 0 auto}
-.block .hd .hist{font-size:13px;white-space:nowrap;flex:0 0 auto;margin-left:auto}
-.nm .row{gap:4px;overflow:hidden}
-.nm .row .iss{font-size:14px;padding:2px 5px}
-.nm .row .lab{font-size:14px;padding:1px 4px}
-.nm .row .zod2{font-size:15px}
-.nm .row .ok{font-size:14px;flex:0 0 auto;margin-left:auto}
-.nm .row span{white-space:nowrap}
-.hitem .st{min-width:76px;text-align:right;flex:0 0 auto}
-.zgrid div{font-size:12px}
-</style><style id="xc-openbar-big">
-.openbar{padding:6px 4px;min-height:62px;gap:3px}
-.openbar .left{flex:0 0 56px;width:56px;font-size:20px;line-height:1.1;font-weight:700;border-radius:6px}
-.openbar .left span{font-size:13px;font-weight:700}
-.openbar .balls{gap:3px}
-.openbar .tile{flex:1 1 0;min-width:0;aspect-ratio:1}
-.openbar .tile .num{font-size:30px;font-weight:800}
-.openbar .tile .zod{height:20px;font-size:22px;line-height:20px;background:rgba(0,0,0,.38)}
-.openbar .refresh{flex:0 0 8px}
-</style><style id="xc-hardfix">
-.block .hd{display:flex;flex-wrap:nowrap;align-items:baseline;gap:4px}
-.block .hd b{font-size:18px!important;white-space:nowrap;overflow:visible!important;text-overflow:clip!important;flex:0 0 auto}
-.block .hd .time{font-size:12px!important;white-space:nowrap;flex:0 0 auto}
-.block .hd .hist{font-size:12px!important;white-space:nowrap;flex:0 0 auto;margin-left:auto}
-.nm .row{display:flex!important;gap:3px!important;font-size:13px!important;overflow:hidden}
-.nm .row .iss{font-size:12px!important;flex:0 0 auto}
-.nm .row .lab{font-size:12px!important;flex:0 0 auto}
-.nm .row .zod2{font-size:14px!important;flex:1 1 auto;overflow:hidden;white-space:nowrap}
-.nm .row .ok{font-size:12px!important;flex:0 0 auto!important;margin-left:auto!important}
-.hitem .st{min-width:76px;text-align:right}
-</style><style id="xc-nemi-compact">
-.nm .row{padding:5px 5px!important;gap:2px!important}
-.nm .row .iss{font-size:11px!important;padding:2px 4px!important}
-.nm .row .lab{font-size:11px!important;padding:1px 3px!important}
-.nm .row .zod2{font-size:12px!important}
-.nm .row .ok{font-size:11px!important;padding:1px 4px!important;flex:0 0 auto!important;margin-left:auto!important}
-.hitem .st{margin-left:8px}
-</style><style id="xc-final3">
-.openbar{padding:4px 4px!important;min-height:56px!important;max-height:60px!important;height:58px!important}
-.openbar .tile .num{font-size:22px!important;font-weight:800!important;line-height:1!important}
-.openbar .tile .zod{height:16px!important;font-size:16px!important;line-height:16px!important}
-.openbar .left{font-size:18px!important;flex:0 0 52px!important;width:52px!important}
-.nm .row{padding-right:6px!important}
-.nm .row .ok{margin-right:4px!important;flex:0 0 auto!important}
-</style>
-<script>
-(function(){
-  function cleanTuku(){document.querySelectorAll('.zl .h').forEach(function(e){var t=(e.textContent||'').replace(/[^\u4e00-\u9fa5A-Za-z0-9]/g,'');if(t==='图库'||t.indexOf('图库')>=0){e.textContent='图库'}})}
-  setTimeout(cleanTuku,800);setTimeout(cleanTuku,1600);setTimeout(cleanTuku,2500);
-})();
-</script><style id="b1plus-skin">
-body{background:#F5EFE0!important}
-header,.block .hd,.nm .h,.zl .h,details.xc-more>summary{background:linear-gradient(#E60012,#B3000E)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22)!important;border-bottom:2px solid #D4AF37!important}
-.logo{color:#FFD24D!important;text-shadow:1px 1px 0 #7A0000,-1px 1px 0 #7A0000}
-.block .hd b{color:#FFD24D!important;-webkit-text-fill-color:#FFD24D!important;background:none!important}
-.block .hd .h,.block .hd .time{color:#FFE9A8!important}
-.nm .h,.zl .h,details.xc-more>summary{color:#FFD24D!important;-webkit-text-fill-color:#FFD24D!important;background-image:linear-gradient(#E60012,#B3000E)!important;background-clip:border-box!important;-webkit-background-clip:border-box!important}
-.tile{background-image:linear-gradient(160deg,#FF3B30,#C00012)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28)!important}
-.tile.b{background-image:linear-gradient(160deg,#2E86FF,#0B4EA2)!important}
-.tile.g{background-image:linear-gradient(160deg,#2ECC71,#0B7A3A)!important}
-.tile .num{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.55)!important}
-.tile .zod{background:linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.6))!important;color:#FFE9A8!important}
-.block,.nm,.zl,details.xc-more{background-image:linear-gradient(#FFFDF6,#FFF3D6)!important;border:1px solid #D4AF37!important}
-.next .rf,.nm .row .ok,.nm .row .lab,.nm .row .iss,.zl .row .zs span{background-image:linear-gradient(#FFE9A8,#F5C542,#D4AF37)!important;color:#7A0000!important;border:1px solid #C9A227!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)!important;-webkit-text-fill-color:#7A0000!important}
-.nm .row .lab,.nm .row .iss{color:#fff!important;-webkit-text-fill-color:#fff!important;background-image:linear-gradient(#E60012,#B3000E)!important}
-.nav{background-image:linear-gradient(#A80008,#6E0006)!important;border-top:2px solid #FFD24D!important}
-.nav a{color:#FFD24D!important}
-.nav .badge{background-image:linear-gradient(#FFE9A8,#F5C542,#D4AF37)!important;color:#7A0000!important}
-.nav .zhun{background-image:linear-gradient(#2ECC71,#0B7A3A)!important;color:#fff!important}
-.openbar{background:#FFF3C4!important;border-top:2px solid #D4AF37!important;border-bottom:2px solid #D4AF37!important;padding:3px 4px!important;gap:3px!important}
-.openbar .left{flex:0 0 48px!important;font-size:18px!important;color:#C90000!important}
-.openbar .balls{gap:3px!important}
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light"><title>新港摇钱树</title><style>*{box-sizing:border-box}body{margin:0;font-family:"Microsoft YaHei",Arial,sans-serif;padding-bottom:64px}
+.notice{text-align:center;font-size:13px;padding:6px;background:#FFF3C4;color:#8a3a00;border-bottom:1px solid #E8C86A}
+header{display:flex;align-items:center;padding:10px 12px;background:linear-gradient(#E60012,#C90000)}
+.logo{font:900 26px/1.15 "Microsoft YaHei";color:#FFD24D;text-shadow:1px 1px 0 #7A0000,-1px -1px 0 #7A0000,1px -1px 0 #7A0000,-1px 1px 0 #7A0000;letter-spacing:1px}
+.seal{margin-left:auto;border:1px solid #FFD24D;color:#FFD24D;border-radius:4px;font-size:12px;padding:4px 7px}
+.tabs{display:flex;gap:0;background:#FFFDF3;border-bottom:2px solid #E60012}
+.tabs a{flex:1;text-align:center;padding:9px 0;font-size:17px;font-weight:700;color:#8a4a00;border-right:1px solid #F0DCA8;text-decoration:none}
+.tabs a.on{background:#E60012;color:#FFD24D}
+.openbar{display:flex;align-items:center;gap:5px;padding:6px 6px;background:#FFF3C4;border-top:2px solid #E0B94A;border-bottom:2px solid #E0B94A}
+.ol{flex:0 0 56px;font:900 20px/1.05 "Microsoft YaHei";color:#C90000;text-align:center}
+.ol span{display:block;font-size:12px;color:#8a4a00;font-weight:700}
+.ob{display:flex;gap:4px;flex:1;min-width:0;align-items:center}
+.tile{flex:1 1 0;min-width:0;aspect-ratio:1;border-radius:4px;overflow:hidden;color:#fff;display:flex;flex-direction:column;text-align:center;border:1px solid rgba(0,0,0,.15)}
+.tile .num{flex:1;display:flex;align-items:center;justify-content:center;font:800 26px/1 "Microsoft YaHei"}
+.tile .zod{height:17px;line-height:17px;font-size:13px;background:rgba(0,0,0,.42)}
+.r{background:#E60012}.b{background:#1E5BC6}.g{background:#0F8A34}
+.plus{flex:0 0 8px;color:#C90000;font-weight:900;text-align:center;font-size:16px}
+.card{margin:8px 8px;background:#FFFDF3;border:2px solid #E0B94A;border-radius:5px;overflow:hidden}
+.card .hd{display:flex;align-items:baseline;gap:6px;padding:8px 10px;background:#E60012;border-bottom:2px solid #FFD24D}
+.card .hd b{font-size:24px;color:#FFD24D;font-weight:900}
+.card .hd .t{font-size:14px;color:#FFE9A8}
+.card .hd .h{margin-left:auto;font-size:15px;color:#FFD24D;font-weight:700}
+.balls{display:flex;gap:5px;padding:8px 10px;align-items:center}
+.balls .tile{width:48px;height:56px;flex:0 0 auto}
+.balls .tile .num{font-size:26px}
+.balls .tile .zod{height:18px;line-height:18px;font-size:14px}
+.next{display:flex;justify-content:space-between;align-items:center;padding:6px 10px 10px;font-size:15px;color:#6b4a10;border-top:1px dashed #E8D098}
+.next .rf{background:#FFD24D;color:#C90000;border-radius:4px;padding:5px 12px;font-size:15px;font-weight:800;border:1px solid #C9A227}
+.mini{margin:8px 8px;background:#FFFDF3;border:2px solid #E0B94A;border-radius:5px;overflow:hidden}
+.mini h5{margin:0;background:#E60012;color:#FFD24D;font:900 22px/1.9 "Microsoft YaHei";text-align:center;border-bottom:2px solid #FFD24D;letter-spacing:1px}
+.mini .row{display:flex;gap:6px;align-items:center;padding:8px 8px;border-top:1px dashed #E8D098;font-size:19px}
+.mini .row:first-of-type{border-top:0}
+.mini i{font-style:normal;background:#E60012;color:#fff;border-radius:3px;padding:2px 6px;font-size:15px;font-weight:700}
+.mini b{color:#C90000;font-size:16px}
+.mini u{margin-left:auto;text-decoration:none;background:#FFD24D;color:#C90000;border-radius:3px;padding:2px 8px;font-size:16px;font-weight:900;border:1px solid #C9A227}
+.nav{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;background:#8A0000;border-top:2px solid #FFD24D}
+.nav a{flex:1;text-align:center;line-height:56px;font-size:14px;color:#FFD24D;text-decoration:none;font-weight:700}
+.nav a.on{background:#C90000;color:#fff}.mini h5{background-image:linear-gradient(#E60012,#B3000E)!important;background-clip:border-box!important;-webkit-background-clip:border-box!important;color:#FFD24D!important;-webkit-text-fill-color:#FFD24D!important;text-shadow:0 1px 0 #7A0000}
+.openbar{padding:3px 4px!important;gap:3px!important}
+.openbar .ol{flex:0 0 48px!important;font-size:18px!important}
+.openbar .ol span{font-size:11px!important}
+.openbar .ob{gap:3px!important}
 .openbar .plus{flex:0 0 4px!important;font-size:14px!important}
-.tabs .tab.on{background-image:linear-gradient(#E60012,#B3000E)!important;color:#FFD24D!important;border-color:#D4AF37!important}
-.tabs .tab{background:#FFFDF6!important}
-</style><style id="xc-fix3">
-.adslot{display:none!important}
-.zl .row{padding:6px 8px!important}
-.zl .row .code{font-size:12px!important;max-width:52%!important;white-space:normal!important;word-break:break-all;text-align:right}
-.zl .row .zs span{font-size:16px!important;margin-right:1px!important}
-.nm .row{padding-right:6px!important}
-.nm .row .ok{flex:0 0 auto!important;margin-right:2px!important}
-</style></head><body><div class="wrap">
-<div class="adslot">（广告位占位 · 保持比例）</div>
-<div class="notice"><b>本站数据仅供参考 · 开奖结果以官方公布为准</b><span class="view">查看</span></div>
-<div class="logo-row"><div class="logo">新港摇钱树</div><div class="seal">正版<br>数据</div></div>
-<div class="tabs"><div class="tab on"><span class="ico"></span>新港</div><div class="tab"><span class="ico"></span>新澳</div><div class="tab"><span class="ico"></span>香港</div></div>
-<div class="openbar">
-  <div class="left">314期开<span>开奖记录</span></div>
-  <div class="balls" id="ob-balls">
-    <div class="tile r"><div class="num">13</div><div class="zod">马</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile b"><div class="num">09</div><div class="zod">狗</div></div><div class="tile b"><div class="num">37</div><div class="zod">马</div></div><div class="tile r"><div class="num">34</div><div class="zod">鸡</div></div><div class="tile g"><div class="num">44</div><div class="zod">猪</div></div><span class="plus">+</span><div class="tile b"><div class="num">31</div><div class="zod">鼠</div></div>
-  </div>
-  <div class="refresh"></div>
-</div>
-<div class="block" id="blk-newhk"><div class="hd"><b>新港第313期</b><span class="time" id="cd-newhk">每天 21:34</span><span class="hist">历史记录</span></div><div class="balls" id="bl-newhk"></div><div class="next"><span id="nx-newhk">新港第314期</span><span class="rf">刷新</span></div></div>
-<div class="block" id="blk-newmo" style="display:none"><div class="hd"><b>新澳彩第314期</b><span class="time" id="cd-newmo">每天 21:30</span><span class="hist">历史记录</span></div><div class="balls" id="bl-newmo"></div><div class="next"><span id="nx-newmo">新澳彩第315期</span><span class="rf">刷新</span></div></div>
-<div class="block" id="blk-hk" style="display:none"><div class="hd"><b>香港彩第119期</b><span class="time" id="cd-hk">每天 21:30</span><span class="hist">历史记录</span></div><div class="balls" id="bl-hk"></div><div class="next"><span id="nx-hk">香港彩第120期</span><span class="rf">刷新</span></div></div>
-<div class="nm"><div class="h">新港摇钱树【单双③肖】</div><div id="nm-rows"></div></div>
-<div class="zl"><div class="h">资料大全</div><div id="zl-rows"></div></div>
-<div class="zl" id="tuku"><div class="h">图库</div>
-  <div style="display:flex;gap:6px;padding:8px">
-    <img src="assets/theme/图库缩略/64d4b287-tjb311.webp" style="width:32%;border:1px solid #F6C65B;border-radius:4px">
-    <img src="assets/theme/图库缩略/b554f6c9-tjb313.jpg" style="width:32%;border:1px solid #F6C65B;border-radius:4px">
-    <img src="assets/theme/图库缩略/0b7daed9-49123sbx20240609.webp" style="width:32%;border:1px solid #F6C65B;border-radius:4px">
-  </div></div>
-<div class="text">本站数据仅供参考 · 不作购彩依据</div>
-</div>
-<div class="nav">
-  <a href="#"><span class="badge">49</span>首页</a>
-  <a href="#"><span class="badge">49</span>资料大全</a>
-  <a href="#"><span class="zhun">准</span>规律走势</a>
-  <a href="#"><span class="badge">49</span>寻宝</a>
-  <a href="#"><span class="badge">49</span>图库</a>
-</div>
-<script>
+</style></head><body><div class="notice">本站数据仅供参考 · 开奖结果以官方公布为准</div>
+<header><div class="logo">新港摇钱树</div><div class="seal">正版</div></header>
+<nav class="tabs"><a class="on">新港</a><a>新澳</a><a>香港</a></nav>
+<div class="openbar"><div class="ol">314期开<span>开奖记录</span></div><div class="ob"><div class="tile r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div></div></div>
+<section class="card"><div class="hd"><b>新港第313期</b><span class="t">19:07</span><span class="h">历史记录</span></div><div class="balls"><div class="tile r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div></div><div class="next"><span>明天 21:34 开奖</span><span class="rf">刷新</span></div></section>
+<section class="mini"><h5>内幕 · 单双③肖</h5>
+<div class="row"><i>313期</i><b>【单数】</b><span>主【兔蛇羊】</span><em>开马13</em><u>准</u></div>
+<div class="row"><i>312期</i><b>【单数】</b><span>主【猪羊虎】</span><em>开鼠07</em><u>准</u></div>
+<div class="row"><i>311期</i><b>【单数】</b><span>主【鼠兔鸡】</span><em>开龙39</em><u>准</u></div>
+</section>
+<div id="xc-extra"></div>
+<div class="nav"><a class="on">首页</a><a>资料大全</a><a>规律走势</a><a>寻宝</a><a>图库</a></div><script>
 (function(){
   var SRC=['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/',''];
   function get(p){var i=0;function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var u=SRC[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
-  var R=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46],B=[3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
-  function col(n){return R.indexOf(n)>=0?'r':(B.indexOf(n)>=0?'b':'g')}
-  function tile(c,z,cls){return '<div class="tile '+cls+'"><div class="num">'+c+'</div><div class="zod">'+z+'</div></div>'}
   Promise.all([get('data/manual-draw.json'),get('data/manual-ziliao.json')]).then(function(r){
     var md=r[0]||{},zl=r[1]||{},rows=(zl.rows||[]).slice(0,12);
-    var ob=document.getElementById('ob-balls');
-    if(ob&&md.nums){ob.innerHTML=md.nums.map(function(x){return tile(x.c,x.z,col(parseInt(x.c,10)))}).join('');}
-    var nm=document.getElementById('nm-rows');
-    if(nm){nm.innerHTML=rows.map(function(d){
-      var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');
-      if(!ok)return '<div class="row"><span class="iss">'+d.issue+'期:内幕</span><span class="pend">【待开】</span></div>';
-      return '<div class="row"><span class="iss">'+d.issue+'期:内幕</span><span class="lab">【'+(d.oddEven==='双'?'双数':'单数')+'】</span><span>主</span><span class="zod2">【'+((d.threeZodiac||[]).join(''))+'】</span><span>开'+(d.result.z||'')+c+'</span><span class="ok">准</span></div>';
-    }).join('');}
-    var zlBox=document.getElementById('zl-rows');
-    if(zlBox){
-      var pool=[];rows.forEach(function(d){(d.threeZodiac||[]).forEach(function(z){if(pool.indexOf(z)<0)pool.push(z)})});
-      pool=pool.concat(['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪']).slice(0,7);
-      var hn=(md.nums||[]).map(function(x){return x.c});
-      zlBox.innerHTML=[7,5,3,2,1].map(function(n){
-        return '<div class="row"><span class="n">'+n+'肖</span><span class="zs">'+pool.slice(0,n).map(function(z){return '<span>'+z+'</span>'}).join('')+'</span><span class="code">码:'+hn.slice(0,n).join('.')+'</span></div>';
-      }).join('');
-    }
-  }).catch(function(e){console.log('[data]',e&&e.message)});
-})();
-</script><script>
-(function(){
-  var SRC=['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/',''];
-  function get(p){var i=0;function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var u=SRC[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
-  var R=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46],B=[3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
-  function col(n){return R.indexOf(n)>=0?'r':(B.indexOf(n)>=0?'b':'g')}
-  function tile(c,z,cls){return '<div class="tile '+cls+'"><div class="num">'+c+'</div><div class="zod">'+z+'</div></div>'}
-  function balls(id,arr){var e=document.getElementById(id);if(e&&arr)e.innerHTML=arr.map(function(x){return tile(x.c,x.z,col(parseInt(x.c,10)))}).join('')}
-  function cd(id,t){var e=document.getElementById(id);if(!e)return;var p=String(t).split(':');var now=new Date();var d=new Date(now.getFullYear(),now.getMonth(),now.getDate(),+p[0],+p[1],0);if(d<=now)d=new Date(d.getTime()+864e5);var s=Math.floor((d-now)/1000);function z(n){return(n<10?'0':'')+n}e.textContent='距开奖 '+z(Math.floor(s%86400/3600))+':'+z(Math.floor(s%3600/60))+':'+z(s%60)}
-  var DATA={};
-  function show(k){['newhk','newmo','hk'].forEach(function(x){var b=document.getElementById('blk-'+x);if(b)b.style.display=(x===k?'':'none')});document.querySelectorAll('.tabs .tab').forEach(function(t,i){t.classList.toggle('on',['newhk','newmo','hk'][i]===k)})}
-  window.__showTab=show;
-  Promise.all([get('data/manual-draw.json'),get('data/draw.json'),get('data/manual-ziliao.json')]).then(function(r){
-    var md=r[0]||{},dr=r[1]||{},by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});
-    DATA.newhk=md;DATA.newmo=by.Macau;DATA.hk=by.HongKong;window.__D={md:md,zl:r[2]||{},draw:dr};
-    balls('bl-newhk',md.nums);balls('bl-newmo',(by.Macau||{}).nums);balls('bl-hk',(by.HongKong||{}).nums);
-    var b=document.querySelector('#blk-newhk .hd b');if(b&&md.issue)b.textContent='新港第'+md.issue+'期';
-    var bx=document.querySelector('#blk-newmo .hd b');if(bx&&by.Macau)bx.textContent='新澳彩第'+String(by.Macau.issue).slice(-3)+'期';
-    var bh=document.querySelector('#blk-hk .hd b');if(bh&&by.HongKong)bh.textContent='香港彩第'+String(by.HongKong.issue).slice(-3)+'期';
-    setInterval(function(){cd('cd-newhk','21:34');cd('cd-newmo','21:30');cd('cd-hk','21:30')},1000);
-    cd('cd-newhk','21:34');cd('cd-newmo','21:30');cd('cd-hk','21:30');
-    // 内幕/资料 继续沿用 page2 原有逻辑
-    var rows=(r[2]&&r[2].rows||[]).slice(0,12);
-    var nm=document.getElementById('nm-rows');
-    if(nm){nm.innerHTML=rows.map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');if(!ok)return '<div class="row"><span class="iss">'+d.issue+'期:内幕</span><span class="pend">【待开】</span></div>';return '<div class="row"><span class="iss">'+d.issue+'期:内幕</span><span class="lab">【'+(d.oddEven==='双'?'双数':'单数')+'】</span><span>主</span><span class="zod2">【'+((d.threeZodiac||[]).join(''))+'】</span><span>开'+(d.result.z||'')+c+'</span><span class="ok">准</span></div>'}).join('')}
-    var zl=document.getElementById('zl-rows');
-    if(zl){var pool=[];rows.forEach(function(d){(d.threeZodiac||[]).forEach(function(z){if(pool.indexOf(z)<0)pool.push(z)})});pool=pool.concat(['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪']).slice(0,7);var hn=(md.nums||[]).map(function(x){return x.c});zl.innerHTML=[7,5,3,2,1].map(function(n){return '<div class="row"><span class="n">'+n+'肖</span><span class="zs">'+pool.slice(0,n).map(function(z){return '<span>'+z+'</span>'}).join('')+'</span><span class="code">码:'+hn.slice(0,n).join('.')+'</span></div>'}).join('')}
+    var ex=document.getElementById('xc-extra');if(!ex)return;
+    var nmi=rows.map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');
+      if(!ok)return '<div class="row"><i>'+d.issue+'期</i><b>【待开】</b></div>';
+      return '<div class="row"><i>'+d.issue+'期</i><b>【'+(d.oddEven==='双'?'双数':'单数')+'】</b><span>主【'+((d.threeZodiac||[]).join(''))+'】</span><em>开'+(d.result.z||'')+c+'</em><u>准</u></div>';}).join('');
+    var pool=[];rows.forEach(function(d){(d.threeZodiac||[]).forEach(function(z){if(pool.indexOf(z)<0)pool.push(z)})});
+    pool=pool.concat(['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪']).slice(0,7);
+    var hn=(md.nums||[]).map(function(x){return x.c});
+    var zli=[7,5,3,2,1].map(function(n){return '<div class="row"><i>'+n+'肖</i><span>'+pool.slice(0,n).join('')+'</span><em>码:'+hn.slice(0,n).join('.')+'</em></div>'}).join('');
+    var his=rows.slice(0,10).map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');return '<div class="row"><i>'+d.issue+'期</i><span>'+(ok?((d.threeZodiac||[]).join('')+' 开'+(d.result.z||'')+c):'待开')+'</span></div>'}).join('');
+    ex.innerHTML='<section class="mini"><h5>内幕 · 单双③肖</h5>'+nmi+'</section>'+
+      '<section class="mini"><h5>资料大全</h5>'+zli+'</section>'+
+      '<section class="mini"><h5>历史开奖记录</h5>'+his+'</section>';
   });
-  document.querySelectorAll('.tabs .tab').forEach(function(t,i){t.addEventListener('click',function(){show(['newhk','newmo','hk'][i])})});
-  setInterval(function(){location.reload()},30000);
-})();
-</script><style id="xc-size-up">
-body{font-size:18px}
-.block .hd b{font-size:24px}
-.block .hd .time{font-size:19px}
-.block .hd .hist{font-size:19px}
-.block .next{font-size:17px}
-.block .balls{gap:6px;padding:6px 8px 10px}
-.block .balls .tile{width:72px;height:72px}
-.block .balls .tile .num{font-size:26px;font-weight:700}
-.block .balls .tile .zod{height:24px;font-size:20px}
-.tabs .tab{font-size:19px;padding:10px 0;gap:8px}
-.tabs .tab .ico{width:34px;height:34px}
-.tabs .tab .ico svg{width:34px;height:34px;display:block}
-.nm .h{font-size:26px;line-height:2}
-.nm .row{font-size:19px;padding:7px 8px}
-.nm .row .iss{font-size:16px;padding:3px 7px}
-.nm .row .lab{font-size:16px}
-.nm .row .ok{font-size:16px}
-.zl .h{font-size:26px;line-height:2}
-.zl .g{font-size:17px}
-.zl .row{font-size:19px;padding:8px 10px}
-.zl .row .n{font-size:18px}
-.zl .row .zs span{font-size:18px}
-.zl .row .code{font-size:16px}
-.openbar .tile.ball-big{}
-.nav a{font-size:13px}
-.nav .badge{width:28px;height:26px;font-size:14px;line-height:26px}
-.nav .zhun{width:50px;height:50px;font-size:18px;line-height:44px;margin-top:-18px}
-</style>
-<script>
-(function(){
-  function lotus(bg){return '<svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg"><circle cx="17" cy="17" r="17" fill="'+bg+'"/><circle cx="17" cy="17" r="15" fill="none" stroke="#fff" stroke-width="2"/><g fill="#fff"><path d="M17 8c2 3 2 6 0 9-2-3-2-6 0-9z"/><path d="M9 13c3 1 5 4 5 7-3-1-5-4-5-7z"/><path d="M25 13c-3 1-5 4-5 7 3-1 5-4 5-7z"/><path d="M7 20c3 0 6 1 8 3-3 1-6 0-8-3z"/><path d="M27 20c-3 0-6 1-8 3 3 1 6 0 8-3z"/><path d="M17 24c2 0 4 1 5 3H12c1-2 3-3 5-3z"/></g></svg>'}
-  function bauhinia(bg){return '<svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg"><circle cx="17" cy="17" r="17" fill="'+bg+'"/><circle cx="17" cy="17" r="15" fill="none" stroke="#fff" stroke-width="2"/><g fill="#fff"><path d="M17 6c2 4 3 8 1 12-3-3-3-8-1-12z"/><path d="M10 11c3 1 6 4 6 8-4-1-6-4-6-8z"/><path d="M24 11c-3 1-6 4-6 8 4-1 6-4 6-8z"/><path d="M7 19c3-1 7 0 9 3-3 2-7 1-9-3z"/><path d="M27 19c-3-1-7 0-9 3 3 2 7 1 9-3z"/><circle cx="17" cy="24" r="3"/></g></svg>'}
-  var icons=[lotus('#1FB61D'),bauhinia('#E60012'),bauhinia('#8E44AD')];
-  document.querySelectorAll('.tabs .tab .ico').forEach(function(e,i){e.innerHTML=icons[i]||'';e.style.fontSize='0'});
-})();
-</script><script>
-(function(){
-  function paint(){
-    if(window.__painted)return;window.__painted=1;
-    var d=window.__D||{};
-    var rows=(d.zl&&d.zl.rows||[]);var md=d.md||{};
-    var host=document.querySelector('.text')||document.querySelector('.nav');
-    var wrap=document.createElement('div');wrap.id='xc-extra';
-    var hist=rows.slice(0,10).map(function(r){
-      var c=r.result&&r.result.c,ok=(c&&c!=='NaN'&&r.status!=='upcoming');
-      var nums=ok?((r.result&&r.result.nums)||[]):[];
-      return '<div class="hitem"><span>新港 '+r.issue+'期&nbsp;</span><span class="st">'+(ok?((r.threeZodiac||[]).join('')+' 开'+(r.result.z||'')+c):'待开')+'</span></div>';
-    }).join('');
-    var gl=rows.slice(0,8).map(function(r){
-      var c=r.result&&r.result.c,ok=(c&&c!=='NaN'&&r.status!=='upcoming');
-      return '<div class="hitem"><span>'+r.issue+'期 '+(r.oddEven==='双'?'双数':'单数')+'</span><span>'+(ok?('主'+((r.threeZodiac||[]).join(''))+' 开'+(r.result.z||'')+c):'待开')+'</span></div>';
-    }).join('');
-    var poem=(rows[0]&&(rows[0].poem||rows[0].poemText))||(md.poem||'');
-    var zt=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
-    var nums=['07 19 31 43','06 18 30 42','05 17 29 41','04 16 28 40','03 15 27 39','02 14 26 38','01 13 25 37 49','12 24 36 48','11 23 35 47','10 22 34 46','09 21 33 45','08 20 32 44'];
-    var zgrid=zt.map(function(z,i){return '<div><b>'+z+'</b>'+nums[i]+'</div>'}).join('');
-    wrap.innerHTML=
-      '<div class="zl"><div class="h">历史开奖记录</div><div class="body">'+hist+'</div></div>'+
-      '<details class="xc-more" open><summary>规律走势</summary><div class="body">'+gl+'</div></details>'+
-      '<details class="xc-more"><summary>玄机诗象</summary><div class="body" style="font-size:18px;line-height:1.8;color:#333">'+(poem?poem:'本期玄机：龙争虎斗，马到成功；留意单数生肖，特码看虎马羊。')+'</div></details>'+
-      '<details class="xc-more"><summary>生肖号码大表</summary><div class="body"><div class="zgrid">'+zgrid+'</div></div></details>';
-    host.parentNode.insertBefore(wrap,host);
-    var t=document.getElementById('tuku');
-    if(t){var box=t.querySelector('div');if(box&&box.children.length<3){
-      ['0b7daed9-49123sbx20240609.webp','5bea6564-gengxin.webp','cac68a23-49123sbx20240609.webp'].forEach(function(n){var im=document.createElement('img');im.src='assets/theme/图库缩略/'+n;im.style.cssText='width:32%;border:1px solid #F6C65B;border-radius:4px';box.appendChild(im)});
-    }}
-    var hd=document.querySelector('#blk-newhk .hd .time');
-    if(hd){var n=new Date();hd.textContent=('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2)}
-  }
-  var t=setInterval(function(){if(window.__D){clearInterval(t);paint()}},400);
-  setTimeout(function(){clearInterval(t);paint()},3000);
 })();
 </script></body></html>
