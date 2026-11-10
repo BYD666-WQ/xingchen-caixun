@@ -43,11 +43,25 @@
         if (mas[i]) mas[i].textContent = n.c;
         if (xs[i]) xs[i].textContent = n.z;
       });
-      var tip = document.createElement('span');
-      tip.textContent = '\u793a\u4f8b';
-      tip.style.cssText = 'display:inline-block;margin-left:6px;padding:1px 6px;border-radius:3px;background:#d90000;color:#fff;font:11px/1.6 "Microsoft YaHei",Arial,sans-serif';
-      if (nm && nm.parentNode) nm.parentNode.insertBefore(tip, nm.nextSibling);
       hkBlock.parentNode.insertBefore(block, hkBlock);
+      // 2.5) 倒计时（每天 21:34）
+      (function () {
+        var hm = String(d.dailyTime || '21:34').split(':');
+        var el = document.createElement('span');
+        el.style.cssText = 'margin-left:8px;font:700 13px/1.4 "Microsoft YaHei",Arial,sans-serif;color:#1f3b8a';
+        var dateEl = block.querySelector('.baomalaodaQi');
+        (qi && qi.parentNode ? qi.parentNode : block).appendChild(el);
+        function tick() {
+          var now = new Date();
+          var t = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(hm[0], 10), parseInt(hm[1], 10), 0);
+          if (t.getTime() <= now.getTime()) t = new Date(t.getTime() + 86400000);
+          var left = Math.floor((t.getTime() - now.getTime()) / 1000);
+          var h = Math.floor(left / 3600), m = Math.floor((left % 3600) / 60), s = left % 60;
+          var p = function (n) { return (n < 10 ? '0' : '') + n; };
+          el.textContent = '距开奖 ' + p(h) + ':' + p(m) + ':' + p(s);
+        }
+        tick(); setInterval(tick, 1000);
+      })();
       // 3) 点击切换
       tab.addEventListener('click', function () {
         qsa('.baomalaodaName').forEach(function (n) {
