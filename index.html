@@ -65,6 +65,28 @@
 .nav .badge{display:block;width:26px;height:24px;margin:0 auto 1px;border-radius:4px;background:linear-gradient(#FFF3C4,#FFD24D);color:#B30000;font:900 13px/24px Arial;border:1px solid #E0C060}
 .nav .zhun{display:block;margin:-16px auto 1px;width:46px;height:46px;border-radius:50%;background:#1FB61D;color:#fff;font:900 16px/40px "Microsoft YaHei";border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)}
 .text{font-size:12px;color:#888;padding:6px 10px}
+</style><style id="xc-overflow-fix">
+.block .hd{display:flex;flex-wrap:nowrap;align-items:baseline;gap:6px}
+.block .hd b{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto}
+.block .hd .time{font-size:17px;white-space:nowrap;flex:0 0 auto;color:#666}
+.block .hd .hist{font-size:17px;white-space:nowrap;flex:0 0 auto}
+.nm .row{flex-wrap:nowrap;white-space:nowrap;overflow:hidden}
+.nm .row .iss{flex:0 0 auto;font-size:15px;padding:2px 6px}
+.nm .row .lab{flex:0 0 auto;font-size:15px;padding:1px 5px}
+.nm .row .zod2{flex:0 0 auto;font-size:17px}
+.zl .row{flex-wrap:nowrap;overflow:hidden}
+.zl .row .n{flex:0 0 auto}
+.zl .row .zs{flex:0 0 auto;white-space:nowrap}
+.zl .row .zs span{margin-right:1px}
+.zl .row .code{flex:0 0 auto;margin-left:auto;font-size:14px}
+details.xc-more{background:linear-gradient(#FFF7E3,#FFE8B8);border:1px solid #F6C65B;border-radius:8px;margin:8px 10px;overflow:hidden}
+details.xc-more>summary{background:#B7B98F;color:#fff;font-weight:900;font-size:22px;text-align:center;line-height:2;list-style:none;cursor:pointer}
+details.xc-more .body{padding:6px 10px}
+details.xc-more .hitem{display:flex;justify-content:space-between;border-top:1px dashed #E6D7AD;padding:6px 0;font-size:17px}
+.zgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.zgrid div{border:1px solid #E6D7AD;background:#fff;border-radius:4px;text-align:center;padding:4px 2px;font-size:12px}
+.zgrid b{color:#E60012;font-size:16px;display:block}
+#tuku img{width:32%}
 </style></head><body><div class="wrap">
 <div class="adslot">（广告位占位 · 保持比例）</div>
 <div class="notice"><b>本站数据仅供参考 · 开奖结果以官方公布为准</b><span class="view">查看</span></div>
@@ -139,7 +161,7 @@
   window.__showTab=show;
   Promise.all([get('data/manual-draw.json'),get('data/draw.json'),get('data/manual-ziliao.json')]).then(function(r){
     var md=r[0]||{},dr=r[1]||{},by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});
-    DATA.newhk=md;DATA.newmo=by.Macau;DATA.hk=by.HongKong;
+    DATA.newhk=md;DATA.newmo=by.Macau;DATA.hk=by.HongKong;window.__D={md:md,zl:r[2]||{},draw:dr};
     balls('bl-newhk',md.nums);balls('bl-newmo',(by.Macau||{}).nums);balls('bl-hk',(by.HongKong||{}).nums);
     var b=document.querySelector('#blk-newhk .hd b');if(b&&md.issue)b.textContent='新港第'+md.issue+'期';
     var bx=document.querySelector('#blk-newmo .hd b');if(bx&&by.Macau)bx.textContent='新澳彩第'+String(by.Macau.issue).slice(-3)+'期';
@@ -191,5 +213,41 @@ body{font-size:18px}
   function bauhinia(bg){return '<svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg"><circle cx="17" cy="17" r="17" fill="'+bg+'"/><circle cx="17" cy="17" r="15" fill="none" stroke="#fff" stroke-width="2"/><g fill="#fff"><path d="M17 6c2 4 3 8 1 12-3-3-3-8-1-12z"/><path d="M10 11c3 1 6 4 6 8-4-1-6-4-6-8z"/><path d="M24 11c-3 1-6 4-6 8 4-1 6-4 6-8z"/><path d="M7 19c3-1 7 0 9 3-3 2-7 1-9-3z"/><path d="M27 19c-3-1-7 0-9 3 3 2 7 1 9-3z"/><circle cx="17" cy="24" r="3"/></g></svg>'}
   var icons=[lotus('#1FB61D'),bauhinia('#E60012'),bauhinia('#8E44AD')];
   document.querySelectorAll('.tabs .tab .ico').forEach(function(e,i){e.innerHTML=icons[i]||'';e.style.fontSize='0'});
+})();
+</script><script>
+(function(){
+  function paint(){
+    var d=window.__D||{};
+    var rows=(d.zl&&d.zl.rows||[]);var md=d.md||{};
+    var host=document.querySelector('.text')||document.querySelector('.nav');
+    var wrap=document.createElement('div');wrap.id='xc-extra';
+    var hist=rows.slice(0,10).map(function(r){
+      var c=r.result&&r.result.c,ok=(c&&c!=='NaN'&&r.status!=='upcoming');
+      var nums=ok?((r.result&&r.result.nums)||[]):[];
+      return '<div class="hitem"><span>新港'+r.issue+'期</span><span>'+(ok?((r.threeZodiac||[]).join('')+' 开'+(r.result.z||'')+c):'待开')+'</span></div>';
+    }).join('');
+    var gl=rows.slice(0,8).map(function(r){
+      var c=r.result&&r.result.c,ok=(c&&c!=='NaN'&&r.status!=='upcoming');
+      return '<div class="hitem"><span>'+r.issue+'期 '+(r.oddEven==='双'?'双数':'单数')+'</span><span>'+(ok?('主'+((r.threeZodiac||[]).join(''))+' 开'+(r.result.z||'')+c):'待开')+'</span></div>';
+    }).join('');
+    var poem=(rows[0]&&(rows[0].poem||rows[0].poemText))||(md.poem||'');
+    var zt=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+    var nums=['07 19 31 43','06 18 30 42','05 17 29 41','04 16 28 40','03 15 27 39','02 14 26 38','01 13 25 37 49','12 24 36 48','11 23 35 47','10 22 34 46','09 21 33 45','08 20 32 44'];
+    var zgrid=zt.map(function(z,i){return '<div><b>'+z+'</b>'+nums[i]+'</div>'}).join('');
+    wrap.innerHTML=
+      '<div class="zl"><div class="h">历史开奖记录</div><div class="body">'+hist+'</div></div>'+
+      '<details class="xc-more" open><summary>规律走势</summary><div class="body">'+gl+'</div></details>'+
+      '<details class="xc-more"><summary>玄机诗象</summary><div class="body" style="font-size:18px;line-height:1.8;color:#333">'+(poem?poem:'本期玄机：龙争虎斗，马到成功；留意单数生肖，特码看虎马羊。')+'</div></details>'+
+      '<details class="xc-more"><summary>生肖号码大表</summary><div class="body"><div class="zgrid">'+zgrid+'</div></div></details>';
+    host.parentNode.insertBefore(wrap,host);
+    var t=document.getElementById('tuku');
+    if(t){var box=t.querySelector('div');if(box&&box.children.length<6){
+      ['0b7daed9-49123sbx20240609.webp','5bea6564-gengxin.webp','cac68a23-49123sbx20240609.webp'].forEach(function(n){var im=document.createElement('img');im.src='assets/theme/图库缩略/'+n;im.style.cssText='width:32%;border:1px solid #F6C65B;border-radius:4px';box.appendChild(im)});
+    }}
+    var hd=document.querySelector('#blk-newhk .hd .time');
+    if(hd){var n=new Date();hd.textContent=('0'+n.getHours()).slice(-2)+':'+('0'+n.getMinutes()).slice(-2)}
+  }
+  var t=setInterval(function(){if(window.__D){clearInterval(t);paint()}},400);
+  setTimeout(function(){clearInterval(t);paint()},3000);
 })();
 </script></body></html>
