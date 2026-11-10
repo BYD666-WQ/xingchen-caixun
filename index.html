@@ -107,6 +107,12 @@ header{background-color:#B3000E!important}
 .openbar{width:100%!important;box-sizing:border-box!important;overflow:hidden!important}
 .openbar .tile{border:0!important;box-shadow:none!important}
 .openbar .ob{overflow:hidden!important}
+</style><style id="xc-ob4">
+.openbar{padding:3px!important;box-sizing:border-box!important;overflow:hidden!important;width:100%!important}
+.openbar .ol{flex:0 0 48px!important;width:48px!important}
+.openbar .plus{flex:0 0 6px!important}
+.openbar .tile{flex:1 1 0!important;min-width:0!important;border:0!important}
+.openbar .refresh,.openbar .bar{flex:0 0 4px!important}
 </style></head><body><div class="notice">本站数据仅供参考 · 开奖结果以官方公布为准</div>
 <header><div class="logo">新港摇钱树</div><div class="seal">正版</div></header>
 <nav class="tabs"><a class="on">新港</a><a>新澳</a><a>香港</a></nav>
@@ -144,5 +150,14 @@ header{background-color:#B3000E!important}
       '<section class="mini"><h5>生肖号码大表</h5><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px">'+['鼠 07 19 31 43','牛 06 18 30 42','虎 05 17 29 41','兔 04 16 28 40','龙 03 15 27 39','蛇 02 14 26 38','马 01 13 25 37 49','羊 12 24 36 48','猴 11 23 35 47','鸡 10 22 34 46','狗 09 21 33 45','猪 08 20 32 44'].map(function(s){var p=s.split(' ');return '<div style="border:1px solid #E8D098;border-radius:4px;text-align:center;padding:4px 2px;font-size:12px;background:#FFFDF6"><b style="color:#C90000;font-size:15px">'+p[0]+'</b><br>'+p.slice(1).join(' ')+'</div>'}).join('')+'</div></section>';
     // 首屏号码保持样张静态（与真实 313 一致）
   }).catch(function(e){});
+})();
+</script><script>
+(function(){
+ function fix(){var ob=document.querySelector('.openbar');if(!ob)return;ob.style.padding='3px 6px 3px 3px';ob.style.boxSizing='border-box';ob.style.overflow='hidden';ob.style.width='100%';
+  var ol=ob.querySelector('.ol');if(ol){ol.style.flex='0 0 48px';ol.style.width='48px'}
+  var pl=ob.querySelector('.plus');if(pl){pl.style.flex='0 0 6px';pl.style.fontSize='14px'}
+  ob.querySelectorAll('.tile').forEach(function(t){t.style.flex='1 1 0';t.style.minWidth='0';t.style.border='0';t.style.boxShadow='none';t.style.width='auto'});
+ }
+ setTimeout(fix,300);setTimeout(fix,1200);setTimeout(fix,2500);
 })();
 </script></body></html>
