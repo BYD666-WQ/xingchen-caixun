@@ -196,7 +196,7 @@ async function loadAll(){
     pl = await fetch(RAW + 'data/manual-play.json?t=' + t).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; });
     try { cp = await fetch(RAW + 'data/site-copy.json?t=' + t).then(function (r) { return r.ok ? r.json() : {}; }); } catch (e) {}
   }
-  $('c-brand').value=cp.brand||'香港摇钱树'; $('c-banner').value=cp.brandNumber||cp.bannerNumber||'7798'; $('c-slogan').value=cp.slogan||'官方开奖信息';
+  $('c-brand').value=cp.brand||'香港摇钱树'; var _cb=$('c-banner'); if(_cb) _cb.value=cp.brandNumber||cp.bannerNumber||'7798'; $('c-slogan').value=cp.slogan||'官方开奖信息';
   $('c-notice').value=cp.notice||''; $('c-disclaimer').value=cp.disclaimer||'数据来自官方公开信息，仅供参考。';
   draw=dr;play=pl;LOADED=true;
   $('g-name').value=dr.name||''; $('g-issue').value=dr.issue||''; $('g-drawtime').value=dr.drawTime||'';
@@ -280,7 +280,7 @@ async function save(){
   var btn=$('btn-save');btn.disabled=true;btn.textContent='提交中…';
   $('btn-save-bar').disabled=true;setState('提交中…请勿关闭页面');
   try{
-    var copy={brand:$('c-brand').value.trim(),brandNumber:$('c-banner').value.trim(),bannerNumber:$('c-banner').value.trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
+    var copy={brand:$('c-brand').value.trim(),brandNumber:(($('c-banner')||{}).value||'').trim(),bannerNumber:(($('c-banner')||{}).value||'').trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
     var zlRows = String($('zl-bulk').value||'').split('\n').map(function(l){return l.trim()}).filter(Boolean).map(function(l){
       var p=l.replace(/,/g,' ').split(/\s+/).filter(Boolean);
       var issue=parseInt(p.shift(),10); var oe=p.shift()==='双'?'双':'单'; var zs=String(p.shift()||'').slice(0,3).split('');
