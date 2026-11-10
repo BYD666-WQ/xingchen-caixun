@@ -534,4 +534,71 @@
     }
     setTimeout(dropHappy8, 1200); setTimeout(dropHappy8, 2600);
   })();
+
+  // 版式 A（清爽版）：大标题 → 一排最新开奖 → 4 彩种按钮；资料/内幕/历史默认收起
+  (function () {
+    var state = { open: false };
+    function fmt(list) { return list.map(function (n) { return n.c || n; }); }
+    function ball(c, z, color) {
+      var bg = color === '\u7ea2' ? '#e71607' : (color === '\u84dd' ? '#2873e6' : '#1fb61d');
+      return '<span style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:' + bg + ';color:#fff;margin:3px;font:700 14px/1 \'Microsoft YaHei\',Arial,sans-serif">' + c +
+        '<i style="font-style:normal;font-size:9px;opacity:.85">' + (z || '') + '</i></span>';
+    }
+    Promise.all([
+      fetch(base() + 'data/site-copy.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }),
+      fetch(base() + 'data/manual-draw.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })
+    ]).then(function (res) {
+      var c = res[0] || {}, d = res[1] || {};
+      var brand = c.brand || '\u9999\u6e2f\u6447\u94b1\u6811';
+      var num = String(c.brandNumber || c.bannerNumber || '7798');
+      var nums = (d.nums || []).slice(0, 7);
+      var balls = nums.map(function (n) { return ball(n.c, n.z, n.color); }).join('');
+      var box = document.createElement('div');
+      box.id = 'xc-layout-a';
+      box.style.cssText = 'max-width:720px;margin:8px auto;padding:12px 10px;background:#fffdf6;border:1px solid #e8dcc8;border-radius:10px;text-align:center';
+      box.innerHTML =
+        '<div id="xc-a-title" style="font:900 26px/1.3 \'Microsoft YaHei\',Arial,sans-serif;color:#c0392b">' + brand +
+        '<span style="color:#d60000;margin-left:4px">' + num + '</span></div>' +
+        '<div id="xc-a-draw" style="margin:10px 0 6px;font:700 13px/1.6 \'Microsoft YaHei\',Arial,sans-serif;color:#333">\u65b0\u9999\u6e2f\u7b2c' + (d.issue || '') + '\u671f</div>' +
+        '<div id="xc-a-balls" style="display:flex;flex-wrap:wrap;justify-content:center">' + balls + '</div>' +
+        '<div id="xc-a-tabs" style="display:flex;gap:8px;justify-content:center;margin:10px 0 4px">' +
+        ['\u65b0\u6fb3\u5f69','\u8001\u6fb3\u5f69','\u65b0\u9999\u6e2f','\u9999\u6e2f\u5f69'].map(function (nm) {
+          return '<button data-tab="' + nm + '" style="flex:1;min-height:42px;border:1px solid #d8ccb4;border-radius:8px;background:#fff;color:#333;font:700 14px \'Microsoft YaHei\',Arial,sans-serif">' + nm + '</button>';
+        }).join('') + '</div>' +
+        '<button id="xc-a-more" style="margin-top:6px;min-height:38px;border:0;border-radius:8px;background:#f3ede1;color:#7a5c1e;font:700 13px \'Microsoft YaHei\',Arial,sans-serif;padding:0 14px">\u5c55\u5f00\u8d44\u6599 / \u5185\u5e55 / \u5386\u53f2</button>';
+      var app = document.getElementById('app') || document.body;
+      app.insertBefore(box, app.firstChild);
+      // 折叠：资料区表、内幕模块、折叠长列表
+      var hidden = [];
+      [document.querySelector('table.sevenxiaosevenma'), document.getElementById('widgetBox43159')].forEach(function (el) {
+        if (!el) return;
+        var host = el.closest ? el.closest('[id^="widgetBox"]') : el;
+        host = host || el;
+        host.style.display = 'none';
+        hidden.push(host);
+      });
+      var folds = document.querySelector('.xc-fold-list') || document.querySelectorAll('.xc-fold-bar');
+      if (folds && folds.length) {
+        var listBox = folds[0].parentNode;
+        listBox.style.display = 'none';
+        hidden.push(listBox);
+      }
+      document.getElementById('xc-a-more').addEventListener('click', function () {
+        state.open = !state.open;
+        hidden.forEach(function (h) { h.style.display = state.open ? '' : 'none'; });
+        this.textContent = state.open ? '\u6536\u8d77\u8d44\u6599 / \u5185\u5e55 / \u5386\u53f2' : '\u5c55\u5f00\u8d44\u6599 / \u5185\u5e55 / \u5386\u53f2';
+      });
+      document.querySelectorAll('#xc-a-tabs button').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var nm = b.getAttribute('data-tab');
+          var tabs = document.querySelectorAll('#widgetBox41362 .tie > div');
+          for (var i = 0; i < tabs.length; i++) {
+            if ((tabs[i].textContent || '').indexOf(nm) >= 0) { tabs[i].click(); break; }
+          }
+          var anchor = document.getElementById('widgetBox41750');
+          if (anchor && anchor.scrollIntoView) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    });
+  })();
 })();
