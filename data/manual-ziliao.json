@@ -2,6 +2,34 @@
  "name": "新香港",
  "rows": [
   {
+   "issue": 314,
+   "oddEven": "单",
+   "threeZodiac": [],
+   "result": {
+    "c": "",
+    "z": ""
+   },
+   "text": "内幕【提前公开】",
+   "status": "live",
+   "updated": "2026-11-10T12:38:24.724Z"
+  },
+  {
+   "issue": 313,
+   "oddEven": "双",
+   "threeZodiac": [
+    "鼠",
+    "羊",
+    "猴"
+   ],
+   "result": {
+    "c": "18",
+    "z": "牛"
+   },
+   "text": "内幕【提前公开】",
+   "status": "live",
+   "updated": "2026-11-10T12:38:24.724Z"
+  },
+  {
    "issue": 312,
    "oddEven": "单",
    "threeZodiac": [
