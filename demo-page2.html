@@ -72,7 +72,7 @@
 <div class="tabs"><div class="tab on"><span class="ico"></span>新港</div><div class="tab"><span class="ico"></span>新澳</div><div class="tab"><span class="ico"></span>香港</div></div>
 <div class="openbar">
   <div class="left">314期开<span>开奖记录</span></div>
-  <div class="balls">
+  <div class="balls" id="ob-balls">
     <div class="tile r"><div class="num">13</div><div class="zod">马</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile b"><div class="num">09</div><div class="zod">狗</div></div><div class="tile b"><div class="num">37</div><div class="zod">马</div></div><div class="tile r"><div class="num">34</div><div class="zod">鸡</div></div><div class="tile g"><div class="num">44</div><div class="zod">猪</div></div><span class="plus">+</span><div class="tile b"><div class="num">31</div><div class="zod">鼠</div></div>
   </div>
   <div class="refresh"></div>
@@ -82,18 +82,8 @@
   <div class="balls"><div class="tile r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div></div>
   <div class="next"><span>新港第314期: 11月11日 星期三 21:34</span><span class="rf">刷新</span></div>
 </div>
-<div class="nm"><div class="h">新港摇钱树【单双③肖】</div>
-  <div class="row"><span class="iss">314期:内幕</span><span class="pend">【待开】</span></div>
-  <div class="row"><span class="iss">313期:内幕</span><span class="lab">【单数】</span><span>主</span><span class="zod2">【兔蛇羊】</span><span>开马13</span><span class="ok">准</span></div>
-  <div class="row"><span class="iss">312期:内幕</span><span class="lab">【单数】</span><span>主</span><span class="zod2">【猪羊虎】</span><span>开鼠07</span><span class="ok">准</span></div>
-  <div class="row"><span class="iss">311期:内幕</span><span class="lab">【单数】</span><span>主</span><span class="zod2">【鼠兔鸡】</span><span>开龙39</span><span class="ok">准</span></div>
-</div>
-<div class="zl"><div class="h">资料大全</div>
-  <div class="g">七肖 · 五肖 · 三肖 · 二肖 · 一肖</div>
-  <div class="row"><span class="n">7肖</span><span class="zs"><span>兔</span><span>蛇</span><span>羊</span><span>猪</span><span>虎</span><span>鼠</span><span>鸡</span></span><span class="code">码:28.26.12.11.30.07.13</span></div>
-  <div class="row"><span class="n">5肖</span><span class="zs"><span>兔</span><span>蛇</span><span>羊</span><span>猪</span><span>虎</span></span><span class="code">码:28.26.12.11.30</span></div>
-  <div class="row"><span class="n">3肖</span><span class="zs"><span>兔</span><span>蛇</span><span>羊</span></span><span class="code">码:28.26.12</span></div>
-</div>
+<div class="nm"><div class="h">新港摇钱树【单双③肖】</div><div id="nm-rows"></div></div>
+<div class="zl"><div class="h">资料大全</div><div id="zl-rows"></div></div>
 <div class="text">本站数据仅供参考 · 不作购彩依据</div>
 </div>
 <div class="nav">
@@ -103,4 +93,32 @@
   <a href="#"><span class="badge">49</span>寻宝</a>
   <a href="#"><span class="badge">49</span>图库</a>
 </div>
-</body></html>
+<script>
+(function(){
+  var SRC=['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/',''];
+  function get(p){var i=0;function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var u=SRC[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
+  var R=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46],B=[3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
+  function col(n){return R.indexOf(n)>=0?'r':(B.indexOf(n)>=0?'b':'g')}
+  function tile(c,z,cls){return '<div class="tile '+cls+'"><div class="num">'+c+'</div><div class="zod">'+z+'</div></div>'}
+  Promise.all([get('data/manual-draw.json'),get('data/manual-ziliao.json')]).then(function(r){
+    var md=r[0]||{},zl=r[1]||{},rows=(zl.rows||[]).slice(0,12);
+    var ob=document.getElementById('ob-balls');
+    if(ob&&md.nums){ob.innerHTML=md.nums.map(function(x){return tile(x.c,x.z,col(parseInt(x.c,10)))}).join('');}
+    var nm=document.getElementById('nm-rows');
+    if(nm){nm.innerHTML=rows.map(function(d){
+      var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');
+      if(!ok)return '<div class="row"><span class="iss">'+d.issue+'期:内幕</span><span class="pend">【待开】</span></div>';
+      return '<div class="row"><span class="iss">'+d.issue+'期:内幕</span><span class="lab">【'+(d.oddEven==='双'?'双数':'单数')+'】</span><span>主</span><span class="zod2">【'+((d.threeZodiac||[]).join(''))+'】</span><span>开'+(d.result.z||'')+c+'</span><span class="ok">准</span></div>';
+    }).join('');}
+    var zlBox=document.getElementById('zl-rows');
+    if(zlBox){
+      var pool=[];rows.forEach(function(d){(d.threeZodiac||[]).forEach(function(z){if(pool.indexOf(z)<0)pool.push(z)})});
+      pool=pool.concat(['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪']).slice(0,7);
+      var hn=(md.nums||[]).map(function(x){return x.c});
+      zlBox.innerHTML=[7,5,3,2,1].map(function(n){
+        return '<div class="row"><span class="n">'+n+'肖</span><span class="zs">'+pool.slice(0,n).map(function(z){return '<span>'+z+'</span>'}).join('')+'</span><span class="code">码:'+hn.slice(0,n).join('.')+'</span></div>';
+      }).join('');
+    }
+  }).catch(function(e){console.log('[data]',e&&e.message)});
+})();
+</script></body></html>
