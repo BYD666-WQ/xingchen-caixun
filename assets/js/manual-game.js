@@ -666,5 +666,60 @@
     }
     setTimeout(refreshDraw, 1500);
     setInterval(refreshDraw, 60000);
+  
+  // 三彩种收口：新港 / 新澳 / 香港 —— 删老澳与快乐8，重排顺序，清重复倒计时
+  (function () {
+    var ORDER = ['\u65b0\u9999\u6e2f', '\u65b0\u6fb3\u5f69', '\u9999\u6e2f\u5f69'];
+    var LABEL = { '\u65b0\u9999\u6e2f': '\u65b0\u6e2f', '\u65b0\u6fb3\u5f69': '\u65b0\u6fb3', '\u9999\u6e2f\u5f69': '\u9999\u6e2f' };
+    function txt(el) { return (el.textContent || '').replace(/\s+/g, ''); }
+    function drop(name) {
+      document.querySelectorAll('.baomalaodaName').forEach(function (n) {
+        if (txt(n) === name) {
+          var b = n;
+          while (b && b !== document.body) { if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) break; b = b.parentNode; }
+          if (b && b.parentNode) b.parentNode.removeChild(b);
+        }
+      });
+    }
+    function fixTabs() {
+      var tie = document.querySelector('#widgetBox41362 .tie');
+      if (!tie) return;
+      var tabs = [].slice.call(tie.children);
+      tabs.forEach(function (t) {
+        var s = txt(t);
+        if (s.indexOf('\u8001\u6fb3') >= 0 || s.indexOf('\u5feb\u4e508') >= 0) { tie.removeChild(t); return; }
+        if (s.indexOf('\u65b0\u9999\u6e2f') >= 0) t.textContent = '\u65b0\u6e2f';
+        else if (s.indexOf('\u65b0\u6fb3') >= 0) t.textContent = '\u65b0\u6fb3';
+        else if (s.indexOf('\u9999\u6e2f') >= 0) t.textContent = '\u9999\u6e2f';
+      });
+      var cur = [].slice.call(tie.children);
+      cur.sort(function (a, b) { return ORDER.indexOf(txt(a) === '\u65b0\u6e2f' ? '\u65b0\u9999\u6e2f' : (txt(a) === '\u65b0\u6fb3' ? '\u65b0\u6fb3\u5f69' : '\u9999\u6e2f\u5f69')) - ORDER.indexOf(txt(b) === '\u65b0\u6e2f' ? '\u65b0\u9999\u6e2f' : (txt(b) === '\u65b0\u6fb3' ? '\u65b0\u6fb3\u5f69' : '\u9999\u6e2f\u5f69')); });
+      cur.forEach(function (c) { tie.appendChild(c); });
+    }
+    function fixCd() {
+      document.querySelectorAll('.baomalaodaName').forEach(function (n) {
+        var b = n;
+        while (b && b !== document.body) { if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) break; b = b.parentNode; }
+        if (!b) return;
+        var host = b.parentNode;
+        var all = host.querySelectorAll('.xc-cd-all');
+        for (var i = 1; i < all.length; i++) all[i].parentNode.removeChild(all[i]);
+        var nodes = host.querySelectorAll('span,div,i,em');
+        for (var j = 0; j < nodes.length; j++) {
+          var el = nodes[j];
+          if (el.children.length) continue;
+          if (el.closest && el.closest('.xc-cd-all')) continue;
+          var t = (el.textContent || '').trim();
+          if (t.indexOf('\u8ddd\u5f00\u5956') === 0 || t.indexOf('\u539f\u5f00\u5956') === 0) { el.style.display = 'none'; continue; }
+          if (t.indexOf('\u8ddd\u5f00\u5956') >= 0) el.textContent = t.replace(/\u8ddd\u5f00\u5956[\s:：]*\d{1,3}:\d{2}:\d{2}/g, '').trim();
+        }
+      });
+    }
+    function fixBanner() {
+      var box = document.querySelector('#widgetBox41365');
+      if (box) { var sp = box.querySelector('span'); if (sp) sp.textContent = '\u5f00\u5956\u5f69\u79cd'; }
+    }
+    function run() { try { drop('\u8001\u6fb3\u5f69'); drop('\u5feb\u4e508'); fixTabs(); fixCd(); fixBanner(); } catch (e) { console.log('[r3]', e && e.message); } }
+    setTimeout(run, 1500); setTimeout(run, 3000); setInterval(run, 3000);
   })();
-
+})();
