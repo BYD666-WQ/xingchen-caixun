@@ -14,10 +14,12 @@ button{width:100%;height:48px;margin-top:16px;border:0;border-radius:6px;backgro
 button:disabled{opacity:.6}
 #msg{margin-top:12px;padding:10px;border-radius:6px;font-size:13px;display:none;white-space:pre-wrap}
 .ok{background:#e8f7ef;color:#0b7a45}.err{background:#fdecea;color:#a33}
-</style></head><body><div class="wrap">
+</style><script>if(window.top!==window.self){window.top.location=window.self.location}</script>
+</head><body><div class="wrap">
 <h1>手动开奖 · 新彩种</h1>
-<div class="hint">需要一次性粘贴 GitHub fine-grained PAT（仅本仓库 contents:write）。token 只存在本机浏览器 localStorage，不会上传到本站。</div>
-<label>PAT</label><input id="token" type="password" placeholder="github_pat_...">
+<div class="hint">需要一次性粘贴 GitHub fine-grained PAT。建 token 时选：<br>① Repository access: Only select repositories → BYD666-WQ/xingchen-caixun<br>② Permissions: Contents: Read and write（只给这一项；读用于取 sha）<br>③ Expiration: 90 天<br>token 只存本机 localStorage，不会上传本站；但同一浏览器其他 byd666-wq.github.io 页面也能读到，公用电脑用完点「清除本机 token」。</div>
+<label>PAT</label><input id="token" type="password" autocomplete="off" placeholder="github_pat_...">
+<button id="clear" type="button" style="background:#8a6d3b;margin-top:8px">清除本机 token</button>
 <label>期号</label><input id="issue" placeholder="如 2">
 <label>6 个正码 + 1 特码</label><input id="nums" placeholder="01 12 23 34 45 06 18">
 <label>生肖（可选，7 个）</label><input id="zodiacs" placeholder="留空自动按号码生成">
@@ -38,9 +40,9 @@ button:disabled{opacity:.6}
   async function api(url,opt){opt=opt||{};opt.headers=Object.assign({'Authorization':'Bearer '+tok.value,'Accept':'application/vnd.github+json'},opt.headers||{});var r=await fetch(url,opt);var j=null;try{j=await r.json()}catch(e){}if(!r.ok)throw new Error((j&&j.message)||('HTTP '+r.status));return j}
   async function save(){
     if(!tok.value.trim()){msg('请先粘贴 PAT',false);return}
-    localStorage.setItem(KEY,tok.value.trim());
     var nums=($('nums').value||'').trim().replace(/,/g,' ').split(/\s+/).filter(Boolean).map(function(n){return n.length<2?('0'+n):n});
     if(nums.length!==7){msg('号码必须是 7 个（6+1），当前 '+nums.length+' 个',false);return}
+    localStorage.setItem(KEY,tok.value.trim());
     var ZH=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
     var zs=($('zodiacs').value||'').trim().replace(/,/g,' ').split(/\s+/).filter(Boolean);
     if(zs.length!==7){zs=nums.map(function(n){return ZH[(parseInt(n,10)-1)%12]})}
@@ -56,6 +58,9 @@ button:disabled{opacity:.6}
     }catch(e){msg('失败：'+e.message,false)}
     btn.disabled=false; btn.textContent='保存并发布（约 1–2 分钟生效）';
   }
+  $('clear').addEventListener('click',function(){
+    localStorage.removeItem(KEY); tok.value=''; msg('已清除本机 token',true);
+  });
   $('rand').addEventListener('click',function(){
     var ZH=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
     var pool=[];for(var i=1;i<=49;i++)pool.push(i);
