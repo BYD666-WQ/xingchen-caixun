@@ -28,6 +28,9 @@ button.small{min-height:40px;font-size:13px;padding:0 12px}
 .ball i{font-style:normal;font-size:9px;font-weight:400}
 table{width:100%;border-collapse:collapse;font-size:13px}
 td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
+#savebar{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;gap:10px;padding:0 12px;background:#fff;border-top:1px solid #e5e5e5;z-index:25;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+#savebar #save-state{flex:1;font-size:12px;color:#666;line-height:1.3}
+body{padding-bottom:76px}
 #msg{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);max-width:92vw;padding:10px 14px;border-radius:8px;color:#fff;background:#333;display:none;z-index:30;white-space:pre-wrap;font-size:13px}
 .commit{font-size:12px;color:#666;border-top:1px solid #eee;padding:6px 0;display:flex;justify-content:space-between;gap:8px;align-items:center}
 </style></head><body>
@@ -92,6 +95,10 @@ td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
   <div id="commits" style="max-height:220px;overflow:auto"></div>
 </div></details></div>
 
+</div>
+<div id="savebar">
+  <span id="save-state">未保存</span>
+  <button id="btn-save-bar" style="min-height:44px;padding:0 18px">保存并发布</button>
 </div>
 <div id="msg"></div>
 <script>
@@ -234,6 +241,7 @@ async function save(){
   };
   var newPlay={name:newDraw.name,issue:newDraw.issue,oddEven:$('p-oe').value,threeZodiac:zs,note:$('p-note').value.trim(),status:'live',updated:new Date().toISOString()};
   var btn=$('btn-save');btn.disabled=true;btn.textContent='提交中…';
+  $('btn-save-bar').disabled=true;setState('提交中…请勿关闭页面');
   try{
     var copy={brand:$('c-brand').value.trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
     var zlRows = String($('zl-bulk').value||'').split('\n').map(function(l){return l.trim()}).filter(Boolean).map(function(l){
@@ -254,10 +262,12 @@ async function save(){
       await saveFile('data/manual-ziliao.json',newZl,'cms: update ziliao');
     }
     Msg('已提交，约 1-2 分钟生效（正在自动确认…）',true);
+    setState('已提交，等待生效…');
     poll();
     draw=newDraw;play=newPlay;renderPreview();
-  }catch(e){Msg('保存失败：'+e.message,false)}
+  }catch(e){Msg('保存失败：'+e.message,false);setState('保存失败：'+e.message)}
   btn.disabled=false;btn.textContent='保存并发布';
+  $('btn-save-bar').disabled=false;
   commitList();
 }
 function poll(){
@@ -267,7 +277,7 @@ function poll(){
     try{
       var d=await fetch(RAW+'data/manual-draw.json?t='+Date.now()).then(function(r){return r.json()});
       if(String(d.issue)===String($('g-issue').value) && d.name===$('g-name').value){
-        clearInterval(timer);Msg('已生效 ✓ 打开站点查看：'+PAGES,true);
+        clearInterval(timer);Msg('已生效 ✓ 打开站点查看：'+PAGES,true);setState('已生效 ✓');
       }else if(tries>=8){clearInterval(timer);Msg('仍在构建中，稍后刷新页面即可',false)}
     }catch(e){}
     if(tries>=8)clearInterval(timer);
@@ -316,6 +326,8 @@ $('btn-bulk').addEventListener('click',function(){
   draw.history.sort(function(a,b){return b.issue-a.issue});renderHistory();Msg('导入 '+added+' 期，记得点「保存并发布」',true);
 });
 $('btn-save').addEventListener('click',save);
+$('btn-save-bar').addEventListener('click',save);
+function setState(t){var el=$('save-state');if(el)el.textContent=t}
 $('btn-clear').addEventListener('click',function(){localStorage.removeItem(KEY);$('token').value='';Msg('已清除本机 token',true)});
 $('btn-refresh').addEventListener('click',function(){loadAll().then(function(){Msg('已重新载入线上数据',true)})});
 $('token').value=token();
