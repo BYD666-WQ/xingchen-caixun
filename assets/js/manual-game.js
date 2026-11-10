@@ -51,9 +51,11 @@
         var tile = mas[i] && mas[i].parentNode;
         if (tile) {
           var at = XC_ATTRS[n.c] || {};
-          var col = n.color || at.c || colorOf(parseInt(n.c, 10));
+          var CMAP = { '\u7ea2': '#e71607', '\u84dd': '#2873e6', '\u7eff': '#1fb61d', red: '#e71607', blue: '#2873e6', green: '#1fb61d' };
+          var raw = n.color || at.c || '';
+          var col = CMAP[raw] || CMAP[colorOf(parseInt(n.c, 10))] || '#1fb61d';
           n.wuxing = n.wuxing || at.w;
-          tile.style.background = col === 'red' ? '#e71607' : (col === 'blue' ? '#2873e6' : '#1fb61d');
+          tile.style.background = col;
           tile.style.color = '#fff';
         }
       });
@@ -166,21 +168,36 @@
     setTimeout(run, 1200);
   })();
 
-  // 全局清扫：任何叶子节点出现「香港彩第…」一律隐藏（含 tab 切换后残留/块外共用行）
+  // 全局清扫（不隐藏，只替换文案 + 独立倒计时）
   (function () {
+    function tick(el) {
+      function t() {
+        var now = new Date();
+        var d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 21, 34, 0);
+        if (d.getTime() <= now.getTime()) d = new Date(d.getTime() + 86400000);
+        var left = Math.floor((d.getTime() - now.getTime()) / 1000);
+        function p(n) { return (n < 10 ? '0' : '') + n; }
+        el.textContent = '\u8ddd\u5f00\u5956 ' + p(Math.floor(left / 3600)) + ':' + p(Math.floor(left % 3600 / 60)) + ':' + p(left % 60);
+      }
+      t(); setInterval(t, 1000);
+    }
     function scrub() {
       var all = document.querySelectorAll('*');
       for (var i = 0; i < all.length; i++) {
-        var el = all[i];
-        if (el.children.length) continue;
-        var t = (el.textContent || '');
-        if (/\u9999\u6e2f\u5f69\u7b2c\s*\d+/.test(t)) {
-          el.textContent = '';
+        var el = all[i], t = (el.textContent || '');
+        if (el.children.length <= 5 && t.length < 140 && /\u9999\u6e2f\u5f69\u7b2c\s*\d+/.test(t)) {
+          if (el.getAttribute('data-xc-fixed') === '1') continue;
+          el.setAttribute('data-xc-fixed', '1');
+          el.textContent = '\u65b0\u9999\u6e2f\u7b2c2\u671f: \u6bcf\u5929 21:34  ';
+          var sp = document.createElement('span');
+          sp.style.cssText = 'margin-left:6px;color:#1f3b8a;font-weight:700';
+          el.appendChild(sp);
+          tick(sp);
         }
       }
     }
-    scrub();
-    setInterval(scrub, 400);
-    document.addEventListener('click', function () { setTimeout(scrub, 60); setTimeout(scrub, 300); });
+    scrub(); setInterval(scrub, 500);
   })();
+})();
+})();
 })();
