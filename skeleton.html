@@ -1,0 +1,56 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light">
+<title>版式骨架（D 结构）</title>
+<link rel="stylesheet" href="assets/css/theme.css">
+<style>
+*{box-sizing:border-box}body{margin:0;background:var(--xc-bg);color:var(--xc-ink);font:var(--xc-fs-2)/1.5 "Microsoft YaHei",Arial,sans-serif;padding-bottom:56px}
+.wrap{max-width:720px;margin:0 auto}
+.mq{background:var(--xc-panel);color:var(--xc-ink-3);font-size:var(--xc-fs-1);padding:4px 8px;border-bottom:var(--xc-line)}
+.brand{background:var(--xc-red-2);color:var(--xc-gold);display:flex;justify-content:space-between;padding:8px 10px;font-size:var(--xc-fs-6);font-weight:900}
+.tabs{display:flex;gap:var(--xc-gap);padding:var(--xc-pad);background:var(--xc-panel);border-bottom:var(--xc-line)}
+.tabs span{flex:1;text-align:center;border:var(--xc-line);border-radius:var(--xc-radius-pill);padding:5px 0;font-size:var(--xc-fs-2)}
+.tabs span.on{background:var(--xc-red-3);color:#fff;border-color:var(--xc-red-deep)}
+.card{background:var(--xc-panel);border:var(--xc-line);border-radius:var(--xc-radius);margin:6px 8px;overflow:hidden;box-shadow:var(--xc-shadow)}
+.card h3{margin:0;background:var(--xc-red);color:var(--xc-gold);font-size:var(--xc-fs-4);font-weight:700;text-align:center;padding:6px 0}
+.card .in{padding:var(--xc-pad)}
+.balls{display:flex;justify-content:center;flex-wrap:wrap}
+.ball{width:30px;height:30px;border-radius:50%;color:#fff;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;margin:2px;font-weight:700;font-size:var(--xc-fs-3);box-shadow:0 0 0 1.5px var(--xc-gold-2) inset}
+.ball.r{background:var(--xc-red-ball)}.ball.b{background:var(--xc-blue-ball)}.ball.g{background:var(--xc-green-ball)}
+.ball i{font-style:normal;font-size:8px;font-weight:400}
+.row{display:flex;justify-content:space-between;border-top:var(--xc-line-thin);padding:4px 0;font-size:var(--xc-fs-2)}
+.row:first-child{border-top:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--xc-gap)}
+.cell{border:var(--xc-line);background:#fff;text-align:center;padding:3px;font-size:var(--xc-fs-1)}
+.cell b{color:var(--xc-red-3);font-size:var(--xc-fs-4)}
+.c3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--xc-gap)}
+.wx{display:flex;gap:var(--xc-gap)}
+.wx div{flex:1;border:var(--xc-line);background:#fff;text-align:center;padding:3px;font-size:var(--xc-fs-1)}
+.entry{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--xc-gap)}
+.entry a{border:var(--xc-line);border-radius:var(--xc-radius);background:#fff;text-align:center;padding:8px 2px;color:var(--xc-red-deep);text-decoration:none;font-size:var(--xc-fs-2)}
+.disc{text-align:center;color:var(--xc-ink-3);font-size:var(--xc-fs-1);padding:8px}
+.nav{position:fixed;left:0;right:0;bottom:0;height:52px;display:flex;background:var(--xc-panel);border-top:var(--xc-line)}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:var(--xc-fs-1);color:var(--xc-ink-3);text-decoration:none}
+.nav a.on{color:var(--xc-red-3);font-weight:700}
+</style></head><body><div class="wrap">
+<div class="mq">【公告】结构骨架 · 视觉待参考站清单</div>
+<div class="brand"><span>新港摇钱树</span><span>☰</span></div>
+<div class="tabs"><span class="on">新港</span><span>新澳</span><span>香港</span></div>
+<div class="card"><h3>313期开 · 开奖记录</h3><div class="in balls">
+<span class="ball r">28<i>兔</i></span><span class="ball b">26<i>蛇</i></span><span class="ball r">12<i>羊</i></span><span class="ball g">11<i>猴</i></span><span class="ball r">30<i>牛</i></span><span class="ball r">07<i>鼠</i></span><span style="margin:0 2px;color:#aaa">+</span><span class="ball r" style="box-shadow:0 0 0 2px var(--xc-gold-2) inset">13<i>马</i></span>
+</div></div>
+<div class="card"><h3>第 313 期 · 每天 21:34</h3><div class="in" style="display:flex;justify-content:space-between;align-items:center"><span>距开奖 19:26:34</span><span style="border:var(--xc-line);border-radius:var(--xc-radius-pill);padding:2px 10px;color:var(--xc-red-deep)">刷新</span></div></div>
+<div class="card"><h3>生肖号码对照</h3><div class="in"><div class="grid">
+<div class="cell"><b>马</b>冲鼠<br>01 13 25 37 49</div><div class="cell"><b>蛇</b>冲猪<br>02 14 26 38</div><div class="cell"><b>龙</b>冲狗<br>03 15 27 39</div>
+</div></div></div>
+<div class="card"><h3>波色 / 五行</h3><div class="in">
+<div class="c3"><div class="cell" style="color:var(--xc-red-ball)">红波<br>01 02 07</div><div class="cell" style="color:var(--xc-blue-ball)">蓝波<br>03 04 09</div><div class="cell" style="color:var(--xc-green-ball)">绿波<br>05 06 11</div></div>
+<div class="wx" style="margin-top:4px"><div>金 05</div><div>木 08</div><div>水 01</div><div>火 02</div><div>土 07</div></div>
+</div></div>
+<div class="card"><h3>单双③肖 · 内幕</h3><div class="in">
+<div class="row"><b>314期</b><span>待开</span></div><div class="row"><b>313期</b><span>单数 主兔蛇羊 开马13 准</span></div><div class="row"><b>312期</b><span>单数 主猪羊虎 开鼠07 准</span></div>
+</div></div>
+<div class="card"><h3>资料入口</h3><div class="in entry"><a href="#">资料大全</a><a href="#">规律走势</a><a href="#">图库</a><a href="#">寻宝</a></div></div>
+<div class="disc">本站数据仅供参考 · 不作购彩依据</div>
+</div>
+<div class="nav"><a href="#" class="on"><span>🏠</span>首页</a><a href="#"><span>📚</span>资料大全</a><a href="#"><span>📈</span>规律走势</a><a href="#"><span>🔍</span>寻宝</a><a href="#"><span>🖼️</span>图库</a></div>
+</body></html>
