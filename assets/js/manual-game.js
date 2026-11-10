@@ -71,6 +71,10 @@
       nextEl.style.cssText = 'max-width:720px;margin:2px auto 8px;padding:0 12px;font:700 13px/1.6 "Microsoft YaHei",Arial,sans-serif;color:#333';
       nextEl.textContent = (d.name || '\u65b0\u9999\u6e2f') + '\u7b2c' + nextIssue0 + '\u671f: ' + (d.drawTime || '\u6bcf\u5929 21:34');
       block.parentNode.insertBefore(nextEl, block.nextSibling);
+      [].slice.call(block.querySelectorAll('.baomalaodaHistory')).forEach(function (h) {
+        h.style.cursor = 'pointer';
+        h.addEventListener('click', function (e) { e.preventDefault(); if (window.XC_NEWHK_HISTORY) window.XC_NEWHK_HISTORY(window.__XC_HISTORY || []); });
+      });
       // 2.4) 下一期行（宽松匹配，覆盖克隆来的其它彩种文案）
       (function () {
         var nextIssue = (parseInt(d.issue, 10) || 1) + 1;
