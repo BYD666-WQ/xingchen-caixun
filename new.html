@@ -22,6 +22,29 @@ h1{font:900 27px/1.3 "Microsoft YaHei",Arial,sans-serif;color:#c0392b;text-align
 .ball i{font-style:normal;font-size:9px;opacity:.85;margin-top:1px}
 .cd{margin-top:8px;font:700 13px "Microsoft YaHei",Arial,sans-serif;color:#1f3b8a}
 .upd{font-size:11px;color:#aaa;margin-top:4px}
+
+/* ===== 复刻旧站外观 ===== */
+body{background:#f5efd8 !important}
+h1{background:linear-gradient(#c32323,#8f1414);color:#ffe08a !important;font-size:22px;padding:10px 0;margin:-12px -10px 6px;-webkit-text-size-adjust:100%}
+.sub{color:#7a5c1e;margin-bottom:10px}
+.tabs button{background:#fffdf3;border:1px solid #d9c48a;border-radius:999px;position:relative;padding-left:26px}
+.tabs button::before{content:"";position:absolute;left:10px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:#d9a441}
+.tabs button.on{background:#b51f1f;border-color:#8f1414;color:#fff}
+.tabs button.on::before{background:#ffe08a}
+.card{border:1px solid #d9c48a;background:#fffdf3;box-shadow:0 1px 0 #fff inset}
+.card h2{background:linear-gradient(#d42d2d,#a81212);color:#ffe08a;margin:-12px -10px 8px;padding:8px 0;border-radius:8px 8px 0 0;font-size:17px}
+.ball{box-shadow:0 0 0 2px #f6d97a inset;font-weight:900}
+.cd{color:#8f1414}
+#ziliao{border:1px solid #d9c48a;background:#fffdf3}
+#ziliao h2{background:linear-gradient(#d42d2d,#a81212);color:#ffe08a;margin:-10px -10px 8px;padding:8px 0;border-radius:8px 8px 0 0}
+.zrow{border-top:1px dashed #e6d7ad}
+#bottomnav{position:fixed;left:0;right:0;bottom:0;height:52px;display:flex;background:#fffdf3;border-top:1px solid #d9c48a;z-index:99}
+#bottomnav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:#8a6d3b;text-decoration:none}
+#bottomnav a i{font-style:normal;font-size:16px;line-height:1}
+#bottomnav a.on{color:#b51f1f;font-weight:700}
+#wrap{padding-bottom:70px}
+@media (prefers-color-scheme: dark){html,body{background:#f5efd8 !important;color:#333 !important}}
+
 #ziliao{margin-top:14px;background:#fffdf6;border:1px solid #e8dcc8;border-radius:10px;padding:10px}
 #ziliao h2{font:700 16px "Microsoft YaHei",Arial,sans-serif;color:#c0392b;margin:0 0 8px;text-align:center}
 .zrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;padding:5px 0;border-top:1px dashed #eee;font:13px/1.5 "Microsoft YaHei",Arial,sans-serif}
@@ -40,6 +63,13 @@ h1{font:900 27px/1.3 "Microsoft YaHei",Arial,sans-serif;color:#c0392b;text-align
 </div>
 <div id="panels"></div>
 <div id="ziliao"><h2>资料</h2><div id="zl"></div></div>
+</div>
+<div id="bottomnav">
+  <a href="/xingchen-caixun/" class="on"><i>🏠</i>首页</a>
+  <a href="#ziliao"><i>📚</i>资料大全</a>
+  <a href="#ziliao"><i>📈</i>规律走势</a>
+  <a href="#ziliao"><i>🔍</i>寻宝</a>
+  <a href="#ziliao"><i>🖼️</i>图库</a>
 </div>
 <script>
 (function(){
