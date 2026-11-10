@@ -45,7 +45,10 @@ jobs:
           ZH = ['马','蛇','龙','兔','虎','牛','鼠','猪','狗','鸡','猴','羊']
           if len(zs) != 7:
               zs = [ZH[(int(n) - 1) % 12] for n in nums]
-          data = {"name": "新彩种", "issue": issue, "nums": [{"c": n, "z": z} for n, z in zip(nums, zs)],
+          RED = set([1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46])
+          BLUE = set([3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48])
+          def color_of(n): return 'red' if n in RED else ('blue' if n in BLUE else 'green')
+          data = {"name": "新彩种", "issue": issue, "nums": [{"c": n, "z": z, "color": color_of(int(n))} for n, z in zip(nums, zs)],
                   "drawTime": os.environ.get("IN_TIME", "待定"), "status": os.environ.get("IN_STATUS", "open"),
                   "updated": __import__("datetime").datetime.now().isoformat()}
           path = "data/manual-draw.json"
