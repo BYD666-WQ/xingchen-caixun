@@ -477,8 +477,10 @@
         var el = nodes[i];
         if (el.children.length) continue;
         var t = (el.textContent || '').trim();
-        if ((t.indexOf('\u8ddd\u5f00\u5956') === 0 || t.indexOf('\u539f\u5f00\u5956') === 0) && !(el.closest && el.closest('.xc-cd-all'))) {
-          el.style.display = 'none';
+        if (el.closest && el.closest('.xc-cd-all')) continue;
+        if (t.indexOf('\u8ddd\u5f00\u5956') === 0 || t.indexOf('\u539f\u5f00\u5956') === 0) { el.style.display = 'none'; continue; }
+        if (t.indexOf('\u8ddd\u5f00\u5956') >= 0) {
+          el.textContent = t.replace(/\u8ddd\u5f00\u5956[\s:：]*\d{1,3}:\d{2}:\d{2}/g, '').replace(/\u539f\u5f00\u5956[\s:：]*\d{1,3}:\d{2}:\d{2}/g, '').trim();
         }
       }
     }
@@ -589,7 +591,8 @@
         }).join('') + '</div>' +
         '<button id="xc-a-more" style="margin-top:6px;min-height:38px;border:0;border-radius:8px;background:#f3ede1;color:#7a5c1e;font:700 13px \'Microsoft YaHei\',Arial,sans-serif;padding:0 14px">\u5c55\u5f00\u8d44\u6599 / \u5185\u5e55 / \u5386\u53f2</button>';
       var navBanner = document.querySelector('#widgetBox41365 span[style*="font-size: 25px"], #widgetBox41365 span');
-      if (navBanner && (navBanner.textContent || '').indexOf('\u65b0\u6fb3') >= 0) navBanner.textContent = '\u5f69\u79cd\u5f00\u5956';
+      var navBox = document.querySelector('#widgetBox41365');
+      if (navBox) { var sp = navBox.querySelector('span'); if (sp) sp.textContent = '\u5f00\u5956\u5f69\u79cd'; }
       var app = document.getElementById('app') || document.body;
       app.insertBefore(box, app.firstChild);
       // 折叠：资料区表、内幕模块、折叠长列表
