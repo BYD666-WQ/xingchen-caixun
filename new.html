@@ -139,12 +139,24 @@ body,#wrap{padding-bottom:84px !important}
     [7,5,3,2,1].forEach(function(n){
       out.push('<div class="zrow"><span class="iss">'+n+'肖</span><span class="zs">'+pool.slice(0,n).map(function(z){return '<span>'+z+'</span>';}).join('')+'</span><span class="code">码:'+hn.slice(0,n).join('.')+'</span></div>');
     });
-          if(manual.nums) his.unshift({t:'新港',issue:manual.issue,nums:manual.nums});
-      hs.innerHTML=his.slice(0,10).map(function(x){
-        return '<div class="hitem"><span>'+x.t+' 第'+x.issue+'期</span><span>'+ (x.nums||[]).slice(0,7).map(function(n){return n.c}).join(' ')+'</span></div>';
+    document.getElementById('zl').innerHTML = out.length ? out.join('') : '<div class="err">资料加载中…</div>';
+    var hs = document.getElementById('hs');
+    if (hs) {
+      var his = [];
+      if (manual && manual.nums) his.push({ t: '\u65b0\u6e2f', issue: manual.issue, nums: manual.nums });
+      if (draw && draw.games) { draw.games.forEach(function (g) { if (g.rule === 'MacauOld' || g.rule === 'Happy8') return; his.push({ t: g.rule === 'Macau' ? '\u65b0\u6fb3' : '\u9999\u6e2f', issue: g.issue, nums: g.nums }); }); }
+      hs.innerHTML = his.slice(0, 10).map(function (x) {
+        return '<div class="hitem"><span>' + x.t + ' \u7b2c' + x.issue + '\u671f</span><span>' + (x.nums || []).slice(0, 7).map(function (n) { return n.c; }).join(' ') + '</span></div>';
       }).join('');
     }
-    // 每卡历史入口
+    var gl = document.getElementById('gl');
+    if (gl) {
+      gl.innerHTML = rows.slice(0, 8).map(function (r) {
+        var c = r.result && r.result.c; var ok = (c && c !== 'NaN' && r.status !== 'upcoming');
+        return '<div class="hitem"><span>\u65b0\u6e2f' + r.issue + '\u671f ' + (r.oddEven === '\u53cc' ? '\u53cc\u6570' : '\u5355\u6570') + ' ' + ((r.threeZodiac || []).join('')) + '</span><span>' + (ok ? ('\u5f00 ' + r.result.z + c) : '\u5f85\u5f00') + '</span></div>';
+      }).join('');
+    }
+// 每卡历史入口
     Array.prototype.forEach.call(document.querySelectorAll('#panels .card'),function(c){
       if(c.querySelector('.hlink')) return;
       var d=document.createElement('div'); d.className='hlink';
