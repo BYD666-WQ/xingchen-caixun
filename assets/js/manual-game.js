@@ -49,7 +49,6 @@
           var at = XC_ATTRS[n.c] || {};
           var col = n.color || at.c || colorOf(parseInt(n.c, 10));
           n.wuxing = n.wuxing || at.w;
-          n.label = n.label || at.n;
           tile.style.background = col === 'red' ? '#e71607' : (col === 'blue' ? '#2873e6' : '#1fb61d');
           tile.style.color = '#fff';
           if (n.wuxing) {
