@@ -7,32 +7,40 @@
  "nums": [
   {
    "c": "01",
-   "z": "马"
+   "z": "马",
+   "color": "red"
   },
   {
    "c": "12",
-   "z": "羊"
+   "z": "羊",
+   "color": "red"
   },
   {
    "c": "23",
-   "z": "猴"
+   "z": "猴",
+   "color": "red"
   },
   {
    "c": "34",
-   "z": "鸡"
+   "z": "鸡",
+   "color": "red"
   },
   {
    "c": "45",
-   "z": "狗"
+   "z": "狗",
+   "color": "red"
   },
   {
    "c": "06",
-   "z": "牛"
+   "z": "牛",
+   "color": "green"
   },
   {
    "c": "18",
-   "z": "牛"
+   "z": "牛",
+   "color": "red"
   }
  ],
- "updated": "2026-11-10T04:32:37.153Z"
+ "note": "wuxing/label 等 researcher num-attrs.json",
+ "updated": "2026-11-10T04:35:42.831Z"
 }
