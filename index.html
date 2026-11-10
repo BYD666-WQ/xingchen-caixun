@@ -77,11 +77,9 @@
   </div>
   <div class="refresh"></div>
 </div>
-<div class="block">
-  <div class="hd"><b>新港第313期</b><span class="time">19:07:17</span><span class="hist">历史记录</span></div>
-  <div class="balls"><div class="tile r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div></div>
-  <div class="next"><span>新港第314期: 11月11日 星期三 21:34</span><span class="rf">刷新</span></div>
-</div>
+<div class="block" id="blk-newhk"><div class="hd"><b>新港第313期</b><span class="time" id="cd-newhk">每天 21:34</span><span class="hist">历史记录</span></div><div class="balls" id="bl-newhk"></div><div class="next"><span id="nx-newhk">新港第314期</span><span class="rf">刷新</span></div></div>
+<div class="block" id="blk-newmo" style="display:none"><div class="hd"><b>新澳彩第314期</b><span class="time" id="cd-newmo">每天 21:30</span><span class="hist">历史记录</span></div><div class="balls" id="bl-newmo"></div><div class="next"><span id="nx-newmo">新澳彩第315期</span><span class="rf">刷新</span></div></div>
+<div class="block" id="blk-hk" style="display:none"><div class="hd"><b>香港彩第119期</b><span class="time" id="cd-hk">每天 21:30</span><span class="hist">历史记录</span></div><div class="balls" id="bl-hk"></div><div class="next"><span id="nx-hk">香港彩第120期</span><span class="rf">刷新</span></div></div>
 <div class="nm"><div class="h">新港摇钱树【单双③肖】</div><div id="nm-rows"></div></div>
 <div class="zl"><div class="h">资料大全</div><div id="zl-rows"></div></div>
 <div class="text">本站数据仅供参考 · 不作购彩依据</div>
@@ -120,5 +118,36 @@
       }).join('');
     }
   }).catch(function(e){console.log('[data]',e&&e.message)});
+})();
+</script><script>
+(function(){
+  var SRC=['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/',''];
+  function get(p){var i=0;function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var u=SRC[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
+  var R=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46],B=[3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
+  function col(n){return R.indexOf(n)>=0?'r':(B.indexOf(n)>=0?'b':'g')}
+  function tile(c,z,cls){return '<div class="tile '+cls+'"><div class="num">'+c+'</div><div class="zod">'+z+'</div></div>'}
+  function balls(id,arr){var e=document.getElementById(id);if(e&&arr)e.innerHTML=arr.map(function(x){return tile(x.c,x.z,col(parseInt(x.c,10)))}).join('')}
+  function cd(id,t){var e=document.getElementById(id);if(!e)return;var p=String(t).split(':');var now=new Date();var d=new Date(now.getFullYear(),now.getMonth(),now.getDate(),+p[0],+p[1],0);if(d<=now)d=new Date(d.getTime()+864e5);var s=Math.floor((d-now)/1000);function z(n){return(n<10?'0':'')+n}e.textContent='距开奖 '+z(Math.floor(s%86400/3600))+':'+z(Math.floor(s%3600/60))+':'+z(s%60)}
+  var DATA={};
+  function show(k){['newhk','newmo','hk'].forEach(function(x){var b=document.getElementById('blk-'+x);if(b)b.style.display=(x===k?'':'none')});document.querySelectorAll('.tabs .tab').forEach(function(t,i){t.classList.toggle('on',['newhk','newmo','hk'][i]===k)})}
+  window.__showTab=show;
+  Promise.all([get('data/manual-draw.json'),get('data/draw.json'),get('data/manual-ziliao.json')]).then(function(r){
+    var md=r[0]||{},dr=r[1]||{},by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});
+    DATA.newhk=md;DATA.newmo=by.Macau;DATA.hk=by.HongKong;
+    balls('bl-newhk',md.nums);balls('bl-newmo',(by.Macau||{}).nums);balls('bl-hk',(by.HongKong||{}).nums);
+    var b=document.querySelector('#blk-newhk .hd b');if(b&&md.issue)b.textContent='新港第'+md.issue+'期';
+    var bx=document.querySelector('#blk-newmo .hd b');if(bx&&by.Macau)bx.textContent='新澳彩第'+String(by.Macau.issue).slice(-3)+'期';
+    var bh=document.querySelector('#blk-hk .hd b');if(bh&&by.HongKong)bh.textContent='香港彩第'+String(by.HongKong.issue).slice(-3)+'期';
+    setInterval(function(){cd('cd-newhk','21:34');cd('cd-newmo','21:30');cd('cd-hk','21:30')},1000);
+    cd('cd-newhk','21:34');cd('cd-newmo','21:30');cd('cd-hk','21:30');
+    // 内幕/资料 继续沿用 page2 原有逻辑
+    var rows=(r[2]&&r[2].rows||[]).slice(0,12);
+    var nm=document.getElementById('nm-rows');
+    if(nm){nm.innerHTML=rows.map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');if(!ok)return '<div class="row"><span class="iss">'+d.issue+'期:内幕</span><span class="pend">【待开】</span></div>';return '<div class="row"><span class="iss">'+d.issue+'期:内幕</span><span class="lab">【'+(d.oddEven==='双'?'双数':'单数')+'】</span><span>主</span><span class="zod2">【'+((d.threeZodiac||[]).join(''))+'】</span><span>开'+(d.result.z||'')+c+'</span><span class="ok">准</span></div>'}).join('')}
+    var zl=document.getElementById('zl-rows');
+    if(zl){var pool=[];rows.forEach(function(d){(d.threeZodiac||[]).forEach(function(z){if(pool.indexOf(z)<0)pool.push(z)})});pool=pool.concat(['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪']).slice(0,7);var hn=(md.nums||[]).map(function(x){return x.c});zl.innerHTML=[7,5,3,2,1].map(function(n){return '<div class="row"><span class="n">'+n+'肖</span><span class="zs">'+pool.slice(0,n).map(function(z){return '<span>'+z+'</span>'}).join('')+'</span><span class="code">码:'+hn.slice(0,n).join('.')+'</span></div>'}).join('')}
+  });
+  document.querySelectorAll('.tabs .tab').forEach(function(t,i){t.addEventListener('click',function(){show(['newhk','newmo','hk'][i])})});
+  setInterval(function(){location.reload()},30000);
 })();
 </script></body></html>
