@@ -49,6 +49,7 @@ button:disabled{opacity:.6}
     if(nums.length!==7){msg('号码必须是 7 个（6+1），当前 '+nums.length+' 个',false);return}
     localStorage.setItem(KEY,tok.value.trim());
     var ZH=['马','蛇','龙','兔','虎','牛','鼠','猪','狗','鸡','猴','羊'];
+  function colorOf(n){var r=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46],b=[3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];return r.indexOf(n)>=0?'red':(b.indexOf(n)>=0?'blue':'green')}
     var zs=($('zodiacs').value||'').trim().replace(/,/g,' ').split(/\s+/).filter(Boolean);
     if(zs.length!==7){zs=nums.map(function(n){return ZH[(parseInt(n,10)-1)%12]})}
     var body={name:'新彩种',issue:$('issue').value.trim(),nums:nums.map(function(n,i){return {c:n,z:zs[i]}}),drawTime:$('time').value.trim()||'待定',status:$('status').value,updated:new Date().toISOString()};
