@@ -1,0 +1,58 @@
+name: manual-draw
+on:
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: "期号（数字）"
+        required: true
+      nums:
+        description: "6 个正码 + 1 特码，用空格或逗号分隔，如 01 12 23 34 45 06 18"
+        required: true
+      zodiacs:
+        description: "生肖（可选，7 个，逗号分隔；留空则按号码自动生成）"
+        required: false
+      draw_time:
+        description: "开奖时间文本，如 11月17日 星期日 21:30"
+        required: false
+      status:
+        description: "状态：open / sampled / closed"
+        required: false
+        default: "open"
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Write manual-draw.json
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          issue = os.environ["IN_ISSUE"].strip()
+          nums = [x.zfill(2) for x in re.split(r"[,\s]+", os.environ["IN_NUMS"].strip()) if x]
+          zs = [x.strip() for x in re.split(r"[,\s]+", os.environ.get("IN_ZODIACS", "").strip()) if x]
+          assert len(nums) == 7, "need exactly 7 numbers (6 + 1 special)"
+          ZH = ["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"]
+          if len(zs) != 7:
+              zs = [ZH[(int(n) - 1) % 12] for n in nums]
+          data = {"name": "新彩种", "issue": issue, "nums": [{"c": n, "z": z} for n, z in zip(nums, zs)],
+                  "drawTime": os.environ.get("IN_TIME", "待定"), "status": os.environ.get("IN_STATUS", "open"),
+                  "updated": __import__("datetime").datetime.now().isoformat()}
+          path = "data/manual-draw.json"
+          json.dump(data, open(path, "w"), ensure_ascii=False, indent=1)
+          print("written", path, data)
+          PY
+        env:
+          IN_ISSUE: ${{ inputs.issue }}
+          IN_NUMS: ${{ inputs.nums }}
+          IN_ZODIACS: ${{ inputs.zodiacs }}
+          IN_TIME: ${{ inputs.draw_time }}
+          IN_STATUS: ${{ inputs.status }}
+      - name: Commit and push
+        run: |
+          git config user.name "xingchen-bot"
+          git config user.email "xingchen-bot@users.noreply.github.com"
+          git add data/manual-draw.json
+          git commit -m "manual draw: issue ${{ inputs.issue }}" || echo "no change"
+          git push
