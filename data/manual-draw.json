@@ -6,41 +6,48 @@
  "status": "sample",
  "nums": [
   {
-   "c": "01",
-   "z": "马",
-   "color": "red"
+   "c": "07",
+   "z": "鼠",
+   "color": "红",
+   "wuxing": "土"
   },
   {
    "c": "12",
    "z": "羊",
-   "color": "red"
+   "color": "红",
+   "wuxing": "金"
   },
   {
    "c": "23",
    "z": "猴",
-   "color": "red"
+   "color": "红",
+   "wuxing": "水"
   },
   {
    "c": "34",
    "z": "鸡",
-   "color": "red"
+   "color": "红",
+   "wuxing": "金"
   },
   {
    "c": "45",
    "z": "狗",
-   "color": "red"
+   "color": "红",
+   "wuxing": "水"
   },
   {
    "c": "06",
    "z": "牛",
-   "color": "green"
+   "color": "绿",
+   "wuxing": "土"
   },
   {
    "c": "18",
    "z": "牛",
-   "color": "red"
+   "color": "红",
+   "wuxing": "火"
   }
  ],
- "note": "wuxing/label 等 researcher num-attrs.json",
- "updated": "2026-11-10T04:35:42.831Z"
+ "note": "彩球含 color/wuxing；来源 agent团队/波色五行-独立表.json",
+ "updated": "2026-11-10T04:37:57.361Z"
 }
