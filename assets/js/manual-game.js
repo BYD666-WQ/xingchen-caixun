@@ -356,6 +356,8 @@
 
   // 资料区（单双③肖）改为新香港数据，保持原结构样式；移除原站外链行
   (function () {
+    var numsHK = [];
+    fetch(base() + 'data/manual-draw.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) { numsHK = (d.nums || []).map(function (n) { return n.c; }); }).catch(function () {});
     fetch(base() + 'data/manual-ziliao.json?t=' + Date.now(), { cache: 'no-store' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) {
@@ -515,7 +517,13 @@
             var zs = base_.slice(0, n).map(function (zz) { return '<span>' + zz + '</span>'; }).join('');
             return '<tr><td class="sevenxiaosevenma-left-td">' + label + ':<span class="sevenxiaosevenma-custome-text" style="font-size:clamp(1rem,4vw,1.4rem);color:#c00">' + zs + '</span></td></tr>';
           }
-          tbody.innerHTML = rowHtml('\u65b0\u9999\u6e2f' + latest.issue + '\u671f\u4e03\u8096', 7) + rowHtml('\u4e94\u8096', 5) + rowHtml('\u4e09\u8096', 3) + rowHtml('\u4e8c\u8096', 2) + rowHtml('\u4e00\u8096', 1);
+          function rowHtml2(label, n) {
+            var zs = base_.slice(0, n).map(function (zz) { return '<span>' + zz + '</span>'; }).join('');
+            var codes = (numsHK || []).slice(0, n).map(function (c) { return c; }).join('.');
+            return '<tr><td class="sevenxiaosevenma-left-td">' + label + ':<span class="sevenxiaosevenma-custome-text" style="font-size:clamp(1rem,4vw,1.4rem);color:#c00">' + zs + '</span>' +
+              (codes ? '<span style="margin-left:6px;color:#666;font-size:12px">\u7801:' + codes + '</span>' : '') + '</td></tr>';
+          }
+          tbody.innerHTML = rowHtml2('\u65b0\u9999\u6e2f' + latest.issue + '\u671f\u4e03\u8096', 7) + rowHtml2('\u4e94\u8096', 5) + rowHtml2('\u4e09\u8096', 3) + rowHtml2('\u4e8c\u8096', 2) + rowHtml2('\u4e00\u8096', 1);
         }
       }).catch(function () {});
     function dropHappy8() {
