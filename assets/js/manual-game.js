@@ -200,7 +200,7 @@
         if (isInNewHk(el) && !el.querySelector('.baomalaodaName') && el.children.length <= 5 && t.length < 140 && /\u9999\u6e2f\u5f69\u7b2c\s*\d+/.test(t)) {
           if (el.getAttribute('data-xc-fixed') === '1') continue;
           el.setAttribute('data-xc-fixed', '1');
-          el.textContent = '\u65b0\u9999\u6e2f\u7b2c2\u671f: \u6bcf\u5929 21:34  ';
+          el.textContent = '\u65b0\u9999\u6e2f\u7b2c' + ((window.__XC_ISSUE || 313) + 1) + '\u671f: \u6bcf\u5929 21:34  ';
           var sp = document.createElement('span');
           sp.style.cssText = 'margin-left:6px;color:#1f3b8a;font-weight:700';
           el.appendChild(sp);
