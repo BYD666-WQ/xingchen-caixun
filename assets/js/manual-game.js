@@ -59,14 +59,28 @@
           }
         }
       });
+      [].slice.call(block.querySelectorAll('*')).forEach(function (el) {
+        if (el.children.length === 0 && (el.textContent || '').indexOf('\u9999\u6e2f\u5f69\u7b2c') >= 0) {
+          el.textContent = (d.name || '\u65b0\u9999\u6e2f') + el.textContent.replace(/^\u9999\u6e2f\u5f69/, '');
+        }
+      });
       hkBlock.parentNode.insertBefore(block, hkBlock);
-      // 2.5) 倒计时（每天 21:34）
+      // 2.5) 下一期行 + 倒计时（必须覆盖克隆来的香港彩文本）
       (function () {
+        var nextIssue = (parseInt(d.issue, 10) || 1) + 1;
+        var nextText = (d.name || '\u65b0\u9999\u6e2f') + '\u7b2c' + nextIssue + '\u671f: ' + (d.drawTime || '\u6bcf\u5929 21:34');
+        var line = null;
+        [].slice.call(block.querySelectorAll('*')).forEach(function (el) {
+          if (line || el.children.length) return;
+          var t = (el.textContent || '');
+          if (t.indexOf('\u7b2c') >= 0 && t.indexOf('\u671f') >= 0 && t.indexOf(':') >= 0 && t.indexOf('\u9999\u6e2f\u5f69') >= 0) line = el;
+        });
+        if (line) line.textContent = nextText;
         var hm = String(d.dailyTime || '21:34').split(':');
-        var el = document.createElement('span');
-        el.style.cssText = 'margin-left:8px;font:700 13px/1.4 "Microsoft YaHei",Arial,sans-serif;color:#1f3b8a';
-        var dateEl = block.querySelector('.baomalaodaQi');
-        (qi && qi.parentNode ? qi.parentNode : block).appendChild(el);
+        var el2 = document.createElement('span');
+        el2.className = 'xc-countdown';
+        el2.style.cssText = 'margin-left:8px;font:700 13px/1.4 "Microsoft YaHei",Arial,sans-serif;color:#1f3b8a';
+        if (line) line.parentNode.insertBefore(el2, line.nextSibling); else block.appendChild(el2);
         function tick() {
           var now = new Date();
           var t = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(hm[0], 10), parseInt(hm[1], 10), 0);
@@ -74,29 +88,10 @@
           var left = Math.floor((t.getTime() - now.getTime()) / 1000);
           var h = Math.floor(left / 3600), m = Math.floor((left % 3600) / 60), s = left % 60;
           var p = function (n) { return (n < 10 ? '0' : '') + n; };
-          el.textContent = '距开奖 ' + p(h) + ':' + p(m) + ':' + p(s);
+          el2.textContent = '\u8ddd\u5f00\u5956 ' + p(h) + ':' + p(m) + ':' + p(s);
         }
         tick(); setInterval(tick, 1000);
-        // 玩法块（单双 + 三肖），样式沿用现资料栏目
-  fetch(base() + 'data/manual-play.json?t=' + Date.now(), { cache: 'no-store' })
-    .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (p) {
-      if (!p) return;
-      var app = document.getElementById('app');
-      var anchor = document.getElementById('widgetBox41750');
-      if (!app || !anchor) return;
-      var box = document.createElement('div');
-      box.style.cssText = 'margin:10px auto;max-width:720px;background:#fffef5;border:1px solid #d8ccb4;border-radius:5px;overflow:hidden';
-      var zs = (p.threeZodiac || []).join('');
-      box.innerHTML =
-        '<div style="background:linear-gradient(#f52c17,#d60000);color:#ffd75e;text-align:center;font:700 17px/2.2 \'Microsoft YaHei\',Arial,sans-serif">' + (p.name || '') + '【单双\u2462肖】</div>' +
-        '<div style="padding:8px 12px;font:700 15px/1.9 \'Microsoft YaHei\',Arial,sans-serif;color:#333">' +
-        '<div>' + (p.issue || '') + '期:内幕【' + (p.oddEven || '') + '数】主【' + zs + '】</div>' +
-        '<div style="color:#a33;font-weight:400;font-size:13px">' + (p.note || '') + '</div>' +
-        '</div>';
-      anchor.parentNode.insertBefore(box, anchor.nextSibling);
-    });
-})();
+      })();
       // 3) 点击切换
       tab.addEventListener('click', function () {
         qsa('.baomalaodaName').forEach(function (n) {
