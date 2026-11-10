@@ -34,23 +34,3 @@
   });
 })();
 
-(function () {
-  function measure() {
-    try {
-      var nav = document.getElementById('xc-bottomnav-v2');
-      if (!nav) { document.title = 'DIAG ' + JSON.stringify({ nav: null }); return; }
-      var r = nav.getBoundingClientRect();
-      var kids = [].slice.call(nav.children).map(function (e) { return Math.round(e.getBoundingClientRect().width); });
-      document.title = 'DIAG ' + JSON.stringify({
-        children: nav.children.length,
-        width: Math.round(r.width),
-        sw: nav.scrollWidth,
-        cw: nav.clientWidth,
-        kids: kids
-      });
-    } catch (e) { document.title = 'DIAG ERR ' + e.message; }
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', measure);
-  else measure();
-  setTimeout(measure, 500);
-})();
