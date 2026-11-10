@@ -63,6 +63,12 @@
         }
       });
       hkBlock.parentNode.insertBefore(block, hkBlock);
+      var nextIssue0 = (parseInt(d.issue, 10) || 1) + 1;
+      var nextEl = document.createElement('div');
+      nextEl.className = 'xc-next-line';
+      nextEl.style.cssText = 'max-width:720px;margin:2px auto 8px;padding:0 12px;font:700 13px/1.6 "Microsoft YaHei",Arial,sans-serif;color:#333';
+      nextEl.textContent = (d.name || '\u65b0\u9999\u6e2f') + '\u7b2c' + nextIssue0 + '\u671f: ' + (d.drawTime || '\u6bcf\u5929 21:34');
+      block.parentNode.insertBefore(nextEl, block.nextSibling);
       // 2.4) 下一期行（宽松匹配，覆盖克隆来的其它彩种文案）
       (function () {
         var nextIssue = (parseInt(d.issue, 10) || 1) + 1;
@@ -140,12 +146,12 @@
       var anchor = document.getElementById('widgetBox41750');
       var src = findBlockByName('\u65b0\u9999\u6e2f');
       if (!anchor || !src || document.getElementById('xc-top-block')) return;
-      var top = src.cloneNode(true);
+      var top = document.createElement('div');
       top.id = 'xc-top-block';
-      top.style.display = '';
-      top.style.margin = '10px auto 6px';
-      var oldBtns = top.querySelectorAll('img, .xc-countdown');
-      for (var i = 0; i < oldBtns.length; i++) { if (oldBtns[i].className && oldBtns[i].className.indexOf('xc-countdown') >= 0) oldBtns[i].remove(); }
+      top.style.cssText = 'max-width:720px;margin:10px auto 6px';
+      top.appendChild(src.cloneNode(true));
+      var sib = src.nextElementSibling;
+      if (sib && sib.className && sib.className.indexOf('xc-next-line') >= 0) top.appendChild(sib.cloneNode(true));
       var hists = top.querySelectorAll('.baomalaodaHistory');
       for (var j = 0; j < hists.length; j++) {
         hists[j].style.cursor = 'pointer';
