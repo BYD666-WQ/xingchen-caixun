@@ -74,14 +74,15 @@ h1{background:linear-gradient(#c32323,#8f1414);color:#ffe08a !important;font-siz
 <div id="nemi"><h2>内幕 · 单双③肖</h2><div id="nm" class="grid"></div></div>
 <div id="hist"><h2>历史开奖</h2><div id="hs"></div></div>
 <div id="ziliao"><h2>资料大全</h2><div id="zl"></div></div>
-<div id="more-sec"><h2>图库 / 规律走势</h2><div class="mlist"><span>图库（占位）</span><span>规律走势（占位）</span><span>寻宝（占位）</span></div></div>
+<div id="guilv"><h2>规律走势</h2><div id="gl"></div></div>
+<div id="tuku"><h2>图库</h2><div class="mlist">图库图片整理中，稍后开放（数据文件已就绪）</div></div>
 </div>
 <div id="bottomnav">
   <a href="/xingchen-caixun/" class="on"><i>🏠</i>首页</a>
   <a href="#ziliao"><i>📚</i>资料大全</a>
-  <a href="#ziliao"><i>📈</i>规律走势</a>
+  <a href="#guilv"><i>📈</i>规律走势</a>
   <a href="#ziliao"><i>🔍</i>寻宝</a>
-  <a href="#ziliao"><i>🖼️</i>图库</a>
+  <a href="#tuku"><i>🖼️</i>图库</a>
 </div>
 <script>
 (function(){
@@ -126,6 +127,16 @@ h1{background:linear-gradient(#c32323,#8f1414);color:#ffe08a !important;font-siz
     Array.prototype.forEach.call(document.querySelectorAll('#panels .card'),function(c,i){ c.style.display = (['newhk','newmo','hk'][i]===state.tab)?'':'none'; });
     // 资料
     var rows=zl.rows||[]; var out=[];
+    var pool=[];
+    rows.forEach(function(r){(r.threeZodiac||[]).forEach(function(z){if(pool.indexOf(z)<0)pool.push(z);});});
+    pool=pool.concat(['\u9f20','\u725b','\u864e','\u5154','\u9f99','\u86c7','\u9a6c','\u7f8a','\u7334','\u9e21','\u72d7','\u732a']).slice(0,7);
+    var cur=(rows.filter(function(r){return r.status!=='upcoming';})[0]||rows[0]||{});
+    var hn=(manual.nums||[]).map(function(x){return x.c;});
+    [7,5,3,2,1].forEach(function(n){
+      out.push('<div class="zrow"><span class="iss">'+n+'肖</span><span class="zs">'+pool.slice(0,n).map(function(z){return '<span>'+z+'</span>';}).join('')+'</span><span class="code">码:'+hn.slice(0,n).join('.')+'</span></div>');
+    });
+    out.push('<div class="zrow" style="border-top:1px solid #e6d7ad;margin-top:4px"></div>');
+    var OUT_TMP=[];
     rows.slice(0,6).forEach(function(r){
       var c=r.result&&r.result.c;
       if(!c||c==='NaN'||r.status==='upcoming'){ out.push('<div class="zrow"><span class="iss">新港'+r.issue+'期</span><span class="pending">【待开】</span></div>'); return; }
@@ -134,6 +145,11 @@ h1{background:linear-gradient(#c32323,#8f1414);color:#ffe08a !important;font-siz
       out.push('<div class="zrow"><span class="iss">新港'+r.issue+'期</span><span class="zs">'+ (r.threeZodiac||[]).map(function(z){return '<span>'+z+'</span>';}).join('') +'</span>'+(codes?'<span class="code">码:'+codes+'</span>':'')+'</div>');
     });
     document.getElementById('zl').innerHTML = out.length? out.join('') : '<div class="err">资料加载中…</div>';
+    var gl=document.getElementById('gl');
+    if(gl){ gl.innerHTML=(rows.slice(0,8).map(function(r){
+      var c=r.result&&r.result.c; var ok=(c&&c!=='NaN'&&r.status!=='upcoming');
+      return '<div class="hitem"><span>新港'+r.issue+'期 '+(r.oddEven==='双'?'双数':'单数')+' '+((r.threeZodiac||[]).join(''))+'</span><span>'+(ok?('开 '+r.result.z+c):'待开')+'</span></div>';
+    }).join('')) || '<div class="err">暂无数据</div>'; }
     // 内幕九宫格
     var nm=document.getElementById('nm');
     if(nm){
@@ -148,7 +164,7 @@ h1{background:linear-gradient(#c32323,#8f1414);color:#ffe08a !important;font-siz
     var hs=document.getElementById('hs');
     if(hs){
       var his=[];
-      if(draw.games){ draw.games.forEach(function(g){ his.push({t:g.rule==='Macau'?'新澳':(g.rule==='HongKong'?'香港':'新港'),issue:g.issue,nums:g.nums}); }); }
+      if(draw.games){ draw.games.forEach(function(g){ if(g.rule==='MacauOld'||g.rule==='Happy8') return; his.push({t:g.rule==='Macau'?'新澳':'香港',issue:g.issue,nums:g.nums}); }); }
       if(manual.nums) his.unshift({t:'新港',issue:manual.issue,nums:manual.nums});
       hs.innerHTML=his.slice(0,10).map(function(x){
         return '<div class="hitem"><span>'+x.t+' 第'+x.issue+'期</span><span>'+ (x.nums||[]).slice(0,7).map(function(n){return n.c}).join(' ')+'</span></div>';
