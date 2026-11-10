@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.github.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
 <title>星辰彩讯 · 手动开奖管理</title>
 <link rel="stylesheet" href="assets/css/site.css">
 <style>
@@ -15,10 +14,10 @@ button{width:100%;height:48px;margin-top:16px;border:0;border-radius:6px;backgro
 button:disabled{opacity:.6}
 #msg{margin-top:12px;padding:10px;border-radius:6px;font-size:13px;display:none;white-space:pre-wrap}
 .ok{background:#e8f7ef;color:#0b7a45}.err{background:#fdecea;color:#a33}
-</style><script>(function(){try{if(window.top!==window.self){window.top.location=window.self.location;}}catch(e){}})();</script>
+</style><script>if(window.top!==window.self){window.top.location=window.self.location}</script>
 </head><body><div class="wrap">
 <h1>手动开奖 · 新彩种</h1>
-<div class="hint">需要一次性粘贴 GitHub fine-grained PAT。建 token 时选：<br>① Repository access: Only select repositories → BYD666-WQ/xingchen-caixun<br>② Permissions: Contents: Read and write（只给这一项；读用于取 sha）<br>③ Expiration: 90 天<br>token 只存在你自己的浏览器里（本机 localStorage），我们看不到、也不会上传；但同一浏览器其他 byd666-wq.github.io 页面也能读到，公用电脑用完请点「清除本机 token」。</div>
+<div class="hint">需要一次性粘贴 GitHub fine-grained PAT。建 token 时选：<br>① Repository access: Only select repositories → BYD666-WQ/xingchen-caixun<br>② Permissions: Contents: Read and write（只给这一项；读用于取 sha）<br>③ Expiration: 90 天<br>token 只存本机 localStorage，不会上传本站；但同一浏览器其他 byd666-wq.github.io 页面也能读到，公用电脑用完点「清除本机 token」。</div>
 <label>PAT</label><input id="token" type="password" autocomplete="off" placeholder="github_pat_...">
 <button id="clear" type="button" style="background:#8a6d3b;margin-top:8px">清除本机 token</button>
 <label>期号</label><input id="issue" placeholder="如 2">
@@ -36,7 +35,6 @@ button:disabled{opacity:.6}
 </div>
 <script>
 (function(){
-  if(window.top!==window.self){var w=document.createElement('div');w.style.cssText='padding:20px;font:16px/1.6 "Microsoft YaHei",Arial,sans-serif;color:#a33';w.textContent='⛔ 本页面不允许被嵌入其他网站显示，请在浏览器中直接打开本地址。';document.body.replaceChildren(w);return;}
   var REPO='BYD666-WQ/xingchen-caixun', PATH='data/manual-draw.json', KEY='xc-gh-pat';
   var $=function(id){return document.getElementById(id)};
   var tok=$('token'); tok.value=localStorage.getItem(KEY)||'';
@@ -48,7 +46,7 @@ button:disabled{opacity:.6}
     var nums=($('nums').value||'').trim().replace(/,/g,' ').split(/\s+/).filter(Boolean).map(function(n){return n.length<2?('0'+n):n});
     if(nums.length!==7){msg('号码必须是 7 个（6+1），当前 '+nums.length+' 个',false);return}
     localStorage.setItem(KEY,tok.value.trim());
-    var ZH=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+    var ZH=['马','蛇','龙','兔','虎','牛','鼠','猪','狗','鸡','猴','羊'];
     var zs=($('zodiacs').value||'').trim().replace(/,/g,' ').split(/\s+/).filter(Boolean);
     if(zs.length!==7){zs=nums.map(function(n){return ZH[(parseInt(n,10)-1)%12]})}
     var body={name:'新彩种',issue:$('issue').value.trim(),nums:nums.map(function(n,i){return {c:n,z:zs[i]}}),drawTime:$('time').value.trim()||'待定',status:$('status').value,updated:new Date().toISOString()};
