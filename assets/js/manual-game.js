@@ -2,6 +2,37 @@
    数据来自 data/manual-draw.json；标注「示例」直到接入 GitHub Actions 手动开奖 */
 (function () {
   'use strict';
+
+  var XC_SHOW_WUXING = (localStorage.getItem('xc:showWuxing') !== '0');
+  function xcSetBallLabel(xiao, zodiac, wuxing) {
+    if (!xiao) return;
+    var z = String(zodiac || '').trim();
+    if (!z) return;
+    var html = '<b style="font-size:13px;font-weight:700;line-height:1.15">' + z + '</b>';
+    if (XC_SHOW_WUXING && wuxing) {
+      html += '<span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.72)"> · ' + String(wuxing).trim() + '</span>';
+    }
+    xiao.innerHTML = html;
+    xiao.style.whiteSpace = 'nowrap';
+  }
+  function xcDecorateAllBalls() {
+    var tiles = document.querySelectorAll('.baomalaodaMa');
+    for (var i = 0; i < tiles.length; i++) {
+      var t = tiles[i];
+      var num = (t.textContent || '').replace(/\s+/g, '');
+      num = (num.match(/^\d{1,2}/) || [''])[0];
+      if (!num) continue;
+      var xiao = t.parentNode ? t.parentNode.querySelector('.baomalaodaXiao') : null;
+      if (!xiao) continue;
+      var raw = (xiao.textContent || '').replace(/\s+/g, '');
+      var z = raw.replace(/[^\u4e00-\u9fa5]/g, '').slice(0, 2);
+      if (!z) continue;
+      var at = (typeof XC_ATTRS === 'object' && XC_ATTRS['0' + num]) ? XC_ATTRS['0' + num] : (typeof XC_ATTRS === 'object' ? XC_ATTRS[num] : null);
+      var w = at ? at.w : '';
+      xcSetBallLabel(xiao, z, w);
+    }
+  }
+
   var XC_ATTRS = {"10":{"z":"鸡","c":"蓝","w":"火","n":"贵妃","f":"葵花","d":"酉金"},"11":{"z":"猴","c":"绿","w":"火","n":"猴王","f":"松花","d":"申金"},"12":{"z":"羊","c":"红","w":"金","n":"西宫","f":"樱花","d":"未土"},"13":{"z":"马","c":"红","w":"金","n":"元帅","f":"杏花","d":"午火"},"14":{"z":"蛇","c":"蓝","w":"水","n":"才人","f":"竹花","d":"巳火"},"15":{"z":"龙","c":"蓝","w":"水","n":"状元","f":"梨花","d":"辰土"},"16":{"z":"兔","c":"绿","w":"木","n":"小姐","f":"兰花","d":"卯木"},"17":{"z":"虎","c":"绿","w":"木","n":"武士","f":"桃花","d":"寅木"},"18":{"z":"牛","c":"红","w":"火","n":"员外","f":"荷花","d":"丑土"},"19":{"z":"鼠","c":"红","w":"火","n":"叛贼","f":"梅花","d":"子水"},"20":{"z":"猪","c":"蓝","w":"土","n":"商贾","f":"桂花","d":"亥水"},"21":{"z":"狗","c":"绿","w":"土","n":"文官","f":"菊花","d":"戌土"},"22":{"z":"鸡","c":"绿","w":"水","n":"东宫","f":"葵花","d":"酉金"},"23":{"z":"猴","c":"红","w":"水","n":"太监","f":"松花","d":"申金"},"24":{"z":"羊","c":"红","w":"木","n":"夫人","f":"樱花","d":"未土"},"25":{"z":"马","c":"蓝","w":"木","n":"秀才","f":"杏花","d":"午火"},"26":{"z":"蛇","c":"蓝","w":"金","n":"美人","f":"竹花","d":"巳火"},"27":{"z":"龙","c":"绿","w":"金","n":"君主","f":"梨花","d":"辰土"},"28":{"z":"兔","c":"绿","w":"土","n":"皇后","f":"兰花","d":"卯木"},"29":{"z":"虎","c":"红","w":"土","n":"都督","f":"桃花","d":"寅木"},"30":{"z":"牛","c":"红","w":"水","n":"大将","f":"荷花","d":"丑土"},"31":{"z":"鼠","c":"蓝","w":"水","n":"神偷","f":"梅花","d":"子水"},"32":{"z":"猪","c":"绿","w":"火","n":"县令","f":"桂花","d":"亥水"},"33":{"z":"狗","c":"绿","w":"火","n":"管家","f":"菊花","d":"戌土"},"34":{"z":"鸡","c":"红","w":"金","n":"歌女","f":"葵花","d":"酉金"},"35":{"z":"猴","c":"红","w":"金","n":"游侠","f":"松花","d":"申金"},"36":{"z":"羊","c":"蓝","w":"土","n":"皇妃","f":"樱花","d":"未土"},"37":{"z":"马","c":"蓝","w":"土","n":"牛童","f":"杏花","d":"午火"},"38":{"z":"蛇","c":"绿","w":"木","n":"宫妃","f":"竹花","d":"巳火"},"39":{"z":"龙","c":"绿","w":"木","n":"国君","f":"梨花","d":"辰土"},"40":{"z":"兔","c":"红","w":"火","n":"东宫","f":"兰花","d":"卯木"},"41":{"z":"虎","c":"蓝","w":"火","n":"将军","f":"桃花","d":"寅木"},"42":{"z":"牛","c":"蓝","w":"金","n":"包公","f":"荷花","d":"丑土"},"43":{"z":"鼠","c":"绿","w":"金","n":"兵将","f":"梅花","d":"子水"},"44":{"z":"猪","c":"绿","w":"水","n":"巫女","f":"桂花","d":"亥水"},"45":{"z":"狗","c":"红","w":"水","n":"奴才","f":"菊花","d":"戌土"},"46":{"z":"鸡","c":"红","w":"木","n":"奴婢","f":"葵花","d":"酉金"},"47":{"z":"猴","c":"蓝","w":"木","n":"侠士","f":"松花","d":"申金"},"48":{"z":"羊","c":"蓝","w":"火","n":"彩蝶","f":"樱花","d":"未土"},"49":{"z":"马","c":"绿","w":"火","n":"笛声","f":"杏花","d":"午火"},"01":{"z":"马","c":"红","w":"水","n":"太子","f":"杏花","d":"午火"},"02":{"z":"蛇","c":"红","w":"火","n":"宫女","f":"竹花","d":"巳火"},"03":{"z":"龙","c":"蓝","w":"火","n":"皇帝","f":"梨花","d":"辰土"},"04":{"z":"兔","c":"蓝","w":"金","n":"玉帝","f":"兰花","d":"卯木"},"05":{"z":"虎","c":"绿","w":"金","n":"大王","f":"桃花","d":"寅木"},"06":{"z":"牛","c":"绿","w":"土","n":"元帅","f":"荷花","d":"丑土"},"07":{"z":"鼠","c":"红","w":"土","n":"国师","f":"梅花","d":"子水"},"08":{"z":"猪","c":"红","w":"木","n":"太保","f":"桂花","d":"亥水"},"09":{"z":"狗","c":"蓝","w":"木","n":"先锋","f":"菊花","d":"戌土"}};
   function colorOf(n){var r=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46],b=[3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];return r.indexOf(n)>=0?'red':(b.indexOf(n)>=0?'blue':'green')};
   function base() { return location.pathname.indexOf('/pages/') >= 0 ? '../' : ''; }
@@ -45,8 +76,7 @@
         if (mas[i]) mas[i].textContent = n.c;
         if (xs[i]) {
           var at0 = XC_ATTRS[n.c] || {};
-          var wx = n.wuxing || at0.w || '';
-          xs[i].textContent = wx ? (wx + '/' + (n.z || at0.z || '')) : (n.z || '');
+          xcSetBallLabel(xs[i], n.z || at0.z, n.wuxing || at0.w);
         }
         var tile = mas[i] && mas[i].parentNode;
         if (tile) {
@@ -84,7 +114,9 @@
           if (/\u7b2c\s*\d+\s*\u671f\s*[:\uff1a]/.test(t)) { el.textContent = target; }
           else if (/\u7b2c\s*\d+\s*\u671f/.test(t) && t.length < 40) { el.textContent = target; }
         }
-      })();
+        setTimeout(xcDecorateAllBalls, 900);
+  setTimeout(xcDecorateAllBalls, 2400);
+})();
       // 2.5) 下一期行 + 倒计时（必须覆盖克隆来的香港彩文本）
       (function () {
         var nextIssue = (parseInt(d.issue, 10) || 1) + 1;
