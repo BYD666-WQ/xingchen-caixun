@@ -207,7 +207,7 @@ async function loadAll(){
   $('p-issue').value=pl.issue||''; $('p-oe').value=pl.oddEven||'单'; $('p-zs').value=(pl.threeZodiac||[]).join(' ');
   $('p-note').value=pl.note||'';
   renderPreview(); renderHistory();
-  recordShas();
+  await recordShas();
 }
 function renderPreview(){
   if (typeof updateNumsHint === 'function') updateNumsHint();
@@ -255,6 +255,12 @@ async function rollback(sha){
     Msg('已提交回滚，约 1-2 分钟生效',true);poll();
   }catch(e){Msg('回滚失败：'+e.message,false)}
 }
+function finallyRestore(){
+  var b1=$('btn-save'), b2=$('btn-save-bar'), b3=$('btn-save-top');
+  if(b1){b1.disabled=false;b1.textContent='保存并发布';}
+  if(b2)b2.disabled=false;
+  if(b3)b3.disabled=false;
+}
 async function save(){
   if(!token()){Msg('请先保存密钥（页面顶部）',false);setState('缺少密钥');return}
   if(!LOADED){Msg('未载入成功，禁止保存（请刷新页面）',false);setState('载入失败');return}
@@ -279,7 +285,7 @@ async function save(){
   };
   var newPlay={name:newDraw.name,issue:newDraw.issue,oddEven:$('p-oe').value,threeZodiac:zs,note:$('p-note').value.trim(),status:'live',updated:new Date().toISOString()};
   var btn=$('btn-save');btn.disabled=true;btn.textContent='提交中…';
-  $('btn-save-bar').disabled=true;setState('提交中…请勿关闭页面');
+  $('btn-save-bar').disabled=true;if($('btn-save-top'))$('btn-save-top').disabled=true;setState('提交中…请勿关闭页面');
   try{
     var copy={brand:$('c-brand').value.trim(),brandNumber:(($('c-banner')||{}).value||'').trim(),bannerNumber:(($('c-banner')||{}).value||'').trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
     var zlRows = String($('zl-bulk').value||'').split('\n').map(function(l){return l.trim()}).filter(Boolean).map(function(l){
@@ -301,18 +307,16 @@ async function save(){
     }
     setState('已提交，校验中…');
     try { await verifySaved(newPlay, newDraw); }
-    catch (ve) { Msg('已提交，但读回校验失败：' + ve.message + '（请刷新后重试恢复）', false); setState('校验失败：' + ve.message); return; }
+    catch (ve) { Msg('已提交，但读回校验失败：' + ve.message + '（请刷新后重试恢复）', false); setState('校验失败：' + ve.message); finallyRestore(); return; }
     await recordShas();
     Msg('已提交，读回校验通过；约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
-    poll();
-    poll();
+    poll(newDraw.updated);
     draw=newDraw;play=newPlay;renderPreview();
   }catch(e){
     if (e.code === 'CONFLICT') { Msg('数据已被别处更新（sha 不一致），请刷新页面后重试', false); setState('冲突：请刷新'); }
     else { Msg('保存失败：' + e.message, false); setState('保存失败：' + e.message); }
   }
-  btn.disabled=false;btn.textContent='保存并发布';
-  $('btn-save-bar').disabled=false;
+  finallyRestore();
   commitList();
 }
 async function readJsonViaApi(path){
@@ -338,13 +342,13 @@ async function verifySaved(expectedPlay, expectedDraw){
   if (String(d.issue) !== String(expectedDraw.issue)) throw new Error('draw.issue 不一致');
   return true;
 }
-function poll(){
+function poll(expectedUpdated){
   var tries=0;
   var timer=setInterval(async function(){
     tries++;
     try{
       var d=await fetch(RAW+'data/manual-draw.json?t='+Date.now()).then(function(r){return r.json()});
-      if(String(d.issue)===String($('g-issue').value) && d.name===$('g-name').value){
+      if (expectedUpdated && d.updated === expectedUpdated) {
         clearInterval(timer);Msg('已生效 ✓ 打开站点查看：'+PAGES,true);setState('已生效 ✓');
       }else if(tries>=8){clearInterval(timer);Msg('仍在构建中，稍后刷新页面即可',false)}
     }catch(e){}
