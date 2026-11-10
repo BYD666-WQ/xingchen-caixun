@@ -242,6 +242,7 @@ async function save(){
   if(nums.length!==7)return Msg('开奖号码必须 7 个（6+1），当前 '+nums.length+' 个',false);
   var zsRaw = String($('p-zs').value || '').replace(/[\s,，、]+/g, '');
   if (!/^[鼠牛虎兔龙蛇马羊猴鸡狗猪]{3}$/.test(zsRaw)) return Msg('三肖必须是 3 个生肖（例：狗马猴）', false);
+  if (new Set(zsRaw.split('')).size !== 3) return Msg('三肖不能重复（例：不要 猪猪猪）', false);
   var zs = zsRaw.split('');
   // 校验通过后再存 token
   localStorage.setItem(KEY,token());
