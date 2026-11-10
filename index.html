@@ -232,4 +232,23 @@ header{background-color:#B3000E!important}
     tick();setInterval(tick,1000);
   }).catch(function(e){console.log('[tt]',e&&e.message)});
 })();
+</script><script>
+(function(){
+  var SRC=['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/',''];
+  function get(p){var i=0;function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var u=SRC[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
+  get('data/manual-ziliao.json').then(function(zl){
+    var rows=(zl&&zl.rows||[]).slice(0,12);if(!rows.length)return;
+    var html=rows.map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');
+      if(!ok)return '<div class="row"><i>'+d.issue+'期</i><b>【待开】</b></div>';
+      return '<div class="row"><i>'+d.issue+'期</i><b>【'+(d.oddEven==='双'?'双数':'单数')+'】</b><span>主【'+((d.threeZodiac||[]).join(''))+'】</span><em>开'+(d.result.z||'')+c+'</em><u>准</u></div>';}).join('');
+    // 删除所有旧「内幕」块
+    document.querySelectorAll('section.mini').forEach(function(m){if((m.innerText||'').indexOf('内幕')>=0)m.remove()});
+    var sec=document.createElement('section');sec.className='mini';sec.id='nm-final';
+    sec.innerHTML='<h5>内幕 · 单双③肖</h5>'+html;
+    var host=document.getElementById('xc-extra')||document.querySelector('.nav');
+    host.parentNode.insertBefore(sec,host);
+    // 数据更新时间
+    var t=document.querySelector('.card .hd .t');if(t)t.textContent='数据更新 '+('0'+new Date().getHours()).slice(-2)+':'+('0'+new Date().getMinutes()).slice(-2);
+  }).catch(function(e){});
+})();
 </script></body></html>
