@@ -159,4 +159,45 @@
   }
   setTimeout(run, 1200); setTimeout(run, 2600); setTimeout(run, 4500);
 })();
+
+/* v3：硬编码三 tab 文案 + 强制首块为新港 */
+(function () {
+  function $a(s, r) { return [].slice.call((r || document).querySelectorAll(s)); }
+  function blk(el) { var b = el; while (b && b !== document.body) { if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) return b; b = b.parentNode; } return null; }
+  var R = [1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46], B = [3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
+  function color(v) { return R.indexOf(v) >= 0 ? '#e71607' : (B.indexOf(v) >= 0 ? '#2873e6' : '#1fb61d'); }
+  function setBlock(b, issue, nums) {
+    if (!b) return;
+    var qi = b.querySelector('.baomalaodaQi'); if (qi && issue) qi.textContent = String(issue);
+    var tiles = b.querySelectorAll('.baomalaodaMa');
+    (nums || []).forEach(function (x, i) {
+      var t = tiles[i]; if (!t) return;
+      t.textContent = x.c;
+      var cell = t.parentNode;
+      if (cell) { cell.style.background = color(parseInt(x.c, 10)); var z = cell.querySelector('.baomalaodaXiao'); if (z) z.textContent = x.z || ''; }
+    });
+  }
+  function api(path) {
+    var us = ['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/' + path, path];
+    function go(i) { return i >= us.length ? Promise.reject() : fetch(us[i] + '?v=' + Math.floor(Date.now() / 60000), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : go(i + 1); }).catch(function () { return go(i + 1); }); }
+    return go(0);
+  }
+  function run() {
+    Promise.all([api('data/manual-draw.json'), api('data/draw.json')]).then(function (r) {
+      var md = r[0] || {}, dr = r[1] || {};
+      var LAB = ['\u65b0\u6e2f', '\u65b0\u6fb3', '\u9999\u6e2f'];
+      $a('.tie').forEach(function (tie) {
+        while (tie.children.length > 3) tie.removeChild(tie.lastElementChild);
+        for (var i = 0; i < 3 && i < tie.children.length; i++) tie.children[i].textContent = LAB[i];
+      });
+      var blocks = [];
+      $a('.baomalaodaName').forEach(function (n) { var b = blk(n); if (b && blocks.indexOf(b) < 0) blocks.push(b); });
+      if (blocks[0]) { var n0 = blocks[0].querySelector('.baomalaodaName'); if (n0) n0.textContent = '\u65b0\u9999\u6e2f'; setBlock(blocks[0], md.issue, md.nums); }
+      var byRule = {}; (dr.games || []).forEach(function (g) { byRule[g.rule] = g; });
+      if (blocks[1] && byRule.Macau) { var n1 = blocks[1].querySelector('.baomalaodaName'); if (n1) n1.textContent = '\u65b0\u65b3\u5f69'.replace('\u5f69','\u65b0\u6fb3'); setBlock(blocks[1], byRule.Macau.issue, byRule.Macau.nums); }
+      if (blocks[2] && byRule.HongKong) { var n2 = blocks[2].querySelector('.baomalaodaName'); if (n2) n2.textContent = '\u9999\u6e2f\u5f69'; setBlock(blocks[2], byRule.HongKong.issue, byRule.HongKong.nums); }
+    }).catch(function (e) { console.log('[panel v3]', e && e.message); });
+  }
+  setTimeout(run, 1500); setTimeout(run, 3000); setTimeout(run, 5000);
+})();
 })();
