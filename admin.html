@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>香港摇钱树 · 内容管理</title>
 <style>
 :root{--g:#07a35a;--ink:#222;--line:#e5e5e5;--bg:#f2f4f3}
@@ -28,7 +31,7 @@ button.small{min-height:40px;font-size:13px;padding:0 12px}
 .ball i{font-style:normal;font-size:9px;font-weight:400}
 table{width:100%;border-collapse:collapse;font-size:13px}
 td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
-#savebar{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;gap:10px;padding:0 12px;background:#fff;border-top:1px solid #e5e5e5;z-index:25;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
+#savebar{position:fixed;left:0;right:0;bottom:0;z-index:9999;min-height:56px;padding-bottom:env(safe-area-inset-bottom);box-sizing:content-box;display:flex;align-items:center;gap:10px;padding:0 12px;background:#fff;border-top:1px solid #e5e5e5;z-index:25;box-shadow:0 -2px 8px rgba(0,0,0,.06)}
 #savebar #save-state{flex:1;font-size:12px;color:#666;line-height:1.3}
 body{padding-bottom:76px}
 #msg{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);max-width:92vw;padding:10px 14px;border-radius:8px;color:#fff;background:#333;display:none;z-index:30;white-space:pre-wrap;font-size:13px}
@@ -36,6 +39,19 @@ body{padding-bottom:76px}
 </style></head><body>
 <header><b>香港摇钱树 · 内容管理</b><span id="who" style="font-size:12px;opacity:.9"></span></header>
 <div class="wrap">
+<div id="guide" style="background:#e8f7ef;border:1px solid #b9e3cd;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;line-height:1.75;color:#0b6b3d">
+  <b>3 步完成修改：</b><br>① 在下面粘贴密钥（只需一次） → ② 填号码/资料 → ③ 点底部「保存并发布」
+</div>
+
+<div class="panel" id="token-panel"><details open><summary>🔑 密钥（只需保存一次）</summary><div class="body">
+  <input id="token" type="password" autocomplete="off" placeholder="粘贴 github_pat… 开头的密钥（粘贴后自动保存）" style="font-size:14px">
+  <div class="row">
+    <button id="btn-token-save" style="min-height:44px">保存密钥</button>
+    <button class="gray" id="btn-clear" style="min-height:44px">清除本机密钥</button>
+  </div>
+  <p id="token-state" style="font-size:12px;color:#888;margin:8px 0 0">未保存密钥</p>
+  <p style="font-size:12px;color:#888;margin:4px 0 0">密钥只存本机浏览器，不会上传到网站。</p>
+</div></details></div>
 
 <div class="panel" id="login-panel" style="display:none"><details open><summary>🔐 登录</summary><div class="body">
   <label>后台密码</label><input id="pw" type="password" autocomplete="off" placeholder="输入密码">
@@ -44,6 +60,7 @@ body{padding-bottom:76px}
 </div></details></div>
 
 <div class="panel"><details open><summary>① 彩种配置</summary><div class="body">
+  <button id="btn-save-top" style="width:100%;min-height:48px;margin-bottom:10px;font-size:16px">保存并发布（改完点这里）</button>
   <label>彩种名称（tab 与标题）</label><input id="g-name">
   <label>当前期号</label><input id="g-issue" inputmode="numeric">
   <label>开奖时间文案</label><input id="g-drawtime">
@@ -83,11 +100,8 @@ body{padding-bottom:76px}
 </div></details></div>
 
 <div class="panel"><details><summary>⑥ 发布与历史版本</summary><div class="body">
-  <label>GitHub PAT（只需一次，fine-grained：本仓库 Contents 读写）</label>
-  <input id="token" type="password" autocomplete="off" placeholder="粘贴 fine-grained PAT">
   <div class="row">
     <button id="btn-save">保存并发布</button>
-    <button class="gray" id="btn-clear">清除本机 token</button>
     <button class="gray" id="btn-refresh">重新载入线上数据</button>
   </div>
   <p style="font-size:12px;color:#888;margin:8px 0 0">保存后约 1–2 分钟生效；页面会自动轮询确认。token 仅存本机浏览器。</p>
@@ -222,7 +236,7 @@ async function rollback(sha){
   }catch(e){Msg('回滚失败：'+e.message,false)}
 }
 async function save(){
-  if(!token())return Msg('请先粘贴 PAT',false);
+  if(!token()){Msg('请先保存密钥（页面顶部）',false);setState('缺少密钥');return}
   var nums=parseNums($('g-nums').value);
   if(nums.length!==7)return Msg('开奖号码必须 7 个（6+1），当前 '+nums.length+' 个',false);
   var zs=parseNums($('p-zs').value);
@@ -327,10 +341,18 @@ $('btn-bulk').addEventListener('click',function(){
 });
 $('btn-save').addEventListener('click',save);
 $('btn-save-bar').addEventListener('click',save);
+if($('btn-save-top'))$('btn-save-top').addEventListener('click',save);
 function setState(t){var el=$('save-state');if(el)el.textContent=t}
-$('btn-clear').addEventListener('click',function(){localStorage.removeItem(KEY);$('token').value='';Msg('已清除本机 token',true)});
+function tokText(t){return t ? ('\u2713 \u5df2\u4fdd\u5b58\uff08\u672c\u673a\uff09\u2026' + t.slice(-4)) : '\u672a\u4fdd\u5b58\u5bc6\u94a5'}
+function refreshTokenState(){var el=$('token-state');if(el)el.textContent=tokText(token())}
+function saveTokenNow(){var v=$('token').value.trim();if(!v){Msg('请先粘贴密钥',false);return}localStorage.setItem(KEY,v);refreshTokenState();Msg('密钥已保存（本机）',true)}
+$('btn-token-save').addEventListener('click',saveTokenNow);
+$('token').addEventListener('paste',function(){setTimeout(function(){saveTokenNow()},80)});
+$('token').addEventListener('input',function(){var v=this.value.trim();if(/^github_pat/.test(v)||v.length>40){localStorage.setItem(KEY,v);refreshTokenState();Msg('密钥已保存（本机）',true)}});
+$('btn-clear').addEventListener('click',function(){localStorage.removeItem(KEY);$('token').value='';refreshTokenState();Msg('已清除本机密钥',true)});
+if($('token'))$('token').value=token();refreshTokenState();
 $('btn-refresh').addEventListener('click',function(){loadAll().then(function(){Msg('已重新载入线上数据',true)})});
-$('token').value=token();
+if($('token'))$('token').value=token();
 if (BACKEND === 'worker') {
   $('login-panel').style.display = '';
   $('btn-login').addEventListener('click', async function(){
