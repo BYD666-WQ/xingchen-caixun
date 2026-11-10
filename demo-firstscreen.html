@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light">
+<title>首屏视觉对齐</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#F5F1E6;color:#222;font-family:"Microsoft YaHei",Arial,sans-serif}
+.wrap{max-width:720px;margin:0 auto;padding:0 10px}
+/* A1 公告条 */
+.notice{display:flex;align-items:center;gap:8px;background:#F5F1E6;padding:8px 0;font-size:14px;color:#E60012}
+.notice b{font-weight:400;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notice .view{background:#2680EB;color:#fff;font-size:12px;padding:3px 14px;border-radius:999px;white-space:nowrap}
+/* A2 LOGO */
+.logo-row{display:flex;align-items:center;gap:8px;padding:6px 0 10px;border-bottom:1px solid #e6ddcb}
+.logo{font:900 30px/1.1 "Microsoft YaHei",Arial,sans-serif;background:linear-gradient(90deg,#E60012 0%,#E60012 55%,#1E5BC6 100%);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:1px}
+.logo .com{font-size:20px;color:#1E5BC6;-webkit-text-fill-color:#1E5BC6;font-weight:900}
+.seal{margin-left:auto;background:#E60012;color:#fff;border:2px solid #F0C860;border-radius:6px;font:900 16px/1.2 "Microsoft YaHei",Arial,sans-serif;padding:6px 8px;text-align:center}
+/* A3 tab */
+.tabs{display:flex;gap:8px;padding:10px 0}
+.tabs .t{display:flex;align-items:center;justify-content:center;gap:6px;flex:1;background:#fff;border:1px solid #ddd;border-radius:999px;font-size:15px;font-weight:700;padding:9px 0;color:#333}
+.tabs .t span.ico{width:18px;height:18px;border-radius:50%;background:#e8e8e8;display:inline-block}
+.tabs .t.on{background:#FBF3D8;border-color:#C8A24A;color:#B30000}
+/* B1 期开条 */
+.issue-bar{display:flex;align-items:center;background:#FBF3D8;border:1px solid #C8A24A;border-radius:6px;padding:6px 8px;gap:10px}
+.issue-bar .tag{background:#FFE9A8;color:#B30000;font-weight:700;font-size:15px;padding:3px 8px;border-radius:4px}
+.issue-bar .rec{color:#B30000;font-size:14px;font-weight:700}
+.balls{display:flex;align-items:center;gap:6px;margin-left:auto}
+.ball{width:40px;height:40px;border-radius:8px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 18px/1 "Microsoft YaHei",Arial,sans-serif}
+.ball i{font-style:normal;font-size:14px;font-weight:400;color:#000;margin-top:1px}
+.ball.r{background:#E60012}.ball.b{background:#1E5BC6}.ball.g{background:#0F9D58}
+.plus{font-weight:900;color:#C8A24A;font-size:18px}
+.refresh-v{background:#FBF3D8;border-left:1px solid #C8A24A;color:#B30000;font-size:13px;font-weight:700;padding:6px 8px;border-radius:4px}
+/* B2 开奖卡 */
+.draw-card{background:#fff;border:1px solid #C8A24A;border-radius:6px;margin-top:8px;overflow:hidden}
+.draw-card .hd{display:flex;align-items:center;background:#B7B98F;color:#fff;font:700 16px/2.2 "Microsoft YaHei",Arial,sans-serif;padding:0 10px}
+.draw-card .hd .hist{margin-left:auto;color:#F08C00;font-weight:700}
+.draw-card .bd{display:flex;align-items:center;gap:6px;padding:10px}
+.draw-card .refresh-o{margin-left:auto;background:#F5A623;color:#fff;font-size:14px;border-radius:6px;padding:6px 12px;border:0}
+</style></head><body><div class="wrap">
+<div class="notice"><b>【公告】本站数据仅供参考 · 开奖结果以官方公布为准 · 每日 21:30 更新</b><span class="view">查看</span></div>
+<div class="logo-row"><div class="logo">新港摇钱树<span class="com">.com</span></div><div class="seal">正版<br>数据</div></div>
+<div class="tabs"><div class="t on"><span class="ico"></span>新港</div><div class="t"><span class="ico"></span>新澳</div><div class="t"><span class="ico"></span>香港</div></div>
+<div class="issue-bar">
+<span class="tag">314期开</span><span class="rec">开奖记录</span>
+<div class="balls">
+<span class="ball r">28<i>兔</i></span><span class="ball b">26<i>蛇</i></span><span class="ball r">12<i>羊</i></span><span class="ball g">11<i>猴</i></span><span class="ball r">30<i>牛</i></span><span class="ball r">07<i>鼠</i></span><span class="plus">+</span><span class="ball r">13<i>马</i></span>
+</div>
+<span class="refresh-v">刷新</span>
+</div>
+<div class="draw-card">
+<div class="hd">新港 第 313 期 · 每天 21:34<span class="hist">历史记录</span></div>
+<div class="bd">
+<span class="ball r">28<i>兔</i></span><span class="ball b">26<i>蛇</i></span><span class="ball r">12<i>羊</i></span><span class="ball g">11<i>猴</i></span><span class="ball r">30<i>牛</i></span><span class="ball r">07<i>鼠</i></span><span class="ball r">13<i>马</i></span>
+<span class="refresh-o">刷新</span>
+</div>
+</div>
+</div></body></html>
