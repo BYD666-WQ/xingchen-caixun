@@ -34,7 +34,7 @@
       hkTab.parentNode.insertBefore(tab, hkTab);
       // 2) 新号码块（克隆香港彩块）
       var block = hkBlock.cloneNode(true);
-      block.style.display = 'none';
+      block.style.display = '';
       var nm = block.querySelector('.baomalaodaName');
       if (nm) nm.textContent = d.name || '\u65b0\u5f69\u79cd';
       var qi = block.querySelector('.baomalaodaQi');
@@ -127,7 +127,7 @@
     function run() {
       var anchor = document.getElementById('widgetBox41750');
       var src = findBlockByName('\u65b0\u9999\u6e2f');
-      if (!anchor || !src || document.getElementById('xc-top-block') || src.style.display === 'none') return;
+      if (!anchor || !src || document.getElementById('xc-top-block')) return;
       var top = src.cloneNode(true);
       top.id = 'xc-top-block';
       top.style.display = '';
