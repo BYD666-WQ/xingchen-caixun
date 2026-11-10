@@ -1,6 +1,6 @@
 {
  "name": "新香港",
- "issue": 314,
+ "issue": 313,
  "oddEven": "单",
  "threeZodiac": [
   "狗",
@@ -8,6 +8,6 @@
   "猴"
  ],
  "note": "内幕玩法示例，等可乐后续文案",
- "status": "live",
- "updated": "2026-11-10T14:22:00.152Z"
+ "status": "sample",
+ "updated": "2026-11-10T14:07:38.049Z"
 }
