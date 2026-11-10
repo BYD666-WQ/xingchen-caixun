@@ -68,7 +68,7 @@
 </style></head><body><div class="wrap">
 <div class="adslot">（广告位占位 · 保持比例）</div>
 <div class="notice"><b>本站数据仅供参考 · 开奖结果以官方公布为准</b><span class="view">查看</span></div>
-<div class="logo-row"><div class="logo">新港摇钱树<small>.com</small></div><div class="seal">正版<br>数据</div></div>
+<div class="logo-row"><div class="logo">新港摇钱树</div><div class="seal">正版<br>数据</div></div>
 <div class="tabs"><div class="tab on"><span class="ico"></span>新港</div><div class="tab"><span class="ico"></span>新澳</div><div class="tab"><span class="ico"></span>香港</div></div>
 <div class="openbar">
   <div class="left">314期开<span>开奖记录</span></div>
@@ -155,5 +155,41 @@
   });
   document.querySelectorAll('.tabs .tab').forEach(function(t,i){t.addEventListener('click',function(){show(['newhk','newmo','hk'][i])})});
   setInterval(function(){location.reload()},30000);
+})();
+</script><style id="xc-size-up">
+body{font-size:18px}
+.block .hd b{font-size:24px}
+.block .hd .time{font-size:19px}
+.block .hd .hist{font-size:19px}
+.block .next{font-size:17px}
+.block .balls{gap:6px;padding:6px 8px 10px}
+.block .balls .tile{width:72px;height:72px}
+.block .balls .tile .num{font-size:26px;font-weight:700}
+.block .balls .tile .zod{height:24px;font-size:20px}
+.tabs .tab{font-size:19px;padding:10px 0;gap:8px}
+.tabs .tab .ico{width:34px;height:34px}
+.tabs .tab .ico svg{width:34px;height:34px;display:block}
+.nm .h{font-size:26px;line-height:2}
+.nm .row{font-size:19px;padding:7px 8px}
+.nm .row .iss{font-size:16px;padding:3px 7px}
+.nm .row .lab{font-size:16px}
+.nm .row .ok{font-size:16px}
+.zl .h{font-size:26px;line-height:2}
+.zl .g{font-size:17px}
+.zl .row{font-size:19px;padding:8px 10px}
+.zl .row .n{font-size:18px}
+.zl .row .zs span{font-size:18px}
+.zl .row .code{font-size:16px}
+.openbar .tile.ball-big{}
+.nav a{font-size:13px}
+.nav .badge{width:28px;height:26px;font-size:14px;line-height:26px}
+.nav .zhun{width:50px;height:50px;font-size:18px;line-height:44px;margin-top:-18px}
+</style>
+<script>
+(function(){
+  function lotus(bg){return '<svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg"><circle cx="17" cy="17" r="17" fill="'+bg+'"/><circle cx="17" cy="17" r="15" fill="none" stroke="#fff" stroke-width="2"/><g fill="#fff"><path d="M17 8c2 3 2 6 0 9-2-3-2-6 0-9z"/><path d="M9 13c3 1 5 4 5 7-3-1-5-4-5-7z"/><path d="M25 13c-3 1-5 4-5 7 3-1 5-4 5-7z"/><path d="M7 20c3 0 6 1 8 3-3 1-6 0-8-3z"/><path d="M27 20c-3 0-6 1-8 3 3 1 6 0 8-3z"/><path d="M17 24c2 0 4 1 5 3H12c1-2 3-3 5-3z"/></g></svg>'}
+  function bauhinia(bg){return '<svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg"><circle cx="17" cy="17" r="17" fill="'+bg+'"/><circle cx="17" cy="17" r="15" fill="none" stroke="#fff" stroke-width="2"/><g fill="#fff"><path d="M17 6c2 4 3 8 1 12-3-3-3-8-1-12z"/><path d="M10 11c3 1 6 4 6 8-4-1-6-4-6-8z"/><path d="M24 11c-3 1-6 4-6 8 4-1 6-4 6-8z"/><path d="M7 19c3-1 7 0 9 3-3 2-7 1-9-3z"/><path d="M27 19c-3-1-7 0-9 3 3 2 7 1 9-3z"/><circle cx="17" cy="24" r="3"/></g></svg>'}
+  var icons=[lotus('#1FB61D'),bauhinia('#E60012'),bauhinia('#8E44AD')];
+  document.querySelectorAll('.tabs .tab .ico').forEach(function(e,i){e.innerHTML=icons[i]||'';e.style.fontSize='0'});
 })();
 </script></body></html>
