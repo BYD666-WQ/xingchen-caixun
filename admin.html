@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>星辰彩讯 · 内容管理</title>
+<title>香港摇钱树 · 内容管理</title>
 <style>
 :root{--g:#07a35a;--ink:#222;--line:#e5e5e5;--bg:#f2f4f3}
 *{box-sizing:border-box}
@@ -31,7 +31,7 @@ td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
 #msg{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);max-width:92vw;padding:10px 14px;border-radius:8px;color:#fff;background:#333;display:none;z-index:30;white-space:pre-wrap;font-size:13px}
 .commit{font-size:12px;color:#666;border-top:1px solid #eee;padding:6px 0;display:flex;justify-content:space-between;gap:8px;align-items:center}
 </style></head><body>
-<header><b>星辰彩讯 · 内容管理</b><span id="who" style="font-size:12px;opacity:.9"></span></header>
+<header><b>香港摇钱树 · 内容管理</b><span id="who" style="font-size:12px;opacity:.9"></span></header>
 <div class="wrap">
 
 <div class="panel"><details open><summary>① 彩种配置</summary><div class="body">
@@ -60,7 +60,7 @@ td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
 </div></details></div>
 
 <div class="panel"><details><summary>⑤ 系统文案</summary><div class="body">
-  <label>站名</label><input id="c-brand" placeholder="星辰彩讯">
+  <label>站名</label><input id="c-brand" placeholder="香港摇钱树">
   <label>标语</label><input id="c-slogan" placeholder="官方开奖信息">
   <label>公告条（留空不显示）</label><input id="c-notice" placeholder="如：本站数据仅供参考">
   <label>页脚免责声明</label><textarea id="c-disclaimer" style="min-height:80px"></textarea>
@@ -126,7 +126,7 @@ async function loadAll(){
   var dr=await fetch(RAW+'data/manual-draw.json?t='+t).then(function(r){return r.json()});
   var pl=await fetch(RAW+'data/manual-play.json?t='+t).then(function(r){return r.ok?r.json():{}}).catch(function(){return{}});
   var cp={};try{cp=await fetch(RAW+'data/site-copy.json?t='+t).then(function(r){return r.ok?r.json():{}})}catch(e){}
-  $('c-brand').value=cp.brand||'星辰彩讯'; $('c-slogan').value=cp.slogan||'官方开奖信息';
+  $('c-brand').value=cp.brand||'香港摇钱树'; $('c-slogan').value=cp.slogan||'官方开奖信息';
   $('c-notice').value=cp.notice||''; $('c-disclaimer').value=cp.disclaimer||'数据来自官方公开信息，仅供参考。';
   draw=dr;play=pl;
   $('g-name').value=dr.name||''; $('g-issue').value=dr.issue||''; $('g-drawtime').value=dr.drawTime||'';
