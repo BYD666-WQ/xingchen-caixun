@@ -635,6 +635,7 @@
         b.addEventListener('click', function () {
           var nm = b.getAttribute('data-tab');
           var tabs = document.querySelectorAll('#widgetBox41362 .tie > div');
+          if (!tabs.length) { location.href = 'more.html?tab=' + encodeURIComponent(nm); return; }
           for (var i = 0; i < tabs.length; i++) {
             if ((tabs[i].textContent || '').indexOf(nm) >= 0) { tabs[i].click(); break; }
           }
