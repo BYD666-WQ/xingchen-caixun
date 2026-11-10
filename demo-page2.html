@@ -136,8 +136,8 @@
     DATA.newhk=md;DATA.newmo=by.Macau;DATA.hk=by.HongKong;
     balls('bl-newhk',md.nums);balls('bl-newmo',(by.Macau||{}).nums);balls('bl-hk',(by.HongKong||{}).nums);
     var b=document.querySelector('#blk-newhk .hd b');if(b&&md.issue)b.textContent='新港第'+md.issue+'期';
-    var bx=document.querySelector('#blk-newmo .hd b');if(bx&&by.Macau)bx.textContent='新澳彩第'+by.Macau.issue+'期';
-    var bh=document.querySelector('#blk-hk .hd b');if(bh&&by.HongKong)bh.textContent='香港彩第'+by.HongKong.issue+'期';
+    var bx=document.querySelector('#blk-newmo .hd b');if(bx&&by.Macau)bx.textContent='新澳彩第'+String(by.Macau.issue).slice(-3)+'期';
+    var bh=document.querySelector('#blk-hk .hd b');if(bh&&by.HongKong)bh.textContent='香港彩第'+String(by.HongKong.issue).slice(-3)+'期';
     setInterval(function(){cd('cd-newhk','21:34');cd('cd-newmo','21:30');cd('cd-hk','21:30')},1000);
     cd('cd-newhk','21:34');cd('cd-newmo','21:30');cd('cd-hk','21:30');
     // 内幕/资料 继续沿用 page2 原有逻辑
