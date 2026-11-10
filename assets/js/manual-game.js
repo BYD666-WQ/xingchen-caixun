@@ -54,7 +54,7 @@
           if (n.wuxing) {
             var w = tile.querySelector('.xc-wx');
             if (!w) { w = document.createElement('span'); w.className = 'xc-wx'; w.style.cssText = 'display:block;font:11px/1.1 "Microsoft YaHei",Arial,sans-serif;color:#fff'; tile.appendChild(w); }
-            w.textContent = n.wuxing + (n.label ? '·' + n.label : '');
+            w.textContent = n.wuxing;
           }
         }
       });
