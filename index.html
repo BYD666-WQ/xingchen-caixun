@@ -153,10 +153,10 @@ header{background-color:#B3000E!important}
 })();
 </script><script>
 (function(){
- function fix(){var ob=document.querySelector('.openbar');if(!ob)return;ob.style.padding='3px 6px 3px 3px';ob.style.boxSizing='border-box';ob.style.overflow='hidden';ob.style.width='100%';
+ function fix(){var ob=document.querySelector('.openbar');if(!ob)return;ob.style.setProperty('padding','3px 6px 3px 3px','important');ob.style.boxSizing='border-box';ob.style.overflow='hidden';ob.style.width='100%';
   var ol=ob.querySelector('.ol');if(ol){ol.style.flex='0 0 48px';ol.style.width='48px'}
   var pl=ob.querySelector('.plus');if(pl){pl.style.flex='0 0 6px';pl.style.fontSize='14px'}
-  ob.querySelectorAll('.tile').forEach(function(t){t.style.flex='1 1 0';t.style.minWidth='0';t.style.border='0';t.style.boxShadow='none';t.style.width='auto'});
+  ob.querySelectorAll('.tile').forEach(function(t){t.classList.add('ob-tile');t.style.flex='1 1 0';t.style.minWidth='0';t.style.border='0';t.style.boxShadow='none';t.style.width='auto'});
  }
  setTimeout(fix,300);setTimeout(fix,1200);setTimeout(fix,2500);
 })();
