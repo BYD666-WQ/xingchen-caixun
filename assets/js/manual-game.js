@@ -664,4 +664,4 @@
     setTimeout(refreshDraw, 1500);
     setInterval(refreshDraw, 60000);
   })();
-})();
+
