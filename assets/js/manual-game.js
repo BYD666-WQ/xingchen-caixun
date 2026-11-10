@@ -2,6 +2,7 @@
    数据来自 data/manual-draw.json；标注「示例」直到接入 GitHub Actions 手动开奖 */
 (function () {
   'use strict';
+  function colorOf(n){var r=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46],b=[3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];return r.indexOf(n)>=0?'red':(b.indexOf(n)>=0?'blue':'green')};
   function base() { return location.pathname.indexOf('/pages/') >= 0 ? '../' : ''; }
   function qsa(s, r) { return [].slice.call((r || document).querySelectorAll(s)); }
   function findBlock(el) {
@@ -42,6 +43,17 @@
       (d.nums || []).forEach(function (n, i) {
         if (mas[i]) mas[i].textContent = n.c;
         if (xs[i]) xs[i].textContent = n.z;
+        var tile = mas[i] && mas[i].parentNode;
+        if (tile) {
+          var col = n.color || colorOf(parseInt(n.c, 10));
+          tile.style.background = col === 'red' ? '#e71607' : (col === 'blue' ? '#2873e6' : '#1fb61d');
+          tile.style.color = '#fff';
+          if (n.wuxing) {
+            var w = tile.querySelector('.xc-wx');
+            if (!w) { w = document.createElement('span'); w.className = 'xc-wx'; w.style.cssText = 'display:block;font:11px/1.1 "Microsoft YaHei",Arial,sans-serif;color:#fff'; tile.appendChild(w); }
+            w.textContent = n.wuxing + (n.label ? '·' + n.label : '');
+          }
+        }
       });
       hkBlock.parentNode.insertBefore(block, hkBlock);
       // 2.5) 倒计时（每天 21:34）
