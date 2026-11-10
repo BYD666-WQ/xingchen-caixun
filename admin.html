@@ -24,6 +24,9 @@ button:disabled{opacity:.6}
 <label>6 个正码 + 1 特码</label><input id="nums" placeholder="01 12 23 34 45 06 18">
 <label>生肖（可选，7 个）</label><input id="zodiacs" placeholder="留空自动按号码生成">
 <label>开奖时间</label><input id="time" placeholder="如 11月17日 星期日 21:30">
+<label>单双</label><select id="oddeven"><option value="单">单数</option><option value="双">双数</option></select>
+<label>三肖（逗号或空格分隔，如 狗 马 猴）</label><input id="threez" placeholder="狗 马 猴">
+<label>玩法文案（可选）</label><input id="playnote" placeholder="留空用默认">
 <label>状态</label><select id="status"><option value="open">open（已开奖）</option><option value="sampled">sampled（示例）</option><option value="closed">closed（关闭）</option></select>
 <button id="rand" style="background:#1f3b8a">随机一键开（生成 7 个号）</button>
 <button id="save">保存并发布（约 1–2 分钟生效）</button>
@@ -61,6 +64,18 @@ button:disabled{opacity:.6}
   $('clear').addEventListener('click',function(){
     localStorage.removeItem(KEY); tok.value=''; msg('已清除本机 token',true);
   });
+  async function savePlay(){
+    var zs=($('threez').value||'').trim().replace(/,/g,' ').split(/\\s+/).filter(Boolean);
+    if(zs.length!==3){msg('三肖必须 3 个（当前 '+zs.length+'）',false);return}
+    var body={name:'新香港',issue:$('issue').value.trim(),oddEven:$('oddeven').value,threeZodiac:zs,note:$('playnote').value.trim(),status:'live',updated:new Date().toISOString()};
+    try{
+      var cur=null; try{cur=await api('https://api.github.com/repos/'+REPO+'/contents/data/manual-play.json?ref=main')}catch(e){}
+      var payload={message:'manual play: issue '+body.issue,content:b64(JSON.stringify(body,null,1)),branch:'main'};
+      if(cur&&cur.sha)payload.sha=cur.sha;
+      await api('https://api.github.com/repos/'+REPO+'/contents/data/manual-play.json',{method:'PUT',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'}});
+      msg('玩法已提交，约 1-2 分钟生效',true);
+    }catch(e){msg('玩法保存失败：'+e.message,false)}
+  }
   $('rand').addEventListener('click',function(){
     var ZH=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
     var pool=[];for(var i=1;i<=49;i++)pool.push(i);
@@ -69,6 +84,6 @@ button:disabled{opacity:.6}
     $('zodiacs').value=pick.map(function(n){return ZH[(n-1)%12]}).join(' ');
     msg('已随机生成 7 个号，检查后点保存',true);
   });
-  $('save').addEventListener('click',save);
+  $('save').addEventListener('click',function(){save();savePlay();});
 })();
 </script></body></html>
