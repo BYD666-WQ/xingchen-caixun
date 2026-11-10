@@ -42,7 +42,7 @@ jobs:
               nums = [x.zfill(2) for x in re.split(r"[,\s]+", os.environ["IN_NUMS"].strip()) if x]
           zs = [x.strip() for x in re.split(r"[,\s]+", os.environ.get("IN_ZODIACS", "").strip()) if x]
           assert len(nums) == 7, "need exactly 7 numbers (6 + 1 special)"
-          ZH = ["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"]
+          ZH = ['马','蛇','龙','兔','虎','牛','鼠','猪','狗','鸡','猴','羊']
           if len(zs) != 7:
               zs = [ZH[(int(n) - 1) % 12] for n in nums]
           data = {"name": "新彩种", "issue": issue, "nums": [{"c": n, "z": z} for n, z in zip(nums, zs)],
