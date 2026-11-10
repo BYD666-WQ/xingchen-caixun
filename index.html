@@ -93,15 +93,7 @@ h1{background-image:linear-gradient(90deg,#F6F7ED,#CFCBA8,#B9B18B,#A59E7C,#948E6
 .hlink button,.hitem{box-shadow:0 2px 12px rgba(50,50,51,.12)!important}
 .zrow{background-image:linear-gradient(#FFFEF5,#FFEDCB)!important}
 </style>
-<style id="xc-l3-skin">
-.tabs button{background-image:url("assets/theme/纹理/9f6ee3c7-BDB76B.webp")!important;background-size:cover!important;background-blend-mode:screen!important}
-h1{position:relative}
-h1::after{content:"";position:absolute;right:10px;top:4px;width:34px;height:16px;background:url("assets/theme/图标/5bea6564-gengxin.webp") center/contain no-repeat}
-#ziliao .zrow{position:relative;padding-left:22px}
-#ziliao .zrow::before{content:"";position:absolute;left:2px;top:50%;transform:translateY(-50%);width:16px;height:16px;background:url("assets/theme/插图/f92604fa-sx_1.gif") center/contain no-repeat}
-#bottomnav{border-top:1px solid #FFCC58!important}
-#bottomnav::before{content:"";display:block;height:2px;background:linear-gradient(90deg,transparent,#FFCC58,transparent)}
-</style></head><body><div id="wrap">
+</head><body><div id="wrap">
 <h1>新港摇钱树</h1>
 <div class="sub">官方开奖信息 · 每 30 秒刷新</div>
 <div class="tabs" id="tabs">
@@ -236,5 +228,15 @@ h1::after{content:"";position:absolute;right:10px;top:4px;width:34px;height:16px
     });
   });
   load(); setInterval(load,30000);
+})();
+</script><style id="xc-l3-skin">
+.tabs button{background-color:#FFFFFF!important;background-image:url("assets/theme/纹理/9f6ee3c7-BDB76B.webp")!important;background-size:cover!important;background-blend-mode:screen!important}
+#bottomnav{border-top:1px solid #FFCC58!important}
+</style>
+<script>
+(function(){
+  function addBadge(){var h1=document.querySelector('h1');if(!h1||h1.querySelector('.xc-badge'))return;var img=document.createElement('img');img.className='xc-badge';img.src='assets/theme/图标/5bea6564-gengxin.webp';img.style.cssText='position:absolute;right:10px;top:6px;width:34px;height:16px';h1.style.position='relative';h1.appendChild(img);}
+  function addZodiac(){var rows=document.querySelectorAll('#ziliao .zrow');for(var i=0;i<rows.length;i++){var r=rows[i];if(r.querySelector('.xc-sx'))continue;var img=document.createElement('img');img.className='xc-sx';img.src='assets/theme/插图/'+(i%2===0?'f92604fa-sx_1.gif':'9f89af28-sx_2.gif');img.style.cssText='width:16px;height:16px;margin-right:4px;vertical-align:-3px';r.insertBefore(img,r.firstChild);}}
+  setTimeout(addBadge,600);setTimeout(addZodiac,900);setTimeout(addBadge,1800);setTimeout(addZodiac,2200);
 })();
 </script></body></html>
