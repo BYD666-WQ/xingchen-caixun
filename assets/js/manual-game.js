@@ -232,4 +232,58 @@
     }
     window.XC_NEWHK_HISTORY = show;
   })();
+
+  // 历史面板（事件委托 + 自己拉数据，避免绑定时机问题）xc-mhist-delegated
+  (function () {
+    function findBlock(el) {
+      var b = el;
+      while (b && b !== document.body) {
+        if (b.querySelector && b.querySelectorAll && b.querySelectorAll('.baomalaodaMa').length >= 7) return b;
+        b = b.parentNode;
+      }
+      return null;
+    }
+    function render(list) {
+      var old = document.getElementById('xc-mhist');
+      if (old) old.remove();
+      var box = document.createElement('div');
+      box.id = 'xc-mhist';
+      box.style.cssText = 'position:fixed;inset:0;z-index:10006;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:12px';
+      var html = '<div style="background:#fff;border-radius:8px;max-width:92vw;max-height:78vh;overflow:auto;padding:10px 12px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;font:700 15px/2 \'Microsoft YaHei\',Arial,sans-serif;color:#1f3b8a">' +
+        '<span>\u65b0\u9999\u6e2f \u00b7 \u5386\u53f2\u5f00\u5956\uff08' + list.length + '\u671f\uff09</span>' +
+        '<button id="xc-mhist-x" style="width:40px;height:40px;border:0;background:none;font-size:20px">\u00d7</button></div>' +
+        '<table style="border-collapse:collapse;font:13px/1.6 \'Microsoft YaHei\',Arial,sans-serif">';
+      list.forEach(function (h) {
+        var balls = (h.nums || []).map(function (n) {
+          var col = n.color === '\u7ea2' ? '#e71607' : (n.color === '\u84dd' ? '#2873e6' : '#1fb61d');
+          return '<span style="display:inline-block;min-width:26px;text-align:center;margin:2px;padding:2px 4px;border-radius:4px;background:' + col + ';color:#fff;font-weight:700">' + n.c +
+            '<i style="display:block;font-style:normal;font-size:10px;font-weight:400">' + (n.wuxing || '') + '/' + (n.z || '') + '</i></span>';
+        }).join('');
+        html += '<tr><td style="padding:6px 8px;border-top:1px solid #eee;white-space:nowrap">' + h.issue + ' \u671f</td><td style="padding:6px 8px;border-top:1px solid #eee">' + balls + '</td></tr>';
+      });
+      html += '</table></div>';
+      box.innerHTML = html;
+      document.body.appendChild(box);
+      box.addEventListener('click', function (e) { if (e.target === box) box.remove(); });
+      document.getElementById('xc-mhist-x').addEventListener('click', function () { box.remove(); });
+    }
+    function open() {
+      fetch(base() + 'data/manual-draw.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { render((d && d.history) || []); })
+        .catch(function () { render([]); });
+    }
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      while (t && t !== document.body && !(t.className && String(t.className).indexOf('baomalaodaHistory') >= 0)) t = t.parentNode;
+      if (!t || t === document.body) return;
+      var b = findBlock(t);
+      if (!b) return;
+      var nm = b.querySelector('.baomalaodaName');
+      if (!nm || (nm.textContent || '').indexOf('\u65b0\u9999\u6e2f') < 0) return;
+      e.preventDefault(); e.stopPropagation();
+      open();
+    }, true);
+  })();
 })();
