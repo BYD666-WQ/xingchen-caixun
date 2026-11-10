@@ -115,19 +115,23 @@
     var RED = [1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46];
     var BLUE = [3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
     function cOf(n) { return RED.indexOf(n) >= 0 ? '#e71607' : (BLUE.indexOf(n) >= 0 ? '#2873e6' : '#1fb61d'); }
-    function ballHtml(c, z) {
+    function ballHtml(c, z, size) {
+      var S = size || 30;
       return '<span style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;' +
-        'width:30px;height:30px;border-radius:50%;background:' + cOf(parseInt(c, 10)) + ';color:#fff;' +
-        'font:700 12px/1 "Microsoft YaHei",Arial,sans-serif;margin:2px">' + c +
-        '<i style="font-style:normal;font-size:9px;font-weight:400">' + (z || '') + '</i></span>';
+        'width:' + S + 'px;height:' + S + 'px;border-radius:50%;background:' + cOf(parseInt(c, 10)) + ';color:#fff;' +
+        'font:700 ' + (S >= 36 ? 14 : 12) + 'px/1 "Microsoft YaHei",Arial,sans-serif;margin:' + (S >= 36 ? 3 : 2) + 'px">' + c +
+        '<i style="font-style:normal;font-size:' + (S >= 36 ? 10 : 9) + 'px;font-weight:400">' + (z || '') + '</i></span>';
     }
-    function card(title, issue, nums, footerText) {
-      var balls = (nums || []).map(function (n) { return ballHtml(n.c || n, n.z || ''); }).join('');
-      return '<div style="flex:1 1 0;min-width:0;background:#fff;border:1px solid #d8ccb4;border-radius:5px;padding:6px 8px;box-sizing:border-box">' +
-        '<div style="display:flex;justify-content:space-between;align-items:baseline;font:700 13px/1.5 \'Microsoft YaHei\',Arial,sans-serif;color:#1f3b8a">' +
-        '<span>' + title + '</span><span style="color:#a33;font-weight:400;font-size:11px">' + issue + '</span></div>' +
-        '<div style="display:flex;flex-wrap:wrap;justify-content:flex-start;margin:2px 0">' + balls + '</div>' +
-        '<div class="xc-ov-cd" style="font:11px/1.4 \'Microsoft YaHei\',Arial,sans-serif;color:#666">' + (footerText || '') + '</div></div>';
+    function card(title, issue, nums, footerText, wide) {
+      var balls = (nums || []).map(function (n) { return ballHtml(n.c || n, n.z || '', n.big ? 40 : 30); }).join('');
+      var flex = wide ? 'flex:1 1 100%' : 'flex:1 1 0';
+      var pad = wide ? '12px 14px' : '6px 8px';
+      var fs = wide ? 17 : 13;
+      return '<div style="' + flex + ';min-width:0;background:#fffef5;border:1px solid #d8ccb4;border-radius:6px;padding:' + pad + ';box-sizing:border-box">' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;font:700 ' + fs + 'px/1.6 "Microsoft YaHei",Arial,sans-serif;color:#1f3b8a">' +
+        '<span>' + title + '</span><span style="color:#a33;font-weight:400;font-size:12px">' + issue + '</span></div>' +
+        '<div style="display:flex;flex-wrap:wrap;justify-content:flex-start;margin:6px 0 2px">' + balls + '</div>' +
+        '<div class="xc-ov-cd" style="font:12px/1.5 "Microsoft YaHei",Arial,sans-serif;color:#666">' + (footerText || '') + '</div></div>';
     }
     function findHkBlock() {
       var names = document.querySelectorAll('.baomalaodaName');
@@ -178,11 +182,10 @@
         var wrap = document.createElement('div');
         wrap.id = 'xc-overview';
         wrap.style.cssText = 'display:flex;gap:8px;margin:8px auto;max-width:720px;padding:0 6px;box-sizing:border-box';
-        wrap.innerHTML = card(d.name || '新香港', '第' + (d.issue || 1) + '期', d.nums || [], '') +
-                         card('香港彩', '第' + hkIssue + '期', hkNums, hkNext ? ('下期 ' + hkNext) : '');
+        wrap.innerHTML = card(d.name || '\u65b0\u9999\u6e2f', '\u7b2c' + (d.issue || 1) + '\u671f', (d.nums || []).map(function(n){return {c:n.c,z:n.z,big:1}}), '', true);
         anchor.parentNode.insertBefore(wrap, anchor);
-        tickCd(wrap.children[0].querySelector('.xc-ov-cd'), d.dailyTime || '21:34');
-        if (hkNext) { var m = hkNext.match(/(\d{1,2}):(\d{2})/); if (m) tickCd(wrap.children[1].querySelector('.xc-ov-cd'), m[1] + ':' + m[2]); }
+        tickCd(wrap.querySelector('.xc-ov-cd'), d.dailyTime || '21:34');
+        
       });
   })();
 })();
