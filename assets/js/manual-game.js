@@ -109,4 +109,80 @@
         if (b && b !== block) b.style.display = '';
       });
     });
+
+  // 概览条：新香港（manual）+ 香港彩（真实数据）并排
+  (function () {
+    var RED = [1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46];
+    var BLUE = [3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
+    function cOf(n) { return RED.indexOf(n) >= 0 ? '#e71607' : (BLUE.indexOf(n) >= 0 ? '#2873e6' : '#1fb61d'); }
+    function ballHtml(c, z) {
+      return '<span style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;' +
+        'width:30px;height:30px;border-radius:50%;background:' + cOf(parseInt(c, 10)) + ';color:#fff;' +
+        'font:700 12px/1 "Microsoft YaHei",Arial,sans-serif;margin:2px">' + c +
+        '<i style="font-style:normal;font-size:9px;font-weight:400">' + (z || '') + '</i></span>';
+    }
+    function card(title, issue, nums, footerText) {
+      var balls = (nums || []).map(function (n) { return ballHtml(n.c || n, n.z || ''); }).join('');
+      return '<div style="flex:1 1 0;min-width:0;background:#fff;border:1px solid #d8ccb4;border-radius:5px;padding:6px 8px;box-sizing:border-box">' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;font:700 13px/1.5 \'Microsoft YaHei\',Arial,sans-serif;color:#1f3b8a">' +
+        '<span>' + title + '</span><span style="color:#a33;font-weight:400;font-size:11px">' + issue + '</span></div>' +
+        '<div style="display:flex;flex-wrap:wrap;justify-content:flex-start;margin:2px 0">' + balls + '</div>' +
+        '<div class="xc-ov-cd" style="font:11px/1.4 \'Microsoft YaHei\',Arial,sans-serif;color:#666">' + (footerText || '') + '</div></div>';
+    }
+    function findHkBlock() {
+      var names = document.querySelectorAll('.baomalaodaName');
+      for (var i = 0; i < names.length; i++) {
+        if ((names[i].textContent || '').replace(/\s+/g, '') === '\u9999\u6e2f\u5f69') {
+          var b = names[i];
+          while (b && b !== document.body) {
+            if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) return b;
+            b = b.parentNode;
+          }
+        }
+      }
+      return null;
+    }
+    function nextText(block) {
+      if (!block) return '';
+      var ms = (block.textContent || '').match(/(\d{1,2})月(\d{1,2})日\s*星期[一二三四五六日天]\s*(\d{1,2})[:：](\d{2})/);
+      if (!ms) return '';
+      return parseInt(ms[1], 10) + '月' + parseInt(ms[2], 10) + '日 ' + ms[3] + ':' + ms[4];
+    }
+    function tickCd(el, hm) {
+      if (!el || !hm) return;
+      var hm2 = String(hm).split(':');
+      function tick() {
+        var now = new Date();
+        var t = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(hm2[0], 10), parseInt(hm2[1], 10), 0);
+        if (t.getTime() <= now.getTime()) t = new Date(t.getTime() + 86400000);
+        var left = Math.floor((t.getTime() - now.getTime()) / 1000);
+        function p(n) { return (n < 10 ? '0' : '') + n; }
+        el.textContent = '距开奖 ' + p(Math.floor(left / 3600)) + ':' + p(Math.floor(left % 3600 / 60)) + ':' + p(left % 60);
+      }
+      tick(); setInterval(tick, 1000);
+    }
+    fetch(base() + 'data/manual-draw.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d) return;
+        var anchor = document.getElementById('widgetBox41750');
+        if (!anchor) return;
+        var hk = findHkBlock();
+        var hkNums = [];
+        if (hk) {
+          var mas = hk.querySelectorAll('.baomalaodaMa'), zs = hk.querySelectorAll('.baomalaodaXiao');
+          for (var i = 0; i < mas.length; i++) hkNums.push({ c: mas[i].textContent.trim(), z: zs[i] ? zs[i].textContent.trim() : '' });
+        }
+        var hkIssue = hk ? ((hk.querySelector('.baomalaodaQi') || {}).textContent || '').trim() : '';
+        var hkNext = nextText(hk);
+        var wrap = document.createElement('div');
+        wrap.id = 'xc-overview';
+        wrap.style.cssText = 'display:flex;gap:8px;margin:8px auto;max-width:720px;padding:0 6px;box-sizing:border-box';
+        wrap.innerHTML = card(d.name || '新香港', '第' + (d.issue || 1) + '期', d.nums || [], '') +
+                         card('香港彩', '第' + hkIssue + '期', hkNums, hkNext ? ('下期 ' + hkNext) : '');
+        anchor.parentNode.insertBefore(wrap, anchor);
+        tickCd(wrap.children[0].querySelector('.xc-ov-cd'), d.dailyTime || '21:34');
+        if (hkNext) { var m = hkNext.match(/(\d{1,2}):(\d{2})/); if (m) tickCd(wrap.children[1].querySelector('.xc-ov-cd'), m[1] + ':' + m[2]); }
+      });
+  })();
 })();
