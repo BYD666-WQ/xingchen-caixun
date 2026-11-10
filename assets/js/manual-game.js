@@ -640,7 +640,10 @@
     }
     async function refreshDraw() {
       var d = await fetchJSON('data/draw.json');
-      if (!d || !d.games) return;
+      if (!d || !d.games) {
+        document.querySelectorAll('.baomalaodaQi').forEach(function (q) { q.textContent = '\u6570\u636e\u83b7\u53d6\u4e2d\u2026'; });
+        return;
+      }
       var byRule = {};
       d.games.forEach(function (g) { byRule[g.rule] = g; });
       document.querySelectorAll('.baomalaodaName').forEach(function (n) {
@@ -665,7 +668,7 @@
       });
     }
     setTimeout(refreshDraw, 1500);
-    setInterval(refreshDraw, 60000);
+    setInterval(refreshDraw, 30000);
   
   // 三彩种收口：新港 / 新澳 / 香港 —— 删老澳与快乐8，重排顺序，清重复倒计时
   (function () {
