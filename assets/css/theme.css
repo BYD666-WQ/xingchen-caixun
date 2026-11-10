@@ -1,20 +1,10 @@
-/* 新港摇钱树 · 主题变量（换皮只改这里） */
 :root{
-  /* 基础 */
-  --xc-bg:#f3ecd6;--xc-panel:#fffdf3;--xc-ink:#333;--xc-ink-2:#666;--xc-ink-3:#8a6d3b;
-  /* 主色（红金） */
-  --xc-red:#a81212;--xc-red-2:#c32323;--xc-red-3:#d42d2d;--xc-red-deep:#8f1414;
-  --xc-gold:#ffe08a;--xc-gold-2:#f6d97a;--xc-gold-line:#d9c48a;--xc-gold-line-2:#e6d7ad;--xc-gold-deep:#b8860b;
-  /* 波色 */
-  --xc-red-ball:#d60000;--xc-blue-ball:#1867d6;--xc-green-ball:#159a1a;
-  /* 线/圆角/字号 */
-  --xc-radius:4px;--xc-radius-pill:999px;
-  --xc-fs-1:10px;--xc-fs-2:11px;--xc-fs-3:12px;--xc-fs-4:13px;--xc-fs-5:16px;--xc-fs-6:18px;
-  --xc-line:1px solid var(--xc-gold-line);
-  --xc-line-thin:1px dashed var(--xc-gold-line-2);
-  --xc-shadow:0 1px 0 #fff inset;
-  /* 间距 */
-  --xc-gap:4px;--xc-pad:6px 8px;
+  --xc-bg:#F5F1E6;--xc-panel:#FFFFFF;--xc-ink:#222222;--xc-ink-2:#555555;--xc-ink-3:#888888;
+  --xc-red:#E60012;--xc-red-2:#C50010;--xc-red-3:#E60012;--xc-red-deep:#A5000D;
+  --xc-blue:#1E5BC6;--xc-gold:#F0C860;--xc-gold-2:#C8A24A;--xc-gold-line:#C8A24A;--xc-gold-line-2:#E6D7AD;
+  --xc-graygreen:#B7B98F;--xc-orange:#F08C00;--xc-orange-2:#F5A623;
+  --xc-red-ball:#E60012;--xc-blue-ball:#1E5BC6;--xc-green-ball:#0F9D58;
+  --xc-radius:6px;--xc-radius-sm:4px;--xc-radius-pill:999px;
+  --xc-fs-1:12px;--xc-fs-2:14px;--xc-fs-3:15px;--xc-fs-4:16px;--xc-fs-5:18px;--xc-fs-6:20px;
 }
-/* 可选：深色模式也强制浅色（彩站风格） */
-@media (prefers-color-scheme: dark){:root{--xc-bg:#f3ecd6}}
+@media (prefers-color-scheme: dark){:root{--xc-bg:#F5F1E6}}
