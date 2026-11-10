@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light">
+<title>区块对齐 · 全块</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#F5F1E6;font-family:"Microsoft YaHei",Arial,sans-serif;color:#222;padding-bottom:64px}
+.wrap{max-width:720px;margin:0 auto}
+.adslot{height:52px;background:#EFE7CE;display:flex;align-items:center;justify-content:center;color:#b9a97c;font-size:12px;border-bottom:1px solid #e3d9bd}
+.notice{display:flex;align-items:center;gap:8px;background:#F7F7F7;padding:6px 10px;font-size:14px;color:#E60012}
+.notice b{flex:1;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.notice .view{background:#2680EB;color:#fff;border-radius:999px;padding:3px 14px;font-size:12px}
+.logo-row{display:flex;align-items:center;padding:8px 10px 6px}
+.logo{font:900 30px/1.1 "Microsoft YaHei",Arial,sans-serif;color:#F60829}
+.logo small{font-size:18px;color:#1E5BC6;font-weight:900}
+.seal{margin-left:auto;background:#E60012;color:#fff;border:2px solid #F0C860;border-radius:6px;font-size:14px;font-weight:900;padding:5px 7px;text-align:center;line-height:1.2}
+.tabs{display:flex;gap:8px;padding:6px 10px 10px}
+.tab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:#fff;border:1px solid #E3DCC9;border-radius:999px;padding:8px 0;font-size:15px;font-weight:700;color:#333}
+.tab .ico{width:20px;height:20px;border-radius:50%;background:#fff;border:1px solid #d5cba9;position:relative;display:inline-block;font-size:0}
+.tab .ico::after{content:'';position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%}
+.tab:nth-child(1) .ico::after{background:#E60012}
+.tab:nth-child(2) .ico::after{background:#2383E9}
+.tab:nth-child(3) .ico::after{background:#1FB61D}
+.tab.on{border-color:#F6C65B;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.openbar{display:flex;align-items:center;gap:3px;padding:4px 4px;width:100%;box-sizing:border-box;background:#FFF3C4;border-top:1px solid #F6C65B;border-bottom:1px solid #F6C65B}
+.openbar .left{flex:0 0 44px;font-size:11px;line-height:1.05;text-align:center;background:#FFE58A;border-radius:4px;color:#B30000;font-weight:700;padding:2px 0}
+.openbar .left span{display:block;font-size:10px;font-weight:400}
+.openbar .balls{display:flex;align-items:center;gap:3px;flex:1 1 0;min-width:0}
+.openbar .refresh{flex:0 0 8px;font-size:0;background:#FFD24D;border-radius:3px;align-self:stretch}
+.tile{border-radius:8px;overflow:hidden;display:flex;flex-direction:column;color:#fff;text-align:center}
+.openbar .tile{flex:1 1 0;min-width:0;aspect-ratio:1}
+.tile .num{flex:1;display:flex;align-items:center;justify-content:center;font:900 26px/1 "Microsoft YaHei",Arial,sans-serif}
+.tile .zod{height:20px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;background:rgba(0,0,0,.42)}
+.openbar .tile .num{font-size:clamp(13px,4.2vw,18px)}
+.openbar .tile .zod{height:9px;font-size:8px;background:rgba(0,0,0,.35)}
+.tile.r{background:#E71607}.tile.b{background:#2383E9}.tile.g{background:#1FB61D}
+.plus{align-self:center;color:#C8A24A;font-weight:900;font-size:16px;flex:0 0 8px;text-align:center}
+.block{background:#fff;border:1px solid #F1D9A6;border-radius:6px;margin:8px 10px;overflow:hidden}
+.block .hd{display:flex;align-items:baseline;gap:8px;padding:8px 10px 4px}
+.block .hd b{font-size:22px;font-weight:900}
+.block .hd .time{font-size:18px;color:#666;margin-left:6px}
+.block .hd .hist{margin-left:auto;color:#E60012;font-size:16px;font-weight:700}
+.block .balls{display:flex;align-items:center;gap:6px;padding:4px 10px 8px}
+.block .balls .tile{width:52px;height:56px}
+.block .next{display:flex;align-items:center;justify-content:space-between;padding:2px 10px 10px;font-size:14px}
+.block .next .rf{background:#F5A623;color:#fff;border-radius:6px;padding:5px 12px}
+/* 内幕区 */
+.nm{background:#FFF9E8;border:2px solid #E60012;border-radius:8px;margin:8px 10px;overflow:hidden}
+.nm .h{background:linear-gradient(#F0412A,#D90000);color:#fff;text-align:center;font:900 22px/2.2 "Microsoft YaHei",Arial,sans-serif}
+.nm .row{display:flex;align-items:center;gap:6px;padding:5px 8px;border-top:1px dashed #F0D9A8;font-size:13px}
+.nm .row .iss{background:#E60012;color:#fff;border-radius:4px;padding:2px 6px;font-weight:700;font-size:12px}
+.nm .row .lab{background:#E60012;color:#fff;border-radius:3px;padding:1px 5px;font-size:12px}
+.nm .row .zod2{color:#222;font-weight:700}
+.nm .row .ok{margin-left:auto;background:#FFE58A;color:#B30000;border-radius:3px;padding:1px 6px;font-weight:700;font-size:12px}
+.nm .row .pend{margin-left:auto;color:#C90000;font-weight:700}
+/* 资料区 */
+.zl{background:linear-gradient(#FFF7E3,#FFE8B8);border:2px solid #F6C65B;border-radius:8px;margin:8px 10px;overflow:hidden}
+.zl .h{background:#B7B98F;color:#fff;text-align:center;font:900 20px/2.1 "Microsoft YaHei",Arial,sans-serif}
+.zl .g{background:#FFF4D7;color:#B30000;font-weight:700;font-size:14px;padding:4px 10px}
+.zl .row{display:flex;align-items:center;gap:6px;padding:5px 10px;border-top:1px dashed #E6D7AD;font-size:13px}
+.zl .row .n{color:#B30000;font-weight:900;font-size:15px}
+.zl .row .zs span{color:#E60012;font-weight:900;font-size:15px;margin-right:4px}
+.zl .row .code{margin-left:auto;color:#555;font-size:12px}
+/* 底栏 */
+.nav{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;background:#fff;border-top:1px solid #E6D7AD;align-items:flex-end;z-index:9}
+.nav a{flex:1;text-align:center;font-size:11px;color:#555;text-decoration:none;padding-bottom:4px}
+.nav .badge{display:block;width:22px;height:22px;margin:0 auto 1px;border-radius:50%;background:#F6E3A1;color:#B30000;font:900 12px/22px Arial;border:1px solid #E0C060}
+.nav .zhun{align-self:flex-start;margin-top:-14px;width:44px;height:44px;border-radius:50%;background:#1FB61D;color:#fff;font:900 15px/44px "Microsoft YaHei";border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.text{font-size:12px;color:#888;padding:6px 10px}
+</style></head><body><div class="wrap">
+<div class="adslot">（广告位占位 · 保持比例）</div>
+<div class="notice"><b>本站数据仅供参考 · 开奖结果以官方公布为准</b><span class="view">查看</span></div>
+<div class="logo-row"><div class="logo">新港摇钱树<small>.com</small></div><div class="seal">正版<br>数据</div></div>
+<div class="tabs"><div class="tab on"><span class="ico"></span>新港</div><div class="tab"><span class="ico"></span>新澳</div><div class="tab"><span class="ico"></span>香港</div></div>
+<div class="openbar">
+  <div class="left">314期开<span>开奖记录</span></div>
+  <div class="balls">
+    <div class="tile r"><div class="num">13</div><div class="zod">马</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile b"><div class="num">09</div><div class="zod">狗</div></div><div class="tile b"><div class="num">37</div><div class="zod">马</div></div><div class="tile r"><div class="num">34</div><div class="zod">鸡</div></div><div class="tile g"><div class="num">44</div><div class="zod">猪</div></div><span class="plus">+</span><div class="tile b"><div class="num">31</div><div class="zod">鼠</div></div>
+  </div>
+  <div class="refresh"></div>
+</div>
+<div class="block">
+  <div class="hd"><b>新港第313期</b><span class="time">19:07:17</span><span class="hist">历史记录</span></div>
+  <div class="balls"><div class="tile r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div></div>
+  <div class="next"><span>新港第314期: 11月11日 星期三 21:34</span><span class="rf">刷新</span></div>
+</div>
+<div class="nm"><div class="h">新港摇钱树【单双③肖】</div>
+  <div class="row"><span class="iss">314期:内幕</span><span class="pend">【待开】</span></div>
+  <div class="row"><span class="iss">313期:内幕</span><span class="lab">【单数】</span><span>主</span><span class="zod2">【兔蛇羊】</span><span>开马13</span><span class="ok">准</span></div>
+  <div class="row"><span class="iss">312期:内幕</span><span class="lab">【单数】</span><span>主</span><span class="zod2">【猪羊虎】</span><span>开鼠07</span><span class="ok">准</span></div>
+  <div class="row"><span class="iss">311期:内幕</span><span class="lab">【单数】</span><span>主</span><span class="zod2">【鼠兔鸡】</span><span>开龙39</span><span class="ok">准</span></div>
+</div>
+<div class="zl"><div class="h">资料大全</div>
+  <div class="g">七肖 · 五肖 · 三肖 · 二肖 · 一肖</div>
+  <div class="row"><span class="n">7肖</span><span class="zs"><span>兔</span><span>蛇</span><span>羊</span><span>猪</span><span>虎</span><span>鼠</span><span>鸡</span></span><span class="code">码:28.26.12.11.30.07.13</span></div>
+  <div class="row"><span class="n">5肖</span><span class="zs"><span>兔</span><span>蛇</span><span>羊</span><span>猪</span><span>虎</span></span><span class="code">码:28.26.12.11.30</span></div>
+  <div class="row"><span class="n">3肖</span><span class="zs"><span>兔</span><span>蛇</span><span>羊</span></span><span class="code">码:28.26.12</span></div>
+</div>
+<div class="text">本站数据仅供参考 · 不作购彩依据</div>
+</div>
+<div class="nav">
+  <a href="#"><span class="badge">49</span>首页</a>
+  <a href="#"><span class="badge">49</span>资料大全</a>
+  <a href="#"><span class="zhun">准</span>规律走势</a>
+  <a href="#"><span class="badge">49</span>寻宝</a>
+  <a href="#"><span class="badge">49</span>图库</a>
+</div>
+</body></html>
