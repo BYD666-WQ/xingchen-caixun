@@ -175,7 +175,7 @@
         if (el.children.length) continue;
         var t = (el.textContent || '');
         if (/\u9999\u6e2f\u5f69\u7b2c\s*\d+/.test(t)) {
-          el.textContent = (d2 ? d2 : '');
+          el.textContent = '';
         }
       }
     }
