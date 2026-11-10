@@ -109,33 +109,12 @@
       });
     });
 
-  // 概览条：新香港（manual）+ 香港彩（真实数据）并排
+  // 顶部第二块：完整克隆「新香港」详情块（数据同源，内容完全一致）
   (function () {
-    var RED = [1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46];
-    var BLUE = [3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
-    function cOf(n) { return RED.indexOf(n) >= 0 ? '#e71607' : (BLUE.indexOf(n) >= 0 ? '#2873e6' : '#1fb61d'); }
-    function ballHtml(c, z, size) {
-      var S = size || 30;
-      return '<span style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;' +
-        'width:' + S + 'px;height:' + S + 'px;border-radius:50%;background:' + cOf(parseInt(c, 10)) + ';color:#fff;' +
-        'font:700 ' + (S >= 36 ? 14 : 12) + 'px/1 "Microsoft YaHei",Arial,sans-serif;margin:' + (S >= 36 ? 3 : 2) + 'px">' + c +
-        '<i style="font-style:normal;font-size:' + (S >= 36 ? 10 : 9) + 'px;font-weight:400">' + (z || '') + '</i></span>';
-    }
-    function card(title, issue, nums, footerText, wide) {
-      var balls = (nums || []).map(function (n) { return ballHtml(n.c || n, n.z || '', n.big ? 40 : 30); }).join('');
-      var flex = wide ? 'flex:1 1 100%' : 'flex:1 1 0';
-      var pad = wide ? '12px 14px' : '6px 8px';
-      var fs = wide ? 17 : 13;
-      return '<div style="' + flex + ';min-width:0;background:#fffef5;border:1px solid #d8ccb4;border-radius:6px;padding:' + pad + ';box-sizing:border-box">' +
-        '<div style="display:flex;justify-content:space-between;align-items:baseline;font:700 ' + fs + 'px/1.6 "Microsoft YaHei",Arial,sans-serif;color:#1f3b8a">' +
-        '<span>' + title + '</span><span style="color:#a33;font-weight:400;font-size:12px">' + issue + '</span></div>' +
-        '<div style="display:flex;flex-wrap:wrap;justify-content:flex-start;margin:6px 0 2px">' + balls + '</div>' +
-        '<div class="xc-ov-cd" style="font:12px/1.5 "Microsoft YaHei",Arial,sans-serif;color:#666">' + (footerText || '') + '</div></div>';
-    }
-    function findHkBlock() {
+    function findBlockByName(nm) {
       var names = document.querySelectorAll('.baomalaodaName');
       for (var i = 0; i < names.length; i++) {
-        if ((names[i].textContent || '').replace(/\s+/g, '') === '\u9999\u6e2f\u5f69') {
+        if ((names[i].textContent || '').replace(/\s+/g, '') === nm) {
           var b = names[i];
           while (b && b !== document.body) {
             if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) return b;
@@ -145,46 +124,27 @@
       }
       return null;
     }
-    function nextText(block) {
-      if (!block) return '';
-      var ms = (block.textContent || '').match(/(\d{1,2})月(\d{1,2})日\s*星期[一二三四五六日天]\s*(\d{1,2})[:：](\d{2})/);
-      if (!ms) return '';
-      return parseInt(ms[1], 10) + '月' + parseInt(ms[2], 10) + '日 ' + ms[3] + ':' + ms[4];
-    }
-    function tickCd(el, hm) {
-      if (!el || !hm) return;
-      var hm2 = String(hm).split(':');
-      function tick() {
-        var now = new Date();
-        var t = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(hm2[0], 10), parseInt(hm2[1], 10), 0);
-        if (t.getTime() <= now.getTime()) t = new Date(t.getTime() + 86400000);
-        var left = Math.floor((t.getTime() - now.getTime()) / 1000);
-        function p(n) { return (n < 10 ? '0' : '') + n; }
-        el.textContent = '距开奖 ' + p(Math.floor(left / 3600)) + ':' + p(Math.floor(left % 3600 / 60)) + ':' + p(left % 60);
+    function run() {
+      var anchor = document.getElementById('widgetBox41750');
+      var src = findBlockByName('\u65b0\u9999\u6e2f');
+      if (!anchor || !src || document.getElementById('xc-top-block') || src.style.display === 'none') return;
+      var top = src.cloneNode(true);
+      top.id = 'xc-top-block';
+      top.style.display = '';
+      top.style.margin = '10px auto 6px';
+      var oldBtns = top.querySelectorAll('img, .xc-countdown');
+      for (var i = 0; i < oldBtns.length; i++) { if (oldBtns[i].className && oldBtns[i].className.indexOf('xc-countdown') >= 0) oldBtns[i].remove(); }
+      var hists = top.querySelectorAll('.baomalaodaHistory');
+      for (var j = 0; j < hists.length; j++) {
+        hists[j].style.cursor = 'pointer';
+        hists[j].addEventListener('click', function (e) {
+          e.preventDefault();
+          if (window.XC_INTERACTIONS && window.XC_INTERACTIONS.openHistory) window.XC_INTERACTIONS.openHistory('\u65b0\u9999\u6e2f');
+        });
       }
-      tick(); setInterval(tick, 1000);
+      anchor.parentNode.insertBefore(top, anchor);
     }
-    fetch(base() + 'data/manual-draw.json?t=' + Date.now(), { cache: 'no-store' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (d) {
-        if (!d) return;
-        var anchor = document.getElementById('widgetBox41750');
-        if (!anchor) return;
-        var hk = findHkBlock();
-        var hkNums = [];
-        if (hk) {
-          var mas = hk.querySelectorAll('.baomalaodaMa'), zs = hk.querySelectorAll('.baomalaodaXiao');
-          for (var i = 0; i < mas.length; i++) hkNums.push({ c: mas[i].textContent.trim(), z: zs[i] ? zs[i].textContent.trim() : '' });
-        }
-        var hkIssue = hk ? ((hk.querySelector('.baomalaodaQi') || {}).textContent || '').trim() : '';
-        var hkNext = nextText(hk);
-        var wrap = document.createElement('div');
-        wrap.id = 'xc-overview';
-        wrap.style.cssText = 'display:flex;gap:8px;margin:8px auto;max-width:720px;padding:0 6px;box-sizing:border-box';
-        wrap.innerHTML = card(d.name || '\u65b0\u9999\u6e2f', '\u7b2c' + (d.issue || 1) + '\u671f', (d.nums || []).map(function(n){return {c:n.c,z:n.z,big:1}}), '', true);
-        anchor.parentNode.insertBefore(wrap, anchor);
-        tickCd(wrap.querySelector('.xc-ov-cd'), d.dailyTime || '21:34');
-        
-      });
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
+    setTimeout(run, 1200);
   })();
 })();
