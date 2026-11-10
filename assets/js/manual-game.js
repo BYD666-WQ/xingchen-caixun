@@ -332,11 +332,13 @@
       .then(function (c) {
         if (!c) return;
         if (c.brand) {
+          var num = String(c.brandNumber || c.bannerNumber || '7798').slice(0, 8);
+          var html = c.brand + '<b style="font-size:1.18em;font-weight:900;color:#d60000;margin-left:4px;vertical-align:-1px">' + num + '</b>';
           var logo = document.querySelector('.xc-logo');
-          if (logo) logo.textContent = c.brand;
+          if (logo) logo.innerHTML = html;
           var fb = document.querySelector('.xc-footer-brand');
-          if (fb) fb.textContent = c.brand;
-          if (document.title) document.title = c.brand + (document.title.split('\u00b7')[1] ? ' \u00b7 ' + document.title.split('\u00b7')[1] : '');
+          if (fb) fb.innerHTML = html;
+          document.title = c.brand + num;
         }
         if (c.disclaimer) {
           var notes = document.querySelectorAll('.xc-footer-note');
