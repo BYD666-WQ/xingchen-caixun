@@ -59,6 +59,13 @@ td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
   <label>玩法文案</label><input id="p-note">
 </div></details></div>
 
+<div class="panel"><details><summary>⑤ 系统文案</summary><div class="body">
+  <label>站名</label><input id="c-brand" placeholder="星辰彩讯">
+  <label>标语</label><input id="c-slogan" placeholder="官方开奖信息">
+  <label>公告条（留空不显示）</label><input id="c-notice" placeholder="如：本站数据仅供参考">
+  <label>页脚免责声明</label><textarea id="c-disclaimer" style="min-height:80px"></textarea>
+</div></details></div>
+
 <div class="panel"><details><summary>④ 发布与历史版本</summary><div class="body">
   <label>GitHub PAT（只需一次，fine-grained：本仓库 Contents 读写）</label>
   <input id="token" type="password" autocomplete="off" placeholder="github_pat_...">
@@ -77,6 +84,24 @@ td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
 <script>
 var ATTRS = {"10":{"z":"鸡","c":"蓝","w":"火"},"11":{"z":"猴","c":"绿","w":"火"},"12":{"z":"羊","c":"红","w":"金"},"13":{"z":"马","c":"红","w":"金"},"14":{"z":"蛇","c":"蓝","w":"水"},"15":{"z":"龙","c":"蓝","w":"水"},"16":{"z":"兔","c":"绿","w":"木"},"17":{"z":"虎","c":"绿","w":"木"},"18":{"z":"牛","c":"红","w":"火"},"19":{"z":"鼠","c":"红","w":"火"},"20":{"z":"猪","c":"蓝","w":"土"},"21":{"z":"狗","c":"绿","w":"土"},"22":{"z":"鸡","c":"绿","w":"水"},"23":{"z":"猴","c":"红","w":"水"},"24":{"z":"羊","c":"红","w":"木"},"25":{"z":"马","c":"蓝","w":"木"},"26":{"z":"蛇","c":"蓝","w":"金"},"27":{"z":"龙","c":"绿","w":"金"},"28":{"z":"兔","c":"绿","w":"土"},"29":{"z":"虎","c":"红","w":"土"},"30":{"z":"牛","c":"红","w":"水"},"31":{"z":"鼠","c":"蓝","w":"水"},"32":{"z":"猪","c":"绿","w":"火"},"33":{"z":"狗","c":"绿","w":"火"},"34":{"z":"鸡","c":"红","w":"金"},"35":{"z":"猴","c":"红","w":"金"},"36":{"z":"羊","c":"蓝","w":"土"},"37":{"z":"马","c":"蓝","w":"土"},"38":{"z":"蛇","c":"绿","w":"木"},"39":{"z":"龙","c":"绿","w":"木"},"40":{"z":"兔","c":"红","w":"火"},"41":{"z":"虎","c":"蓝","w":"火"},"42":{"z":"牛","c":"蓝","w":"金"},"43":{"z":"鼠","c":"绿","w":"金"},"44":{"z":"猪","c":"绿","w":"水"},"45":{"z":"狗","c":"红","w":"水"},"46":{"z":"鸡","c":"红","w":"木"},"47":{"z":"猴","c":"蓝","w":"木"},"48":{"z":"羊","c":"蓝","w":"火"},"49":{"z":"马","c":"绿","w":"火"},"01":{"z":"马","c":"红","w":"水"},"02":{"z":"蛇","c":"红","w":"火"},"03":{"z":"龙","c":"蓝","w":"火"},"04":{"z":"兔","c":"蓝","w":"金"},"05":{"z":"虎","c":"绿","w":"金"},"06":{"z":"牛","c":"绿","w":"土"},"07":{"z":"鼠","c":"红","w":"土"},"08":{"z":"猪","c":"红","w":"木"},"09":{"z":"狗","c":"蓝","w":"木"}};
 var REPO='BYD666-WQ/xingchen-caixun', BRANCH='main', KEY='xc-gh-pat';
+var CMS_BACKEND='contents'; // contents | gh-actions（B 方案留口，未实现时走 contents）
+var BANNED_FILES=['data/ziliao-list.json','data/ziliao-list-macau.json','data/ziliao-list-macauold.json','data/ziliao-list-hk.json','data/ziliao-list-happy8.json','data/hub.json','data/tuku.json','data/guilv.json','data/num-attrs.json'];
+function guardFile(path){ if(BANNED_FILES.indexOf(path)>=0) throw new Error('该文件过大（>1MB），禁止走 Contents API：'+path); }
+async function saveFile(path,obj,msg){
+  if(CMS_BACKEND==='gh-actions'){ throw new Error('gh-actions 后端尚未接入（B 方案留口）'); }
+  guardFile(path);
+  for(var attempt=0;attempt<2;attempt++){
+    try{ return await putFile(path,obj,msg); }
+    catch(e){
+      var m=String(e.message||'');
+      if(attempt===0 && (m.indexOf('409')>=0 || m.toLowerCase().indexOf('sha')>=0 && m.indexOf('does not match')>=0)){
+        await new Promise(function(r){setTimeout(r,800)});
+        continue;
+      }
+      throw e;
+    }
+  }
+}
 var PAGES='https://byd666-wq.github.io/xingchen-caixun/';
 var RAW='https://raw.githubusercontent.com/'+REPO+'/'+BRANCH+'/';
 var draw=null, play=null;
@@ -100,6 +125,9 @@ async function loadAll(){
   var t=Date.now();
   var dr=await fetch(RAW+'data/manual-draw.json?t='+t).then(function(r){return r.json()});
   var pl=await fetch(RAW+'data/manual-play.json?t='+t).then(function(r){return r.ok?r.json():{}}).catch(function(){return{}});
+  var cp={};try{cp=await fetch(RAW+'data/site-copy.json?t='+t).then(function(r){return r.ok?r.json():{}})}catch(e){}
+  $('c-brand').value=cp.brand||'星辰彩讯'; $('c-slogan').value=cp.slogan||'官方开奖信息';
+  $('c-notice').value=cp.notice||''; $('c-disclaimer').value=cp.disclaimer||'数据来自官方公开信息，仅供参考。';
   draw=dr;play=pl;
   $('g-name').value=dr.name||''; $('g-issue').value=dr.issue||''; $('g-drawtime').value=dr.drawTime||'';
   $('g-dailytime').value=dr.dailyTime||'21:34';
@@ -167,8 +195,10 @@ async function save(){
   var newPlay={name:newDraw.name,issue:newDraw.issue,oddEven:$('p-oe').value,threeZodiac:zs,note:$('p-note').value.trim(),status:'live',updated:new Date().toISOString()};
   var btn=$('btn-save');btn.disabled=true;btn.textContent='提交中…';
   try{
-    await putFile('data/manual-draw.json',newDraw,'CMS: update draw');
-    await putFile('data/manual-play.json',newPlay,'CMS: update play');
+    await saveFile('data/manual-draw.json',newDraw,'CMS: update draw');
+    await saveFile('data/manual-play.json',newPlay,'CMS: update play');
+    var copy={brand:$('c-brand').value.trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
+    await saveFile('data/site-copy.json',copy,'CMS: update site copy');
     Msg('已提交，约 1-2 分钟生效（正在自动确认…）',true);
     poll();
     draw=newDraw;play=newPlay;renderPreview();
