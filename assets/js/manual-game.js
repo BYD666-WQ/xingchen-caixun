@@ -332,13 +332,13 @@
       .then(function (c) {
         if (!c) return;
         if (c.brand) {
-          var num = String(c.brandNumber || c.bannerNumber || '7798').slice(0, 8);
-          var html = c.brand + '<b style="font-size:1.18em;font-weight:900;color:#d60000;margin-left:4px;vertical-align:-1px">' + num + '</b>';
+          var num = String(c.brandNumber || c.bannerNumber || '').trim().slice(0, 8);
+          var html = c.brand + (num ? '<b style="font-size:1.18em;font-weight:900;color:#d60000;margin-left:4px;vertical-align:-1px">' + num + '</b>' : '');
           var logo = document.querySelector('.xc-logo');
           if (logo) logo.innerHTML = html;
           var fb = document.querySelector('.xc-footer-brand');
           if (fb) fb.innerHTML = html;
-          document.title = c.brand + num;
+          document.title = c.brand + (num || '');
         }
         if (c.disclaimer) {
           var notes = document.querySelectorAll('.xc-footer-note');
@@ -550,7 +550,7 @@
     ]).then(function (res) {
       var c = res[0] || {}, d = res[1] || {};
       var brand = c.brand || '\u9999\u6e2f\u6447\u94b1\u6811';
-      var num = String(c.brandNumber || c.bannerNumber || '7798');
+      var num = String(c.brandNumber || c.bannerNumber || '').trim();
       var nums = (d.nums || []).slice(0, 7);
       var balls = nums.map(function (n) { return ball(n.c, n.z, n.color); }).join('');
       var box = document.createElement('div');
@@ -558,7 +558,7 @@
       box.style.cssText = 'max-width:720px;margin:8px auto;padding:12px 10px;background:#fffdf6;border:1px solid #e8dcc8;border-radius:10px;text-align:center';
       box.innerHTML =
         '<div id="xc-a-title" style="font:900 26px/1.3 \'Microsoft YaHei\',Arial,sans-serif;color:#c0392b">' + brand +
-        '<span style="color:#d60000;margin-left:4px">' + num + '</span></div>' +
+        (num ? '<span style="color:#d60000;margin-left:4px">' + num + '</span>' : '') + '</div>' +
         '<div id="xc-a-draw" style="margin:10px 0 6px;font:700 13px/1.6 \'Microsoft YaHei\',Arial,sans-serif;color:#333">\u65b0\u9999\u6e2f\u7b2c' + (d.issue || '') + '\u671f</div>' +
         '<div id="xc-a-balls" style="display:flex;flex-wrap:wrap;justify-content:center">' + balls + '</div>' +
         '<div id="xc-a-tabs" style="display:flex;gap:8px;justify-content:center;margin:10px 0 4px">' +
