@@ -45,6 +45,15 @@ h1{background:linear-gradient(#c32323,#8f1414);color:#ffe08a !important;font-siz
 #wrap{padding-bottom:70px}
 @media (prefers-color-scheme: dark){html,body{background:#f5efd8 !important;color:#333 !important}}
 
+#nemi,#hist,#more-sec{margin-top:14px;background:#fffdf3;border:1px solid #d9c48a;border-radius:10px;padding:10px}
+#nemi h2,#hist h2,#more-sec h2{background:linear-gradient(#d42d2d,#a81212) !important;color:#ffe08a !important;margin:-10px -10px 8px !important;padding:8px 0 !important;border-radius:8px 8px 0 0 !important;text-align:center;font-size:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.nrow{border:1px solid #e6d7ad;border-radius:6px;padding:6px;font-size:12px;background:#fff}
+.nrow b{color:#b51f1f}
+.hitem{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-top:1px dashed #e6d7ad}
+.mlist{display:flex;gap:8px;justify-content:space-around;font-size:12px;color:#7a5c1e;padding:6px 0}
+.hlink{margin-top:6px}
+.hlink button{min-height:32px;border:1px solid #d9c48a;background:#fffdf3;border-radius:999px;color:#8f1414;font-size:12px;padding:0 12px}
 #ziliao{margin-top:14px;background:#fffdf6;border:1px solid #e8dcc8;border-radius:10px;padding:10px}
 #ziliao h2{font:700 16px "Microsoft YaHei",Arial,sans-serif;color:#c0392b;margin:0 0 8px;text-align:center}
 .zrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;padding:5px 0;border-top:1px dashed #eee;font:13px/1.5 "Microsoft YaHei",Arial,sans-serif}
@@ -62,7 +71,10 @@ h1{background:linear-gradient(#c32323,#8f1414);color:#ffe08a !important;font-siz
   <button data-k="hk">香港</button>
 </div>
 <div id="panels"></div>
-<div id="ziliao"><h2>资料</h2><div id="zl"></div></div>
+<div id="nemi"><h2>内幕 · 单双③肖</h2><div id="nm" class="grid"></div></div>
+<div id="hist"><h2>历史开奖</h2><div id="hs"></div></div>
+<div id="ziliao"><h2>资料大全</h2><div id="zl"></div></div>
+<div id="more-sec"><h2>图库 / 规律走势</h2><div class="mlist"><span>图库（占位）</span><span>规律走势（占位）</span><span>寻宝（占位）</span></div></div>
 </div>
 <div id="bottomnav">
   <a href="/xingchen-caixun/" class="on"><i>🏠</i>首页</a>
@@ -122,7 +134,36 @@ h1{background:linear-gradient(#c32323,#8f1414);color:#ffe08a !important;font-siz
       out.push('<div class="zrow"><span class="iss">新港'+r.issue+'期</span><span class="zs">'+ (r.threeZodiac||[]).map(function(z){return '<span>'+z+'</span>';}).join('') +'</span>'+(codes?'<span class="code">码:'+codes+'</span>':'')+'</div>');
     });
     document.getElementById('zl').innerHTML = out.length? out.join('') : '<div class="err">资料加载中…</div>';
-    var foot=document.querySelector('.upd');
+    // 内幕九宫格
+    var nm=document.getElementById('nm');
+    if(nm){
+      nm.innerHTML=rows.slice(0,6).map(function(r){
+        var c=r.result&&r.result.c;
+        var ok=(c&&c!=='NaN');
+        return '<div class="nrow"><b>新港'+r.issue+'期</b> '+(r.oddEven==='双'?'【双数】':'【单数】')+
+          ' 主【'+(r.threeZodiac||[]).join('')+'】 '+(ok?('开 '+r.result.z+c+' <b>准</b>'):'<span style="color:#a33">待开</span>')+'</div>';
+      }).join('');
+    }
+    // 历史开奖（最近 10 期）
+    var hs=document.getElementById('hs');
+    if(hs){
+      var his=[];
+      if(draw.games){ draw.games.forEach(function(g){ his.push({t:g.rule==='Macau'?'新澳':(g.rule==='HongKong'?'香港':'新港'),issue:g.issue,nums:g.nums}); }); }
+      if(manual.nums) his.unshift({t:'新港',issue:manual.issue,nums:manual.nums});
+      hs.innerHTML=his.slice(0,10).map(function(x){
+        return '<div class="hitem"><span>'+x.t+' 第'+x.issue+'期</span><span>'+ (x.nums||[]).slice(0,7).map(function(n){return n.c}).join(' ')+'</span></div>';
+      }).join('');
+    }
+    // 每卡历史入口
+    Array.prototype.forEach.call(document.querySelectorAll('#panels .card'),function(c){
+      if(c.querySelector('.hlink')) return;
+      var d=document.createElement('div'); d.className='hlink';
+      d.innerHTML='<button type="button">历史记录</button>';
+      d.querySelector('button').addEventListener('click',function(){
+        var his=document.getElementById('hist'); if(his){ his.scrollIntoView({behavior:'smooth',block:'start'}); }
+      });
+      c.appendChild(d);
+    });
   }
   function load(){
     Promise.all([get('data/draw.json').catch(function(){return null;}),get('data/manual-draw.json').catch(function(){return null;}),get('data/manual-ziliao.json').catch(function(){return null;})]).then(function(r){
