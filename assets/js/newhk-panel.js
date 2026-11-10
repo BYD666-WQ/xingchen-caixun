@@ -200,4 +200,75 @@
   }
   setTimeout(run, 1500); setTimeout(run, 3000); setTimeout(run, 5000);
 })();
+
+/* v4：自绘三块 + 隐藏 archive 块 + 严格待开 + 站名去数字 */
+(function () {
+  function $a(s, r) { return [].slice.call((r || document).querySelectorAll(s)); }
+  var R = [1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46], B = [3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
+  function color(v) { return R.indexOf(v) >= 0 ? '#e71607' : (B.indexOf(v) >= 0 ? '#2873e6' : '#1fb61d'); }
+  function api(p) {
+    var us = ['https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/' + p, p];
+    function go(i) { return i >= us.length ? Promise.reject() : fetch(us[i] + '?v=' + Math.floor(Date.now() / 60000), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : go(i + 1); }).catch(function () { return go(i + 1); }); }
+    return go(0);
+  }
+  function ball(n) {
+    return '<span style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:' + color(parseInt(n.c, 10)) + ';color:#fff;margin:3px;font:700 14px/1 \'Microsoft YaHei\',Arial,sans-serif">' + n.c +
+      '<i style="font-style:normal;font-size:9px;opacity:.85">' + (n.z || '') + '</i></span>';
+  }
+  function card(name, issue, nums) {
+    return '<div style="background:#fffdf6;border:1px solid #e8dcc8;border-radius:10px;padding:10px;margin:8px 0;text-align:center">' +
+      '<div style="font:700 16px/1.6 \'Microsoft YaHei\',Arial,sans-serif;color:#c0392b">' + name + ' 第' + issue + '期</div>' +
+      '<div style="display:flex;flex-wrap:wrap;justify-content:center;margin-top:6px">' + (nums || []).slice(0, 7).map(ball).join('') + '</div></div>';
+  }
+  function fixTabs() {
+    $a('.tie').forEach(function (tie) {
+      var keep = [];
+      $a(':scope > *', tie).forEach(function (t, i) {
+        if (i < 3) { t.innerHTML = ''; t.textContent = ['\u65b0\u6e2f', '\u65b0\u6fb3', '\u9999\u6e2f'][i]; keep.push(t); }
+        else t.remove();
+      });
+    });
+  }
+  function hideArchive() {
+    $a('.baomalaodaName').forEach(function (n) {
+      var b = n; while (b && b !== document.body) { if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) break; b = b.parentNode; }
+      if (b) b.style.display = 'none';
+    });
+  }
+  function fixTop(name, issue, nums) {
+    var host = document.getElementById('xc-three');
+    if (host) return;
+    var anchor = document.getElementById('widgetBox41750') || document.getElementById('app');
+    if (!anchor || !anchor.parentNode) return;
+    host = document.createElement('div');
+    host.id = 'xc-three';
+    host.style.cssText = 'max-width:720px;margin:0 auto;padding:0 8px';
+    host.innerHTML = card('\u65b0\u6e2f', issue, nums);
+    anchor.parentNode.insertBefore(host, anchor);
+  }
+  function fixZiliao(zl) {
+    var box = document.getElementById('widgetBox43159'); if (!box || !zl || !zl.rows) return;
+    var inner = box.querySelector('.nmsx-festive-content'); if (!inner) return;
+    inner.innerHTML = zl.rows.map(function (r) {
+      var c = r.result && r.result.c;
+      if (r.status === 'upcoming' || !c || c === 'NaN' || c === '') {
+        return '<div class="nmsx-festive-row"><span class="nmsx-festive-issue">\u65b0\u9999\u6e2f' + r.issue + '\u671f:\u5185\u5e55</span><span class="nmsx-festive-type">\u3010\u5f85\u5f00\u3011</span></div>';
+      }
+      return '<div class="nmsx-festive-row"><span class="nmsx-festive-issue">\u65b0\u9999\u6e2f' + r.issue + '\u671f:\u5185\u5e55</span><span class="nmsx-festive-type">\u3010' + (r.oddEven === '\u53cc' ? '\u53cc\u6570' : '\u5355\u6570') + '\u3011</span><span class="nmsx-festive-main">\u4e3b</span><span class="nmsx-festive-zodiac">\u3010' + (r.threeZodiac || []).join('') + '\u3011</span><span>\u5f00</span><span class="nmsx-festive-result">' + (r.result.z || '') + c + '</span><span class="nmsx-festive-accurate">\u51c6</span></div>';
+    }).join('');
+  }
+  function brand() {
+    var logo = document.querySelector('.xc-logo'); if (logo) logo.textContent = '\u65b0\u6e2f\u6447\u94b1\u6811';
+    document.title = '\u65b0\u6e2f\u6447\u94b1\u6811';
+  }
+  function run() {
+    Promise.all([api('data/manual-draw.json'), api('data/manual-ziliao.json')]).then(function (r) {
+      brand(); fixTabs(); hideArchive();
+      var md = r[0] || {}, zl = r[1] || {};
+      fixTop('\u65b0\u6e2f', md.issue, md.nums);
+      fixZiliao(zl);
+    }).catch(function (e) { console.log('[panel v4]', e && e.message); });
+  }
+  setTimeout(run, 1200); setTimeout(run, 2600); setTimeout(run, 4500);
+})();
 })();
