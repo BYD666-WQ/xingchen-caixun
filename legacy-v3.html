@@ -3442,14 +3442,31 @@ font-size: 19pt;
       }
     });
   }
+
+  function dedupeBlocks(){
+    var seen={};
+    document.querySelectorAll('.baomalaodaName').forEach(function(n){
+      var b=blk(n); if(!b) return;
+      var key=(n.textContent||'').replace(/\s+/g,'');
+      if(seen[key]){ b.style.display='none'; } else { seen[key]=1; }
+    });
+  }
+  function collapseGaps(){
+    document.querySelectorAll('div').forEach(function(d){
+      if(d.getBoundingClientRect().top>700) return;
+      var t=(d.textContent||'').trim();
+      if(t==='' && !d.querySelector('img') && d.offsetHeight>20 && d.offsetHeight<120) d.style.display='none';
+    });
+  }
+
   Promise.all([get('data/manual-draw.json'),get('data/draw.json'),get('data/manual-ziliao.json'),get('data/site-copy.json')]).then(function(r){
     var md=r[0]||{},dr=r[1]||{},zl=r[2]||{};
     var lao=blkByName('新香港');
-    if(lao&&lao.b){var nm=lao.b.querySelector('.baomalaodaName');if(nm)nm.textContent='新香港';fill(lao.b,md.issue,md.nums);}
+    var nx=blkByName('新香港'); if(nx&&nx.b)fill(nx.b,md.issue,md.nums);
     var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});
     var xa=blkByName('新澳彩'); if(xa&&by.Macau)fill(xa.b,by.Macau.issue,by.Macau.nums);
     var hk=blkByName('香港彩'); if(hk&&by.HongKong)fill(hk.b,by.HongKong.issue,by.HongKong.nums);
-    fixNemi(zl); dedupeCd(); collapseTop();
+    fixNemi(zl); dedupeCd(); dedupeBlocks(); collapseGaps();
     // 清 logo 数字
     document.querySelectorAll('.xc-logo,.xc-footer-brand').forEach(function(e){e.textContent='新港摇钱树'});
     document.title='新港摇钱树';
