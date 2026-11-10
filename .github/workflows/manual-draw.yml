@@ -2,6 +2,10 @@ name: manual-draw
 on:
   workflow_dispatch:
     inputs:
+      random:
+        description: "随机开奖：true = 随机生成 7 个号（忽略 nums）"
+        required: false
+        default: "false"
       issue:
         description: "期号（数字）"
         required: true
@@ -30,7 +34,12 @@ jobs:
           python3 - <<'PY'
           import json, os, re
           issue = os.environ["IN_ISSUE"].strip()
-          nums = [x.zfill(2) for x in re.split(r"[,\s]+", os.environ["IN_NUMS"].strip()) if x]
+          import random
+          if os.environ.get("IN_RANDOM", "").lower() == "true":
+              pick = random.sample(range(1, 50), 7)
+              nums = [("%02d" % n) for n in pick]
+          else:
+              nums = [x.zfill(2) for x in re.split(r"[,\s]+", os.environ["IN_NUMS"].strip()) if x]
           zs = [x.strip() for x in re.split(r"[,\s]+", os.environ.get("IN_ZODIACS", "").strip()) if x]
           assert len(nums) == 7, "need exactly 7 numbers (6 + 1 special)"
           ZH = ["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"]
@@ -44,6 +53,7 @@ jobs:
           print("written", path, data)
           PY
         env:
+          IN_RANDOM: ${{ inputs.random }}
           IN_ISSUE: ${{ inputs.issue }}
           IN_NUMS: ${{ inputs.nums }}
           IN_ZODIACS: ${{ inputs.zodiacs }}
