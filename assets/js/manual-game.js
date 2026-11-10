@@ -461,4 +461,27 @@
     ].join('');
     document.head.appendChild(st);
   })();
+
+  // 统一球体排版（球内数字+球下生肖居中）+ 顶部横幅大数字
+  (function () {
+    var st = document.createElement('style');
+    st.id = 'xc-ball-center';
+    st.textContent = [
+      '.wdrc,.wdbc,.wdgc{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;letter-spacing:0!important;padding:0!important;box-sizing:content-box!important}',
+      '.wdrc span,.wdbc span,.wdgc span,.wdrc b,.wdbc b,.wdgc b{display:block!important;width:100%!important;text-align:center!important;letter-spacing:0!important;margin:0!important;padding:0!important;line-height:1.05!important}',
+      '.wdrc .baomalaodaXiao,.wdbc .baomalaodaXiao,.wdgc .baomalaodaXiao{display:flex!important;justify-content:center!important;align-items:center!important;width:100%!important;text-align:center!important;letter-spacing:0!important}',
+      '.baomalaodaName,.baomalaodaQi{text-align:center}',
+      '#xc-banner-num{font:900 44px/1.2 "Microsoft YaHei",Arial,sans-serif;color:#d60000;text-align:center;letter-spacing:2px;padding:6px 0}'
+    ].join('');
+    document.head.appendChild(st);
+  })();
+  // 顶部横幅：替换成可配置大数字（默认 7798）
+  fetch(base() + 'data/site-copy.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (c) {
+      var num = (c && c.bannerNumber) || '7798';
+      var box = document.querySelector('.amcz-domain');
+      if (!box) return;
+      box.innerHTML = '<div id="xc-banner-num">' + String(num).slice(0, 12) + '</div>';
+    }).catch(function () {});
 })();
