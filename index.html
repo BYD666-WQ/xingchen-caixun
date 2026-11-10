@@ -202,7 +202,7 @@ header{background-color:#B3000E!important}
   function p2(x){return (x<10?'0':'')+x}
   function nextDate(hm){var n=new Date();var a=String(hm).split(':');var t=new Date(n.getFullYear(),n.getMonth(),n.getDate(),parseInt(a[0],10),parseInt(a[1],10),0);if(t<=n)t=new Date(t.getTime()+864e5);return t}
   function renderText(){
-    var tm=document.querySelector('.card .hd .time');var n=new Date();
+    var tm=document.querySelector('.card .hd .t');var n=new Date();
     if(tm)tm.textContent='数据更新 '+p2(n.getHours())+':'+p2(n.getMinutes());
     var span=document.querySelector('.card .next span');if(!span)return;
     var t=nextDate(TIME_TABLE['新港']);
