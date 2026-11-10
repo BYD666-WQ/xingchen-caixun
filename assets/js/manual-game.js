@@ -524,61 +524,38 @@
       box.innerHTML = '<div id="xc-banner-num">' + String(num).slice(0, 12) + '</div>';
     }).catch(function () {});
 
-  // 资料区「七肖/五肖/三肖/二肖/一肖」换新香港数据 + 移除快乐8开奖块/tab
+  // 资料区：13 张 sevenxiaosevenma 全部逐表重建为新香港数据
   (function () {
-    fetch(base() + 'data/manual-ziliao.json?t=' + Date.now(), { cache: 'no-store' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (z) {
-        var tables = document.querySelectorAll('table.sevenxiaosevenma');
-        if (tables.length && z && z.rows && z.rows.length) {
-          var pool = [];
-          z.rows.forEach(function (row) { (row.threeZodiac || []).forEach(function (zz) { if (pool.indexOf(zz) < 0) pool.push(zz); }); });
-          var base_ = pool.concat(['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪']).slice(0, 7);
-          var latest = z.rows.find(function (r) { return r.status !== 'upcoming'; }) || z.rows[0];
-          var tbodies = [].slice.call(tables).map(function (tb) { return tb.querySelector('tbody') || tb; });
-          function rowHtml(label, n) {
-            var zs = base_.slice(0, n).map(function (zz) { return '<span>' + zz + '</span>'; }).join('');
-            return '<tr><td class="sevenxiaosevenma-left-td">' + label + ':<span class="sevenxiaosevenma-custome-text" style="font-size:clamp(1rem,4vw,1.4rem);color:#c00">' + zs + '</span></td></tr>';
-          }
-          function rowHtml2(label, n) {
-            var zs = base_.slice(0, n).map(function (zz) { return '<span>' + zz + '</span>'; }).join('');
-            var codes = (numsHK || []).slice(0, n).map(function (c) { return c; }).join('.');
-            return '<tr><td class="sevenxiaosevenma-left-td">' + label + ':<span class="sevenxiaosevenma-custome-text" style="font-size:clamp(1rem,4vw,1.4rem);color:#c00">' + zs + '</span>' +
+    Promise.all([fetchJSON('data/manual-ziliao.json'), fetchJSON('data/manual-draw.json')]).then(function (res) {
+      var z = res[0] || {}, d = res[1] || {};
+      var rows = z.rows || [];
+      var nums = (d.nums || []).map(function (n) { return n.c; });
+      var tables = [].slice.call(document.querySelectorAll('table.sevenxiaosevenma'));
+      console.log('[ziliao] tables=', tables.length, 'rows=', rows.length, 'nums=', nums.join(','));
+      if (!tables.length || !rows.length) return;
+      function zs(n) { return base_.slice(0, n).map(function (x) { return '<span>' + x + '</span>'; }).join(''); }
+      var base_ = [];
+      rows.forEach(function (r) { (r.threeZodiac || []).forEach(function (x) { if (base_.indexOf(x) < 0) base_.push(x); }); });
+      base_ = base_.concat(['\u9f20','\u725b','\u864e','\u5154','\u9f99','\u86c7','\u9a6c','\u7f8a','\u7334','\u9e21','\u72d7','\u732a']).slice(0, 7);
+      try {
+        tables.forEach(function (tb, idx) {
+          var row = rows[idx % rows.length] || rows[0];
+          var tbody = tb.querySelector('tbody') || tb;
+          var issue = row.issue || d.issue;
+          function line(label, n) {
+            var codes = nums.slice(0, n).join('.');
+            return '<tr><td class="sevenxiaosevenma-left-td">' + label + ':<span class="sevenxiaosevenma-custome-text" style="font-size:clamp(1rem,4vw,1.4rem);color:#c00">' + zs(n) + '</span>' +
               (codes ? '<span style="margin-left:6px;color:#666;font-size:12px">\u7801:' + codes + '</span>' : '') + '</td></tr>';
           }
-          var htmlRows = rowHtml2('\u65b0\u9999\u6e2f' + latest.issue + '\u671f\u4e03\u8096', 7) + rowHtml2('\u4e94\u8096', 5) + rowHtml2('\u4e09\u8096', 3) + rowHtml2('\u4e8c\u8096', 2) + rowHtml2();
-          tbodies.forEach(function (tb) { tb.innerHTML = htmlRows; });
-        }
-      }).catch(function () {});
-    function dropHappy8() {
-      var tabs = document.querySelectorAll('#widgetBox41362 .tie > div');
-      for (var i = 0; i < tabs.length; i++) { if ((tabs[i].textContent || '').indexOf('\u5feb\u4e508') >= 0) { tabs[i].parentNode.removeChild(tabs[i]); break; } }
-      var names = document.querySelectorAll('.baomalaodaName');
-      for (var j = 0; j < names.length; j++) {
-        if ((names[j].textContent || '').replace(/\s+/g, '') === '\u5feb\u4e508') {
-          var b = names[j];
-          while (b && b !== document.body) { if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) break; b = b.parentNode; }
-          if (b && b.parentNode) b.parentNode.removeChild(b);
-          var cd = document.querySelector('.xc-cd-all');
-          break;
-        }
-      }
-    }
-    function dropBlockByName(nm) {
-      var names = document.querySelectorAll('.baomalaodaName');
-      for (var j = 0; j < names.length; j++) {
-        if ((names[j].textContent || '').replace(/\s+/g, '') === nm) {
-          var b = names[j];
-          while (b && b !== document.body) { if (b.querySelector && b.querySelectorAll('.baomalaodaMa').length >= 7) break; b = b.parentNode; }
-          if (b && b.parentNode) b.parentNode.removeChild(b);
-          return;
-        }
-      }
-    }
-    function dropLaoo() { dropBlockByName('\u8001\u6fb3\u5f69'); }
-    setTimeout(dropHappy8, 1200); setTimeout(dropHappy8, 2600);
-    setTimeout(dropLaoo, 1400); setTimeout(dropLaoo, 2800);
+          tbody.innerHTML = '';
+          tbody.innerHTML = line('\u65b0\u9999\u6e2f' + issue + '\u671f\u4e03\u8096', 7) + line('\u4e94\u8096', 5) + line('\u4e09\u8096', 3) + line('\u4e8c\u8096', 2) + line('\u4e00\u8096', 1);
+          tb.setAttribute('data-xc-hk', '1');
+        });
+        console.log('[ziliao] rebuilt=', document.querySelectorAll('table.sevenxiaosevenma[data-xc-hk="1"]').length);
+      } catch (e) { console.log('[ziliao] error', e && e.message); }
+    }).catch(function (e) { console.log('[ziliao] fetch failed', e && e.message); });
   })();
+})();
 
   // 版式 A（清爽版）：大标题 → 一排最新开奖 → 4 彩种按钮；资料/内幕/历史默认收起
   (function () {
