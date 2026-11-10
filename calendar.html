@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="color-scheme" content="light only"><meta name="viewport" content="width=device-width,initial-scale=1"><title>开奖日历 · 新港摇钱树</title><style>
+:root{color-scheme:light}html,body{margin:0;background:#F5F1E6;color:#222;font-family:"Microsoft YaHei",Arial,sans-serif;-webkit-text-size-adjust:100%}
+header{display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(#E60012,#B3000E);color:#FFD24D;font-weight:900;font-size:20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+header a{margin-left:auto;color:#FFD24D;font-size:13px;text-decoration:none;border:1px solid #FFD24D;border-radius:4px;padding:3px 8px}
+h1{font-size:18px;color:#8A0000;margin:10px 12px 6px}
+.sub{margin:0 12px 10px;font-size:12px;line-height:1.65;color:#8a6a3a;background:#FFF3C4;border:1px solid #E8C86A;border-radius:4px;padding:7px 9px}
+.block{margin:8px 12px;background:linear-gradient(#FFFDF6,#FFF3D6);border:1px solid #C8A24A;border-radius:5px;overflow:hidden}
+.block .hd{display:flex;align-items:baseline;gap:8px;padding:8px 10px;background:linear-gradient(#E60012,#B3000E);border-bottom:2px solid #FFD24D}
+.block .hd b{font-size:19px;font-weight:900;color:#FFD24D;letter-spacing:.5px}
+.block .hd em{font-style:normal;margin-left:auto;font-size:12px;color:#FFE9A8}
+.block .bd{padding:8px 10px}
+.note{margin:8px 12px 80px;font-size:12px;line-height:1.7;color:#7a5a2a;background:#FFF3C4;border:1px dashed #C8A24A;border-radius:5px;padding:9px 10px}
+.rows .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;border-top:1px dashed #E8D098;font-size:16px}
+.rows .row:first-child{border-top:0}
+.rows .row i{font-style:normal;color:#8A0000;font-weight:800;font-size:14px;flex:0 0 auto}
+.rows .row span{flex:1 1 auto;text-align:left}
+.rows .row em{font-style:normal;color:#333;flex:0 0 auto;font-weight:700}
+table.bt{width:100%;border-collapse:collapse;table-layout:fixed}
+table.bt th{padding:6px 2px;font-size:12px;font-weight:700;color:#8A0000;background:#F7E7B8;border-bottom:1px solid #D4AF37}
+table.bt td{padding:6px 2px;font-size:13px;text-align:center;border-top:1px dashed #E8D098;color:#333}
+table.bt td b{color:#8A0000}
+.n{display:inline-block;width:32px;height:32px;line-height:32px;border-radius:4px;color:#fff;font-weight:800;text-align:center;font-size:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.n.r{background:linear-gradient(160deg,#FF3B30,#C00012)}
+.n.b{background:linear-gradient(160deg,#2E86FF,#0B4EA2)}
+.n.g{background:linear-gradient(160deg,#2ECC71,#0B7A3A)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;border:1px solid #D4AF37;border-radius:999px;padding:3px 9px;background:#FFFDF6;color:#6b4a10}
+.chip b{color:#C90000;margin-left:3px}
+.sk{display:inline-block;border-radius:3px;background:linear-gradient(90deg,#EEE5D2,#F7F1E3,#EEE5D2);height:14px}
+.nav{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;background:linear-gradient(#A80008,#6E0006);border-top:2px solid #FFD24D}
+.nav a{flex:1;text-align:center;line-height:56px;font-size:14px;color:#FFD24D;text-decoration:none;font-weight:700}
+.nav a.on{background:linear-gradient(#D4000F,#8A0006);color:#fff}
+</style><style>.bd.p{font-size:14px;line-height:1.8;color:#333}.bd.p b{color:#8A0000}.tag{display:inline-block;margin-left:5px;font-size:10px;color:#fff;background:#C90000;border-radius:3px;padding:0 4px;vertical-align:2px}tr.today td{background:#FFF3C4}td.cal-off{color:#b9a06a}td.cal-on{color:#8A0000;font-weight:800}</style></head><body><header>新港摇钱树 · 开奖日历<a href="index.html">返回首页</a></header>
+<h1>开奖日历</h1>
+<div class="sub">按站内时间表生成<b>未来 7 天（含今天）</b>的开奖安排：新港每天 21:34、新澳每天 21:30、香港每周二/四/六 21:30（北京时间）。只列站内已确认时间的彩种。</div>
+<div class="block"><div class="hd"><b>未来 7 天</b><em id="cal-range">加载中…</em></div><table class="bt" id="cal-table"><colgroup><col style="width:24%"><col style="width:16%"><col style="width:20%"><col style="width:20%"><col style="width:20%"></colgroup><thead><tr><th>日期</th><th>星期</th><th>新港</th><th>新澳</th><th>香港</th></tr></thead><tbody id="cal-body"><tr><td colspan="5" style="padding:14px"><span class="sk" style="width:70%"></span></td></tr></tbody></table></div>
+<div class="note">说明：① 时间为北京时间，按站内 TIME_TABLE 生成，实际以官方公布为准；② 香港彩只在每周二、四、六开奖，其余日期标「—」；③ 日历只服务查看，不代表任何投注安排。</div>
+<div class="nav"><a href="index.html">首页</a><a class="on" href="ziliao.html">资料大全</a><a href="guilv.html">规律走势</a><a href="index.html">寻宝</a><a href="gallery.html">图库</a></div>
+<script>
+(function(){
+var TT={新港:'21:34',新澳:'21:30',香港:'21:30'};
+var DAYS={新港:[0,1,2,3,4,5,6],新澳:[0,1,2,3,4,5,6],香港:[2,4,6]};
+var WD=['日','一','二','三','四','五','六'];
+function p2(x){return (x<10?'0':'')+x}
+var now=new Date();var base=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+var rows='';var first=null,last=null;
+for(var i=0;i<7;i++){
+  var t=new Date(base.getTime()+i*86400000);var dow=t.getDay();
+  var date=(t.getMonth()+1)+'月'+t.getDate()+'日';
+  if(i===0)first=date; if(i===6)last=date;
+  var cells='';
+  ['新港','新澳','香港'].forEach(function(k){
+    var on=DAYS[k].indexOf(dow)>=0;
+    cells+='<td class="'+(on?'cal-on':'cal-off')+'" data-kind="'+k+'">'+(on?TT[k]:'—')+'</td>';
+  });
+  rows+='<tr class="cal-row'+(i===0?' today':'')+'" data-dow="'+dow+'"><td><b>'+date+'</b>'+(i===0?'<span class="tag">今天</span>':'')+'</td><td>周'+WD[dow]+'</td>'+cells+'</tr>';
+}
+document.getElementById('cal-body').innerHTML=rows;
+document.getElementById('cal-range').textContent=first+' – '+last;
+window.__cal={rows:7,range:first+' – '+last,table:TT,days:DAYS};
+})();
+</script>
+<script src="assets/js/subnav.js"></script></body></html>
