@@ -264,21 +264,36 @@ function finallyRestore(){
 function validateZlText(txt){
   var lines=String(txt||'').split('\n').map(function(s){return s.trim()}).filter(Boolean);
   var out=[];
+  var ZC='鼠牛虎兔龙蛇马羊猴鸡狗猪';
+  var ZRE=new RegExp('^['+ZC+']{3}$');
+  var ZONLY=new RegExp('^['+ZC+']+$');
   for(var i=0;i<lines.length;i++){
-    var ln=i+1;if(/NaN/i.test(lines[i]))throw new Error('资料区第'+ln+'行：出现 NaN，请先修正（可点「重新载入线上数据」）');var p=lines[i].replace(/,/g,' ').split(/\s+/).filter(Boolean);
-    if(!/^\d{3,4}$/.test(p[0]||'')||isNaN(parseInt(p[0],10))) throw new Error('资料区第'+ln+'行：期号必须是数字（如 314）');
-    if(p[1]!=='单'&&p[1]!=='双') throw new Error('资料区第'+ln+'行：单双必须是 单/双');
-    var zs=String(p[2]||'');
-    if(zs&&(!/^[鼠牛虎兔龙蛇马羊猴鸡狗猪]+$/.test(zs)||zs.length!==3||new Set(zs.split('')).size!==3)) throw new Error('资料区第'+ln+'行：三肖必须是 3 个不重复生肖（可留空）');
-    var res=String(p[3]||'');
-    if(res&&!/^\d{1,2}$/.test(res)) throw new Error('资料区第'+ln+'行：开奖号码必须是 1–2 位数字（当前 "'+res+'"）');
-    var n=res?parseInt(res,10):0;
-    if(res&&(n<1||n>49)) throw new Error('资料区第'+ln+'行：开奖号码必须是 1–49');
-    var at=n?attrsOf(n):{};
-    out.push({issue:parseInt(p[0],10),oddEven:p[1],threeZodiac:zs?zs.split(''):[],result:res?{c:pad(n),z:at.z||''}:{c:'',z:''},text:'内幕【提前公开】',status:res?'live':'upcoming',updated:new Date().toISOString()});
+    var ln=i+1;var p=lines[i].replace(/,/g,' ').split(/\s+/).filter(Boolean);
+    if(!p.length)continue;
+    if(/NaN/i.test(lines[i]))throw new Error('资料区第'+ln+'行：出现 NaN，请先修正（可点「重新载入线上数据」）');
+    if(!/^\d{3,4}$/.test(p[0]||''))throw new Error('资料区第'+ln+'行「期号」：必须是数字（如 314），当前 "'+p[0]+'"');
+    var issue=parseInt(p[0],10);
+    var oe='',zs='',res='';
+    for(var j=1;j<p.length;j++){
+      var tok=p[j];
+      if(tok==='单'||tok==='双'){ if(oe)throw new Error('资料区第'+ln+'行「单双」：只能有一个 单/双'); oe=tok; continue; }
+      if(/^\d{1,2}$/.test(tok)){ if(res)throw new Error('资料区第'+ln+'行「开奖号码」：只能有一个号码'); res=tok; continue; }
+      if(ZRE.test(tok)){ if(zs)throw new Error('资料区第'+ln+'行「三肖」：只能有一组'); zs=tok; continue; }
+      if(ZONLY.test(tok))throw new Error('资料区第'+ln+'行「三肖」：三肖可留空；若填写必须是 3 个不重复生肖（当前 "'+tok+'"）');
+      throw new Error('资料区第'+ln+'行：无法识别内容 "'+tok+'"（三肖=3个生肖，开奖号=1-2位数字，单双=单/双；均可留空）');
+    }
+    if(zs&&new Set(zs.split('')).size!==3)throw new Error('资料区第'+ln+'行「三肖」：不能重复（当前 "'+zs+'"）；三肖可留空，若填写必须是 3 个不重复生肖');
+    var resObj={c:'',z:''};
+    if(res){
+      var n=parseInt(res,10);
+      if(n<1||n>49)throw new Error('资料区第'+ln+'行「开奖号码」：必须在 1–49（当前 "'+res+'"）');
+      var at=attrsOf(n);resObj={c:pad(n),z:at.z||''};
+    }
+    out.push({issue:issue,oddEven:oe,threeZodiac:zs?zs.split(''):[],result:resObj,text:'内幕【提前公开】',status:res?'live':'upcoming',updated:new Date().toISOString()});
   }
   return out;
 }
+window.__validateZlText=validateZlText;
 async function pagesDispatch(){
   try{
     if(!token())return;
