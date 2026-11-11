@@ -16,4 +16,24 @@ h1{font-size:18px;color:#8A0000;margin:10px 12px 6px}
 </style></head><body><header>新港摇钱树 · 规律走势<a href="index.html">返回首页</a></header><h1>规律走势</h1><div class="list" id="list"><div class="row"><i class="sk" style="width:52px"></i><span class="sk" style="width:55%"></span><em class="sk" style="width:80px"></em></div><div class="row"><i class="sk" style="width:52px"></i><span class="sk" style="width:55%"></span><em class="sk" style="width:80px"></em></div><div class="row"><i class="sk" style="width:52px"></i><span class="sk" style="width:55%"></span><em class="sk" style="width:80px"></em></div><div class="row"><i class="sk" style="width:52px"></i><span class="sk" style="width:55%"></span><em class="sk" style="width:80px"></em></div><div class="row"><i class="sk" style="width:52px"></i><span class="sk" style="width:55%"></span><em class="sk" style="width:80px"></em></div><div class="row"><i class="sk" style="width:52px"></i><span class="sk" style="width:55%"></span><em class="sk" style="width:80px"></em></div><div class="row"><i class="sk" style="width:52px"></i><span class="sk" style="width:55%"></span><em class="sk" style="width:80px"></em></div><div class="row"><i class="sk" style="width:52px"></i><span class="sk" style="width:55%"></span><em class="sk" style="width:80px"></em></div></div>
 <div class="nav"><a href="index.html">首页</a><a href="ziliao.html">资料大全</a><a class="on" href="guilv.html">规律走势</a><a href="index.html">寻宝</a><a href="gallery.html">图库</a></div>
 <script>(function(){var S=['https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/',''];function get(p){var i=0,NAMES=['raw','jsdelivr','local'];function go(){if(i>=S.length)return Promise.reject(new Error('x'));var k=i;var u=S[i++]+p+'?t='+Date.now();try{window.__dataOrder=window.__dataOrder||[];window.__dataOrder.push({try:NAMES[k]||String(k),path:p});console.log('[data-order] try '+(NAMES[k]||k)+' '+p)}catch(e){}return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json().then(function(j){try{window.__dataOrder.push({hit:NAMES[k]||String(k),path:p});console.log('[data-order] hit '+(NAMES[k]||k)+' '+p)}catch(e){}return j})}).catch(function(){try{window.__dataOrder.push({fail:NAMES[k]||String(k),path:p})}catch(e){}return go()})}return go()}
-get('data/manual-ziliao.json').then(function(zl){var rows=(zl&&zl.rows||[]).slice(0,12);var html=rows.map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');return '<div class="row"><i>'+d.issue+'期</i><span>'+(d.oddEven==='双'?'双数':'单数')+' · 主'+((d.threeZodiac||[]).join(''))+'</span><em>'+(ok?('开'+(d.result.z||'')+c):'待开')+'</em></div>'}).join('');document.getElementById('list').innerHTML=html;}).catch(function(){})})()</script><script src="assets/js/subnav.js"></script></body></html>
+get('data/manual-ziliao.json').then(function(zl){
+  var rows=(zl&&zl.rows||[]).slice(0,12);
+  var ZOD='鼠牛虎兔龙蛇马羊猴鸡狗猪';
+  function zOk(z){z=String(z||'');return z.length===1&&ZOD.indexOf(z)>=0?z:''}
+  var oe={'单':0,'双':0},bs={'大':0,'小':0},zc={},valid=0;
+  var bodyRows=rows.map(function(d){
+    var c=String(d.result&&d.result.c||'');
+    var good=/^\d{1,2}$/.test(c)&&d.status!=='upcoming';
+    var z=zOk(d.result&&d.result.z);
+    var zs=(d.threeZodiac||[]).map(zOk).filter(Boolean).join('');
+    if(good){valid++;oe[d.oddEven==='双'?'双':'单']++;var n=parseInt(c,10);if(n>=25)bs['大']++;else bs['小']++;if(z)zc[z]=(zc[z]||0)+1}
+    return '<div class="row"><i>'+d.issue+'期</i><span>'+(d.oddEven==='双'?'双数':'单数')+' · 主'+(zs||'—')+'</span><em>'+(good?('开'+(z||'')+c):'待开')+'</em></div>';
+  }).join('');
+  var zcStr=Object.keys(zc).sort(function(a,b){return zc[b]-zc[a]}).slice(0,5).map(function(z){return z+zc[z]}).join('、')||'—';
+  var stats='<div class="row"><i>单双</i><span>单 '+oe['单']+' 期 · 双 '+oe['双']+' 期</span><em>近 '+valid+' 期</em></div>'+
+    '<div class="row"><i>大小</i><span>大(25-49) '+bs['大']+' · 小(1-24) '+bs['小']+'</span><em>特码</em></div>'+
+    '<div class="row"><i>生肖</i><span>'+zcStr+'</span><em>特码次数</em></div>'+
+    '<div class="row"><i>说明</i><span>数据源当前仅 '+rows.length+' 期可用；统计按实际期数计算，不补造数据。</span><em>—</em></div>';
+  window.__guilv={dataRows:rows.length,valid:valid,statRows:3,noteRows:1};
+  document.getElementById('list').innerHTML=bodyRows+stats;
+}).catch(function(){document.getElementById('list').innerHTML='<div class="row"><i>—</i><span>数据加载失败，请稍后重试</span><em>—</em></div>'})})()</script><script src="assets/js/subnav.js"></script></body></html>
