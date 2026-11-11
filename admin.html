@@ -261,6 +261,13 @@ function finallyRestore(){
   if(b2)b2.disabled=false;
   if(b3)b3.disabled=false;
 }
+async function pagesDispatch(){
+  try{
+    if(!token())return;
+    var r=await fetch('https://api.github.com/repos/'+REPO+'/actions/workflows/pages.yml/dispatches',{method:'POST',headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({ref:BRANCH})});
+    if(r.status>=400){console.log('[pages-dispatch] skip HTTP '+r.status)}else{console.log('[pages-dispatch] ok')}
+  }catch(e){console.log('[pages-dispatch] ignored '+(e&&e.message))}
+}
 async function save(){
   if(!token()){Msg('请先保存密钥（页面顶部）',false);setState('缺少密钥');return}
   if(!LOADED){Msg('未载入成功，禁止保存（请刷新页面）',false);setState('载入失败');return}
@@ -305,6 +312,7 @@ async function save(){
       await saveFile('data/site-copy.json',copy,'CMS: update site copy');
       await saveFile('data/manual-ziliao.json',newZl,'cms: update ziliao');
     }
+    pagesDispatch(); // 保存成功后触发 Pages 构建；无 workflow 权限时内部忽略、不阻塞
     setState('已提交，校验中…');
     try { await verifySaved(newPlay, newDraw); }
     catch (ve) { Msg('已提交，但读回校验失败：' + ve.message + '（请刷新后重试恢复）', false); setState('校验失败：' + ve.message); finallyRestore(); return; }

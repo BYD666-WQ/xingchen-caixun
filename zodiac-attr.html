@@ -37,8 +37,8 @@ table.bt td b{color:#8A0000}
 <div class="note">说明：每个生肖 4 个号码，马为 5 个（含 49），合计 49 码无重复；生肖随年份变化，本表为当前站内口径。五行/波色为传统民俗分类，不具预测效力。</div>
 <div class="nav"><a href="index.html">首页</a><a class="on" href="ziliao.html">资料大全</a><a href="guilv.html">规律走势</a><a href="index.html">寻宝</a><a href="gallery.html">图库</a></div>
 <script>
-(function(){var S=['','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/'];
-function get(p){var i=0;function go(){if(i>=S.length)return Promise.reject(new Error('x'));var u=S[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
+(function(){var S=['https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/',''];
+function get(p){var i=0,NAMES=['raw','jsdelivr','local'];function go(){if(i>=S.length)return Promise.reject(new Error('x'));var k=i;var u=S[i++]+p+'?t='+Date.now();try{window.__dataOrder=window.__dataOrder||[];window.__dataOrder.push({try:NAMES[k]||String(k),path:p});console.log('[data-order] try '+(NAMES[k]||k)+' '+p)}catch(e){}return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json().then(function(j){try{window.__dataOrder.push({hit:NAMES[k]||String(k),path:p});console.log('[data-order] hit '+(NAMES[k]||k)+' '+p)}catch(e){}return j})}).catch(function(){try{window.__dataOrder.push({fail:NAMES[k]||String(k),path:p})}catch(e){}return go()})}return go()}
 function empty(){document.getElementById('zod-wrap').innerHTML='暂无数据（属性表未加载）';document.getElementById('zod-count').textContent='暂无数据'}
 var ORDER=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
 get('data/num-attrs.json').then(function(data){

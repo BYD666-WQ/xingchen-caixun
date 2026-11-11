@@ -37,8 +37,8 @@ table.bt td b{color:#8A0000}
 <div class="note">来源：原站 2026-11-10 页面存档中的「玄机解料 · 正版诗象」栏目，仅整理原文 15 期，未新增、未补编。本站开奖记录以开奖页为准；诗句内容仅供浏览，请理性看待。</div>
 <div class="nav"><a href="index.html">首页</a><a class="on" href="ziliao.html">资料大全</a><a href="guilv.html">规律走势</a><a href="index.html">寻宝</a><a href="gallery.html">图库</a></div>
 <script>
-(function(){var S=['','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/'];
-function get(p){var i=0;function go(){if(i>=S.length)return Promise.reject(new Error('x'));var u=S[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
+(function(){var S=['https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/',''];
+function get(p){var i=0,NAMES=['raw','jsdelivr','local'];function go(){if(i>=S.length)return Promise.reject(new Error('x'));var k=i;var u=S[i++]+p+'?t='+Date.now();try{window.__dataOrder=window.__dataOrder||[];window.__dataOrder.push({try:NAMES[k]||String(k),path:p});console.log('[data-order] try '+(NAMES[k]||k)+' '+p)}catch(e){}return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json().then(function(j){try{window.__dataOrder.push({hit:NAMES[k]||String(k),path:p});console.log('[data-order] hit '+(NAMES[k]||k)+' '+p)}catch(e){}return j})}).catch(function(){try{window.__dataOrder.push({fail:NAMES[k]||String(k),path:p})}catch(e){}return go()})}return go()}
 function empty(){document.getElementById('poem-wrap').innerHTML='<div class="bd">暂无数据（诗句库未加载）</div>';document.getElementById('poem-count').textContent='暂无数据'}
 get('data/poems.json').then(function(data){
   var rows=(data&&data.rows||[]);if(!rows.length){empty();return}

@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="color-scheme" content="light only"><meta name="viewport" content="width=device-width,initial-scale=1"><title>近 10 期走势 · 新港摇钱树</title><style>
+:root{color-scheme:light}html,body{margin:0;background:#F5F1E6;color:#222;font-family:"Microsoft YaHei",Arial,sans-serif;-webkit-text-size-adjust:100%}
+header{display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(#E60012,#B3000E);color:#FFD24D;font-weight:900;font-size:20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+header a{margin-left:auto;color:#FFD24D;font-size:13px;text-decoration:none;border:1px solid #FFD24D;border-radius:4px;padding:3px 8px}
+h1{font-size:18px;color:#8A0000;margin:10px 12px 6px}
+.sub{margin:0 12px 10px;font-size:12px;line-height:1.65;color:#8a6a3a;background:#FFF3C4;border:1px solid #E8C86A;border-radius:4px;padding:7px 9px}
+.block{margin:8px 12px;background:linear-gradient(#FFFDF6,#FFF3D6);border:1px solid #C8A24A;border-radius:5px;overflow:hidden}
+.block .hd{display:flex;align-items:baseline;gap:8px;padding:8px 10px;background:linear-gradient(#E60012,#B3000E);border-bottom:2px solid #FFD24D}
+.block .hd b{font-size:19px;font-weight:900;color:#FFD24D;letter-spacing:.5px}
+.block .hd em{font-style:normal;margin-left:auto;font-size:12px;color:#FFE9A8}
+.block .bd{padding:8px 10px}
+.note{margin:8px 12px 80px;font-size:12px;line-height:1.7;color:#7a5a2a;background:#FFF3C4;border:1px dashed #C8A24A;border-radius:5px;padding:9px 10px}
+.rows .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;border-top:1px dashed #E8D098;font-size:16px}
+.rows .row:first-child{border-top:0}
+.rows .row i{font-style:normal;color:#8A0000;font-weight:800;font-size:14px;flex:0 0 auto}
+.rows .row span{flex:1 1 auto;text-align:left}
+.rows .row em{font-style:normal;color:#333;flex:0 0 auto;font-weight:700}
+table.bt{width:100%;border-collapse:collapse;table-layout:fixed}
+table.bt th{padding:6px 2px;font-size:12px;font-weight:700;color:#8A0000;background:#F7E7B8;border-bottom:1px solid #D4AF37}
+table.bt td{padding:6px 2px;font-size:13px;text-align:center;border-top:1px dashed #E8D098;color:#333}
+table.bt td b{color:#8A0000}
+.n{display:inline-block;width:32px;height:32px;line-height:32px;border-radius:4px;color:#fff;font-weight:800;text-align:center;font-size:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.n.r{background:linear-gradient(160deg,#FF3B30,#C00012)}
+.n.b{background:linear-gradient(160deg,#2E86FF,#0B4EA2)}
+.n.g{background:linear-gradient(160deg,#2ECC71,#0B7A3A)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;border:1px solid #D4AF37;border-radius:999px;padding:3px 9px;background:#FFFDF6;color:#6b4a10}
+.chip b{color:#C90000;margin-left:3px}
+.sk{display:inline-block;border-radius:3px;background:linear-gradient(90deg,#EEE5D2,#F7F1E3,#EEE5D2);height:14px}
+.nav{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;background:linear-gradient(#A80008,#6E0006);border-top:2px solid #FFD24D}
+.nav a{flex:1;text-align:center;line-height:56px;font-size:14px;color:#FFD24D;text-decoration:none;font-weight:700}
+.nav a.on{background:linear-gradient(#D4000F,#8A0006);color:#fff}
+</style><style>.bd.p{font-size:14px;line-height:1.8;color:#333}.bd.p b{color:#8A0000}</style></head><body><header>新港摇钱树 · 近 10 期走势<a href="index.html">返回首页</a></header>
+<h1>近 10 期走势简表</h1>
+<div class="sub">数据来自站内开奖记录（新香港）：逐期列出特码、生肖、单双与三肖，再统计近 10 期特码的波色/五行分布。<b>样本只有 10 期，不代表未来走势</b>，仅作历史资料查看。</div>
+<div class="block"><div class="hd"><b>近 10 期开奖</b><em id="trend-count">加载中…</em></div><table class="bt" id="trend-table"><colgroup><col style="width:20%"><col style="width:16%"><col style="width:14%"><col style="width:14%"><col style="width:36%"></colgroup><thead><tr><th>期号</th><th>特码</th><th>生肖</th><th>单双</th><th>三肖（主）</th></tr></thead><tbody id="trend-body"><tr><td colspan="5" style="padding:14px"><span class="sk" style="width:70%"></span></td></tr></tbody></table></div>
+<div class="block"><div class="hd"><b>特码统计</b><em>仅近 10 期</em></div><div class="rows" id="trend-stats"><div class="row"><i>统计</i><span class="sk" style="width:60%"></span><em class="sk" style="width:50px"></em></div></div></div>
+<div class="note">统计口径：只统计近 10 期开奖号码中的第 7 个号码（特码）；单双/三肖取站内记录，波色/五行按号码属性表对应。样本小，请勿据此判断冷热或预测下期。</div>
+<div class="nav"><a href="index.html">首页</a><a class="on" href="ziliao.html">资料大全</a><a href="guilv.html">规律走势</a><a href="index.html">寻宝</a><a href="gallery.html">图库</a></div>
+<script>
+(function(){var S=['','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/'];
+function get(p){var i=0;function go(){if(i>=S.length)return Promise.reject(new Error('x'));var u=S[i++]+p+'?v='+Math.floor(Date.now()/30000);return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go)}return go()}
+function empty(){document.getElementById('trend-body').innerHTML='<tr><td colspan="5" style="padding:14px;color:#8a6a3a">暂无数据（开奖记录未加载）</td></tr>';document.getElementById('trend-count').textContent='暂无数据';document.getElementById('trend-stats').innerHTML='<div class="row"><i>统计</i><span>暂无数据</span><em>—</em></div>'}
+Promise.all([get('data/manual-ziliao.json'),get('data/manual-draw.json'),get('data/num-attrs.json')]).then(function(r){
+  var zl=r[0]||{},md=r[1]||{},attr=(r[2]&&r[2].rows)||[];
+  var amap={};attr.forEach(function(a){amap[a.num]=a});
+  var dmap={};if(md.issue&&md.nums)dmap[String(md.issue)]=md.nums;(md.history||[]).forEach(function(h){dmap[String(h.issue)]=h.nums});
+  var rows=(zl.rows||[]).filter(function(x){return x.result&&x.result.c&&x.result.c!=='NaN'&&x.status!=='upcoming'}).slice(0,10);
+  if(!rows.length){empty();return}
+  var cCount={红:0,蓝:0,绿:0},wCount={金:0,木:0,水:0,火:0,土:0},oe={单:0,双:0};
+  var body='';
+  rows.forEach(function(x){
+    var num=('0'+parseInt(x.result.c,10)).slice(-2);
+    var arr=dmap[String(x.issue)]||[];var last=arr.length?arr[arr.length-1]:null;
+    var a=last||amap[num]||{};
+    var color=a.color||'';var wx=a.wuxing||'';
+    if(cCount[color]!==undefined)cCount[color]++;
+    if(wCount[wx]!==undefined)wCount[wx]++;
+    if(oe[x.oddEven]!==undefined)oe[x.oddEven]++;
+    var cls=color==='红'?'r':(color==='蓝'?'b':'g');
+    body+='<tr class="trend-row"><td><b>'+x.issue+'期</b></td><td><span class="n '+cls+'">'+num+'</span></td><td>'+(x.result.z||'')+'</td><td>'+(x.oddEven||'')+'</td><td style="font-size:13px">'+((x.threeZodiac||[]).join(' '))+'</td></tr>';
+  });
+  document.getElementById('trend-body').innerHTML=body;
+  document.getElementById('trend-count').textContent=rows.length+' 期';
+  var stats='<div class="row"><i>单双</i><span>单 '+oe['单']+' 期 · 双 '+oe['双']+' 期</span><em>合计 '+rows.length+' 期</em></div>';
+  stats+='<div class="row"><i>波色</i><span>红 '+cCount['红']+' · 蓝 '+cCount['蓝']+' · 绿 '+cCount['绿']+'</span><em>特码</em></div>';
+  var wxList=[];['金','木','水','火','土'].forEach(function(w){if(wCount[w])wxList.push(w+' '+wCount[w])});
+  stats+='<div class="row"><i>五行</i><span>'+wxList.join(' · ')+'</span><em>特码</em></div>';
+  document.getElementById('trend-stats').innerHTML=stats;
+  window.__trend={rows:rows.length,oe:oe,color:cCount,wuxing:wCount};
+}).catch(empty)})();
+</script>
+<script src="assets/js/subnav.js"></script></body></html>
