@@ -317,6 +317,19 @@ function buildHistory(prevIssue,prevNums,newIssue,history){
   return {history:hist,pushed:pushed};
 }
 window.__buildHistory=buildHistory;
+function buildZlRows(rows,newIssue){
+  var out=(rows||[]).map(function(r){return r});
+  var pushed=false;
+  if(out.length){
+    var fi=parseInt(out[0].issue,10)||0;
+    if(fi<newIssue){
+      out.unshift({issue:newIssue,oddEven:'',threeZodiac:[],result:{c:'',z:''},text:'内幕【提前公开】',status:'upcoming',updated:new Date().toISOString()});
+      pushed=true;
+    }
+  }
+  return {rows:out,pushed:pushed};
+}
+window.__buildZlRows=buildZlRows;
 async function save(){
   if(!token()){Msg('请先保存密钥（页面顶部）',false);setState('缺少密钥');return}
   if(!LOADED){Msg('未载入成功，禁止保存（请刷新页面）',false);setState('载入失败');return}
@@ -352,6 +365,9 @@ async function save(){
   try{ zlParsed=validateZlText($('zl-bulk').value); }catch(ve){ return Msg('这会导致页面显示错，请修正：'+ve.message,false); }
   var zlRowsEarly=zlParsed.rows;
   warns=warns.concat(zlParsed.warnings);
+  var zlAuto=buildZlRows(zlRowsEarly,newIssueVal);
+  if(zlAuto.pushed)warns.push('已自动补 '+newIssueVal+' 期资料行（三肖/单双/开奖号留空），请到资料区补齐');
+  zlRowsEarly=zlAuto.rows;
   showWarn(warns);
   var btn=$('btn-save');btn.disabled=true;btn.textContent='提交中…';
   $('btn-save-bar').disabled=true;if($('btn-save-top'))$('btn-save-top').disabled=true;setState('提交中…（号码顺序：'+orderTxt+'）');
@@ -359,6 +375,7 @@ async function save(){
     var copy={brand:$('c-brand').value.trim(),brandNumber:(($('c-banner')||{}).value||'').trim(),bannerNumber:(($('c-banner')||{}).value||'').trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
     var zlRows = zlRowsEarly;
     var newZl={name:newDraw.name,rows:zlRows,updated:new Date().toISOString()};
+    try{ window.__ZL=newZl; renderZl(newZl); }catch(e){}
     if (BACKEND === 'worker') {
       await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'ziliao',data:newZl})});
       await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'play',data:newPlay})});
