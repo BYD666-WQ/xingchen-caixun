@@ -2,9 +2,9 @@
  "ok": true,
  "status": "success",
  "message": "数据已更新（实时彩种 4）",
- "updated": "2026-11-11 22:07:18",
- "updatedAt": "2026-11-11T22:07:18+08:00",
- "lastSuccess": "2026-11-11 22:07:18",
+ "updated": "2026-11-11 22:10:18",
+ "updatedAt": "2026-11-11T22:10:18+08:00",
+ "lastSuccess": "2026-11-11 22:10:18",
  "newest_seen_ts": "315",
  "newest_seen_ids": [
   "Macau:315",
@@ -12,7 +12,7 @@
   "HongKong:119"
  ],
  "read_count": 4,
- "new_count": 3,
+ "new_count": 0,
  "probe_ok": true,
  "receipt_gap_alert": false,
  "digest_frozen_alert": false,
