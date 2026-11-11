@@ -97,6 +97,7 @@ body{padding-bottom:76px}
 <div class="panel"><details><summary>⑤ 资料区（单双③肖）</summary><div class="body">
   <label>每行一条：期号 单双 三肖 开奖号（例：313 单 狗马猴 43）</label>
   <textarea id="zl-bulk" style="min-height:140px" placeholder="313 单 狗马猴 43"></textarea>
+  <div id="zl-warn" style="display:none;margin:6px 0;padding:6px 8px;background:#FFF3C4;border:1px solid #E8C86A;border-radius:4px;color:#8a3a00;font-size:12px;line-height:1.6"></div>
   <p style="font-size:12px;color:#888;margin:6px 0 0">保存后资料区会整体替换成这里的内容（期号会显示为「新香港X期:内幕」）。</p>
 </div></details></div>
 
@@ -146,7 +147,9 @@ var SHA_CACHE = {};
 var DATA_PATHS = ['data/manual-draw.json','data/manual-play.json','data/site-copy.json','data/manual-ziliao.json'];
 function $(id){return document.getElementById(id)}
 function Msg(t,ok){var m=$('msg');m.style.display='block';m.style.background=ok?'#0b7a45':'#a33';m.textContent=t;clearTimeout(m._t);m._t=setTimeout(function(){m.style.display='none'},6000)}
-function pad(n){return (n<10?'0':'')+n}
+
+function showWarn(list){var el=$('zl-warn');if(!el)return;if(!list||!list.length){el.style.display='none';el.innerHTML='';return}el.style.display='block';el.innerHTML='⚠ 保存提示（不会阻止保存）：<br>'+list.map(function(x){return '· '+x}).join('<br>')}
+function clearWarn(){showWarn([])}function pad(n){return (n<10?'0':'')+n}
 function ballColor(c){return c==='红'?'#e71607':(c==='蓝'?'#2873e6':'#1fb61d')}
 function attrsOf(num){var k=pad(parseInt(num,10));return ATTRS[k]||{}}
 function parseNums(s){return String(s||'').trim().replace(/,/g,' ').split(/\s+/).filter(Boolean).map(function(x){return pad(parseInt(x,10))})}
@@ -263,35 +266,35 @@ function finallyRestore(){
 }
 function validateZlText(txt){
   var lines=String(txt||'').split('\n').map(function(s){return s.trim()}).filter(Boolean);
-  var out=[];
+  var out=[],warns=[];
   var ZC='鼠牛虎兔龙蛇马羊猴鸡狗猪';
   var ZRE=new RegExp('^['+ZC+']{3}$');
   var ZONLY=new RegExp('^['+ZC+']+$');
+  var missZs=0,missOe=0;
+  function hard(m){throw new Error(m)}
   for(var i=0;i<lines.length;i++){
     var ln=i+1;var p=lines[i].replace(/,/g,' ').split(/\s+/).filter(Boolean);
     if(!p.length)continue;
-    if(/NaN/i.test(lines[i]))throw new Error('资料区第'+ln+'行：出现 NaN，请先修正（可点「重新载入线上数据」）');
-    if(!/^\d{3,4}$/.test(p[0]||''))throw new Error('资料区第'+ln+'行「期号」：必须是数字（如 314），当前 "'+p[0]+'"');
-    var issue=parseInt(p[0],10);
-    var oe='',zs='',res='';
+    if(/NaN/i.test(lines[i]))hard('资料区第'+ln+'行出现 NaN——这会导致页面显示错，请修正后再保存');
+    var itok=p[0],issue=parseInt(itok,10);
+    if(!/^\d{3,4}$/.test(itok)){var iv=isNaN(issue)?0:issue;warns.push('第'+ln+'行期号「'+itok+'」建议用数字（本次按 '+iv+' 保存）');issue=iv}
+    var oe='',zsArr=[],res='';
     for(var j=1;j<p.length;j++){
       var tok=p[j];
-      if(tok==='单'||tok==='双'){ if(oe)throw new Error('资料区第'+ln+'行「单双」：只能有一个 单/双'); oe=tok; continue; }
-      if(/^\d{1,2}$/.test(tok)){ if(res)throw new Error('资料区第'+ln+'行「开奖号码」：只能有一个号码'); res=tok; continue; }
-      if(ZRE.test(tok)){ if(zs)throw new Error('资料区第'+ln+'行「三肖」：只能有一组'); zs=tok; continue; }
-      if(ZONLY.test(tok))throw new Error('资料区第'+ln+'行「三肖」：三肖可留空；若填写必须是 3 个不重复生肖（当前 "'+tok+'"）');
-      throw new Error('资料区第'+ln+'行：无法识别内容 "'+tok+'"（三肖=3个生肖，开奖号=1-2位数字，单双=单/双；均可留空）');
+      if(tok==='单'||tok==='双'){ if(oe)warns.push('第'+ln+'行单双出现多个，已取「'+oe+'」'); else oe=tok; continue; }
+      if(/^\d+$/.test(tok)){var n=parseInt(tok,10);if(n<1||n>49)hard('资料区第'+ln+'行号码「'+tok+'」不在 1–49——这会导致页面显示错，请修正后再保存');if(res)warns.push('第'+ln+'行出现多个号码，已取「'+res+'」');else res=('0'+n).slice(-2);continue}
+      if(ZONLY.test(tok)){var cs=tok.split('');if(zsArr.length)warns.push('第'+ln+'行三肖出现多组，已取「'+zsArr.join('')+'」');else{zsArr=cs.slice(0,3);if(cs.length!==3)warns.push('第'+ln+'行三肖「'+tok+'」建议填 3 个（本次存「'+zsArr.join('')+'」）');if(new Set(zsArr).size!==zsArr.length)warns.push('第'+ln+'行三肖「'+zsArr.join('')+'」建议不重复（不阻止保存）')}continue}
+      warns.push('第'+ln+'行忽略无法识别内容「'+tok+'」（三肖=3个生肖，号码=1-49，单双=单/双；都可留空）');
     }
-    if(zs&&new Set(zs.split('')).size!==3)throw new Error('资料区第'+ln+'行「三肖」：不能重复（当前 "'+zs+'"）；三肖可留空，若填写必须是 3 个不重复生肖');
+    if(!zsArr.length)missZs++;
+    if(!oe)missOe++;
     var resObj={c:'',z:''};
-    if(res){
-      var n=parseInt(res,10);
-      if(n<1||n>49)throw new Error('资料区第'+ln+'行「开奖号码」：必须在 1–49（当前 "'+res+'"）');
-      var at=attrsOf(n);resObj={c:pad(n),z:at.z||''};
-    }
-    out.push({issue:issue,oddEven:oe,threeZodiac:zs?zs.split(''):[],result:resObj,text:'内幕【提前公开】',status:res?'live':'upcoming',updated:new Date().toISOString()});
+    if(res){var at=attrsOf(parseInt(res,10));resObj={c:res,z:at.z||''}}
+    out.push({issue:issue,oddEven:oe,threeZodiac:zsArr,result:resObj,text:'内幕【提前公开】',status:res?'live':'upcoming',updated:new Date().toISOString()});
   }
-  return out;
+  if(missZs)warns.push('有 '+missZs+' 行三肖留空（页面显示「—」，不影响保存）');
+  if(missOe)warns.push('有 '+missOe+' 行单双留空（不影响保存）');
+  return {rows:out,warnings:warns};
 }
 window.__validateZlText=validateZlText;
 async function pagesDispatch(){
@@ -305,15 +308,16 @@ async function save(){
   if(!token()){Msg('请先保存密钥（页面顶部）',false);setState('缺少密钥');return}
   if(!LOADED){Msg('未载入成功，禁止保存（请刷新页面）',false);setState('载入失败');return}
   var nums=parseNums($('g-nums').value);
-  if(nums.length!==7)return Msg('开奖号码必须 7 个（6+1），当前 '+nums.length+' 个',false);
-  if(!nums.every(function(c){var n=parseInt(c,10);return /^\d{2}$/.test(c)&&n>=1&&n<=49}))return Msg('开奖号码必须是 01–49 的两位数字',false);
+  if(nums.length!==7)return Msg('这会导致页面显示错，请修正：开奖号码需要 7 个（6+1），当前 '+nums.length+' 个',false);
+  if(!nums.every(function(c){var n=parseInt(c,10);return /^\d{2}$/.test(c)&&n>=1&&n<=49}))return Msg('这会导致页面显示错，请修正：开奖号码请填 01–49 的两位数字',false);
+  var ZC_ALL='鼠牛虎兔龙蛇马羊猴鸡狗猪';
   var zsRaw = String($('p-zs').value || '').replace(/[\s,，、]+/g, '');
-  if (!/^[鼠牛虎兔龙蛇马羊猴鸡狗猪]{3}$/.test(zsRaw)) return Msg('三肖必须是 3 个生肖（例：狗马猴）', false);
-  if (new Set(zsRaw.split('')).size !== 3) return Msg('三肖不能重复（例：不要 猪猪猪）', false);
-  var zs = zsRaw.split('');
+  var warns=[];
+  var zs = zsRaw.split('').filter(function(c){return ZC_ALL.indexOf(c)>=0}).slice(0,3);
+  if (!(/^[鼠牛虎兔龙蛇马羊猴鸡狗猪]{3}$/.test(zsRaw) && new Set(zsRaw.split('')).size === 3)) warns.push('内幕三肖建议填 3 个不重复生肖（例：狗马猴；留空也可以，不影响保存）');
   // 校验通过后再存 token
   localStorage.setItem(KEY,token());
-  if ((draw&&draw.history||[]).length>0 && String($('zl-bulk').value||'').trim()===''){return Msg('历史/资料区为空，已阻止保存（防止误清空）',false)}
+  if ((draw&&draw.history||[]).length>0 && String($('zl-bulk').value||'').trim()===''){warns.push('资料区为空，保存后会清空历史记录——可先备份再保存')}
   var newDraw={
     name:$('g-name').value.trim()||'新香港',
     issue:parseInt($('g-issue').value,10)||1,
@@ -325,8 +329,11 @@ async function save(){
     updated:new Date().toISOString()
   };
   var newPlay={name:newDraw.name,issue:newDraw.issue,oddEven:$('p-oe').value,threeZodiac:zs,note:$('p-note').value.trim(),status:'live',updated:new Date().toISOString()};
-  var zlRowsEarly;
-  try{ zlRowsEarly=validateZlText($('zl-bulk').value); }catch(ve){ return Msg(ve.message,false); }
+  var zlParsed;
+  try{ zlParsed=validateZlText($('zl-bulk').value); }catch(ve){ return Msg('这会导致页面显示错，请修正：'+ve.message,false); }
+  var zlRowsEarly=zlParsed.rows;
+  warns=warns.concat(zlParsed.warnings);
+  showWarn(warns);
   var btn=$('btn-save');btn.disabled=true;btn.textContent='提交中…';
   $('btn-save-bar').disabled=true;if($('btn-save-top'))$('btn-save-top').disabled=true;setState('提交中…请勿关闭页面');
   try{
