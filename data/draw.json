@@ -2,13 +2,13 @@
  "ok": true,
  "status": "ok",
  "source": "gh-actions",
- "updated": "2026-11-11 22:37:42",
- "updatedAt": "2026-11-11T22:37:42+08:00",
+ "updated": "2026-11-11 22:40:20",
+ "updatedAt": "2026-11-11T22:40:20+08:00",
  "games": [
   {
    "rule": "Macau",
    "name": "新澳彩",
-   "widgetId": 41417,
+   "widgetId": 41362,
    "issue": 2026315,
    "shortIssue": 315,
    "nums": [
