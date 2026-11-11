@@ -67,6 +67,7 @@ body{padding-bottom:76px}
   <label>每天几点开奖（倒计时用，HH:MM）</label><input id="g-dailytime" inputmode="numeric">
   <label>开奖号码（6 个正码 + 1 个特别号）</label><input id="g-nums" placeholder="可整串粘贴，如 07 12 23 34 45 06 18">
   <div id="nums-hint" style="font-size:12px;color:#888;margin-top:4px">支持整串粘贴自动拆分（空格/逗号/14 位连写均可）</div>
+  <p style="font-size:12px;color:#888;margin:4px 0 0">号码按你输入的顺序保存，不做排序；顺序即正码顺序。</p>
   <div class="row"><button class="small gray" id="btn-rand">随机一键开</button><button class="small gray" id="btn-calc">重新计算生肖/波色</button></div>
   <div class="balls" id="preview"></div>
 </div></details></div>
@@ -304,6 +305,18 @@ async function pagesDispatch(){
     if(r.status>=400){console.log('[pages-dispatch] skip HTTP '+r.status)}else{console.log('[pages-dispatch] ok')}
   }catch(e){console.log('[pages-dispatch] ignored '+(e&&e.message))}
 }
+function buildHistory(prevIssue,prevNums,newIssue,history){
+  var hist=(history||[]).map(function(h){return {issue:h.issue,nums:(h.nums||[]).slice()}});
+  var pushed=false;
+  if(prevIssue&&prevNums&&prevNums.length&&String(prevIssue)!==String(newIssue)){
+    hist=hist.filter(function(h){return String(h.issue)!==String(prevIssue)});
+    hist.unshift({issue:prevIssue,nums:prevNums.map(function(n){return {c:n.c,z:n.z||'',color:n.color||'',wuxing:n.wuxing||''}})});
+    pushed=true;
+  }
+  hist.sort(function(a,b){return parseInt(b.issue,10)-parseInt(a.issue,10)});
+  return {history:hist,pushed:pushed};
+}
+window.__buildHistory=buildHistory;
 async function save(){
   if(!token()){Msg('请先保存密钥（页面顶部）',false);setState('缺少密钥');return}
   if(!LOADED){Msg('未载入成功，禁止保存（请刷新页面）',false);setState('载入失败');return}
@@ -318,14 +331,20 @@ async function save(){
   // 校验通过后再存 token
   localStorage.setItem(KEY,token());
   if ((draw&&draw.history||[]).length>0 && String($('zl-bulk').value||'').trim()===''){warns.push('资料区为空，保存后会清空历史记录——可先备份再保存')}
+  var newIssueVal=parseInt($('g-issue').value,10)||1;
+  var prevIssueRaw=(draw&&draw.issue)?parseInt(draw.issue,10):0;
+  var hb=buildHistory(prevIssueRaw,(draw&&draw.nums)||[],newIssueVal,(draw&&draw.history)||[]);
+  if(hb.pushed)warns.push('已自动把上一期 '+prevIssueRaw+' 压入历史记录');
+  var orderTxt=nums.join(' ');
+  try{console.log('[save] 号码顺序（按输入原序）= '+orderTxt)}catch(e){}
   var newDraw={
     name:$('g-name').value.trim()||'新香港',
-    issue:parseInt($('g-issue').value,10)||1,
+    issue:newIssueVal,
     drawTime:$('g-drawtime').value.trim()||'每天 21:34',
     dailyTime:$('g-dailytime').value.trim()||'21:34',
     status:'sample',
     nums:numsWithAttrs(nums),
-    history:(draw&&draw.history||[]),
+    history:hb.history,
     updated:new Date().toISOString()
   };
   var newPlay={name:newDraw.name,issue:newDraw.issue,oddEven:$('p-oe').value,threeZodiac:zs,note:$('p-note').value.trim(),status:'live',updated:new Date().toISOString()};
@@ -335,7 +354,7 @@ async function save(){
   warns=warns.concat(zlParsed.warnings);
   showWarn(warns);
   var btn=$('btn-save');btn.disabled=true;btn.textContent='提交中…';
-  $('btn-save-bar').disabled=true;if($('btn-save-top'))$('btn-save-top').disabled=true;setState('提交中…请勿关闭页面');
+  $('btn-save-bar').disabled=true;if($('btn-save-top'))$('btn-save-top').disabled=true;setState('提交中…（号码顺序：'+orderTxt+'）');
   try{
     var copy={brand:$('c-brand').value.trim(),brandNumber:(($('c-banner')||{}).value||'').trim(),bannerNumber:(($('c-banner')||{}).value||'').trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
     var zlRows = zlRowsEarly;
