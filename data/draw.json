@@ -2,8 +2,8 @@
  "ok": true,
  "status": "ok",
  "source": "gh-actions",
- "updated": "2026-11-12 01:18:18",
- "updatedAt": "2026-11-12T01:18:18+08:00",
+ "updated": "2026-11-12 13:13:25",
+ "updatedAt": "2026-11-12T13:13:25+08:00",
  "games": [
   {
    "rule": "Macau",
@@ -389,7 +389,7 @@
   {
    "rule": "MacauOld",
    "name": "老澳彩",
-   "widgetId": 41362,
+   "widgetId": 41414,
    "issue": 2026315,
    "shortIssue": 315,
    "nums": [
@@ -770,7 +770,7 @@
   {
    "rule": "HongKong",
    "name": "香港彩",
-   "widgetId": 41362,
+   "widgetId": 41852,
    "issue": 2026119,
    "shortIssue": 119,
    "nums": [
@@ -1151,7 +1151,7 @@
   {
    "rule": "Happy8",
    "name": "快乐8",
-   "widgetId": 41362,
+   "widgetId": 41398,
    "issue": 2026301,
    "shortIssue": 301,
    "nums": [

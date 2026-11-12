@@ -2,9 +2,9 @@
  "ok": true,
  "status": "success",
  "message": "数据已更新（实时彩种 4）",
- "updated": "2026-11-12 01:18:18",
- "updatedAt": "2026-11-12T01:18:18+08:00",
- "lastSuccess": "2026-11-12 01:18:18",
+ "updated": "2026-11-12 13:13:25",
+ "updatedAt": "2026-11-12T13:13:25+08:00",
+ "lastSuccess": "2026-11-12 13:13:25",
  "newest_seen_ts": "315",
  "newest_seen_ids": [
   "Macau:315",
@@ -14,7 +14,7 @@
  "read_count": 4,
  "new_count": 0,
  "probe_ok": true,
- "receipt_gap_alert": false,
+ "receipt_gap_alert": true,
  "digest_frozen_alert": false,
  "liveRules": [
   "Macau",
