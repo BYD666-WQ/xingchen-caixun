@@ -400,7 +400,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   var SRC=['','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/'];
   function get(p){var i=0,NAMES=['raw','jsdelivr','local'];function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var k=i;var u=SRC[i++]+p+'?t='+Date.now();var AC=(typeof AbortController!=='undefined')?new AbortController():null;var TO=AC?setTimeout(function(){try{AC.abort()}catch(e){}},2500):null;try{window.__dataOrder=window.__dataOrder||[];window.__dataOrder.push({try:NAMES[k]||String(k),path:p});console.log('[data-order] try '+(NAMES[k]||k)+' '+p)}catch(e){}return fetch(u,{cache:'no-store',signal:AC?AC.signal:undefined}).then(function(r){if(TO)clearTimeout(TO);if(!r.ok)throw 0;return r.json().then(function(j){try{window.__dataOrder.push({hit:NAMES[k]||String(k),path:p});console.log('[data-order] hit '+(NAMES[k]||k)+' '+p)}catch(e){}return j})}).catch(function(){if(TO)clearTimeout(TO);try{window.__dataOrder.push({fail:NAMES[k]||String(k),path:p})}catch(e){}return go()})}return go()}
   get('data/manual-ziliao.json').then(function(zl){
-    var rows=(zl&&zl.rows||[]).slice(0,12);if(!rows.length)return;
+    var rows=(zl&&zl.rows||[]).slice(0,10).sort(function(a,b){return (parseInt(a.issue,10)||0)-(parseInt(b.issue,10)||0)});if(!rows.length)return;
     var ZOD='鼠牛虎兔龙蛇马羊猴鸡狗猪';
     function zOk(v){v=String(v||'');return v.length===1&&ZOD.indexOf(v)>=0?v:''}
     var oHit=0,zHit=0;
@@ -604,54 +604,43 @@ details.mini>summary::-webkit-details-marker{display:none}
   Promise.all(files.map(fetchJ)).then(function(j){sig=getSig(j);stats();schedule()}).catch(function(){schedule()});
 })();
 </script>
-<style id="xc-hist-style">
-.xc-hide.xc-hide{display:none!important}
-.xc-hist-btn{display:block;width:100%;margin:6px 0 2px;border:1px dashed #E8C98A;background:#FFF8E8;color:#8a5a2a;font:700 13px/1.2 "Microsoft YaHei",Arial,sans-serif;border-radius:6px;padding:8px 0;cursor:pointer}
-.xc-hist-btn:active{background:#FBEBC8}
-</style>
-<script id="xc-hist-script">
+
+
+<script id="xc-block-rules">
 (function(){
-  var SEL='#nm-final,#wuxiao,#santou,#shuangbo,#danshuang,#liuxiao,#qiwei,#sisha,#pingte,#ds4';
+  /* 规则（板块级）：
+     B. 每板块最多展示最新 10 期：数据按「旧→新」渲染（与其它板块一致），超过 10 行时丢弃最老的（前 N 行）。
+     C. 板块级连续两期未中：取最近两个「已开奖」行的结果（跳过待开/未知），若都为未中，则整块 display:none；
+        一旦最新结果出现命中（或待开），自动恢复展示。注释即实现口径。 */
+  var SEL=['#nm-final','#wuxiao','#santou','#shuangbo','#danshuang','#liuxiao','#qiwei','#sisha','#pingte','#ds4'];
   var ROW='.row:not(.xc-stat):not(.xc-note),.wx-row,.st-row,.sb-row,.ds-row,.lx-row,.qw-row,.ss-row,.pt-row,.ds4-row';
-  function rowsOf(sec){return [].slice.call(sec.querySelectorAll(ROW)).filter(function(r){return r.closest(SEL)===sec})}
-  function reduced(){return window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}
-  function setLabel(btn,n,expanded){btn.textContent=expanded?'收起 ▲':'历史统计 ('+n+'期) ▼'}
-  function toggle(sec,rows,btn){
-    if(sec._animating)return;
-    var expand=sec.dataset.xcExpanded!=='1';
-    var start=sec.getBoundingClientRect().height;
-    rows.forEach(function(r,i){if(expand||i<5)r.classList.remove('xc-hide');else r.classList.add('xc-hide')});
-    var end=sec.getBoundingClientRect().height;
-    sec.dataset.xcExpanded=expand?'1':'0';
-    setLabel(btn,rows.length,expand);
-    if(reduced()){sec.style.height='';sec.style.overflow='';return}
-    sec._animating=true;
-    sec.style.overflow='hidden';
-    sec.style.height=start+'px';
-    void sec.offsetHeight;
-    requestAnimationFrame(function(){
-      sec.style.transition='height .26s ease';
-      sec.style.height=end+'px';
-      setTimeout(function(){sec.style.transition='';sec.style.height='';sec.style.overflow='';sec._animating=false},300);
+  function rowsOf(sec){return [].slice.call(sec.querySelectorAll(ROW)).filter(function(r){return r.closest(SEL.join(','))===sec})}
+  function resultOf(row){
+    if(row.classList.contains('upcoming'))return null;
+    var dr=String(row.getAttribute('data-result')||'').trim();
+    if(dr==='错'||dr==='未中'||dr==='肖未')return false;
+    if(dr==='对'||dr==='准'||dr==='肖中')return true;
+    if(row.querySelector('u.miss'))return false;
+    if(row.querySelector('u.hit'))return true;
+    var txt=(row.textContent||'');
+    if(/未中|肖未/.test(txt))return false;
+    if(/准|肖中/.test(txt))return true;
+    return null;
+  }
+  function apply(){
+    SEL.forEach(function(sel){
+      var sec=document.querySelector(sel);if(!sec)return;
+      var rows=rowsOf(sec);
+      if(rows.length>10){rows.slice(0,rows.length-10).forEach(function(r){r.parentNode&&r.parentNode.removeChild(r)});rows=rowsOf(sec)}
+      var known=rows.map(resultOf).filter(function(x){return x!==null});
+      var last2=known.slice(-2);
+      var hide=last2.length===2&&last2[0]===false&&last2[1]===false;
+      sec.style.display=hide?'none':'';
+      sec.setAttribute('data-xc-rule',hide?'hidden-2miss':(rows.length>=10?'latest10':''));
     });
   }
-  function decorate(){
-    document.querySelectorAll(SEL).forEach(function(sec){
-      if(!sec||!sec.parentNode)return;
-      var rows=rowsOf(sec);var cnt=rows.length;
-      var btn=sec.querySelector(':scope > .xc-hist-btn');
-      if(cnt<=5){if(btn)btn.remove();sec.dataset.xcCount='';return}
-      if(btn&&sec.dataset.xcCount===String(cnt))return;
-      if(btn)btn.remove();
-      rows.forEach(function(r,i){if(i>=5)r.classList.add('xc-hide')});
-      sec.dataset.xcCount=String(cnt);sec.dataset.xcExpanded='0';
-      var b=document.createElement('button');b.className='xc-hist-btn';setLabel(b,cnt,false);
-      b.addEventListener('click',function(){toggle(sec,rows,b)});
-      sec.appendChild(b);
-    });
-  }
-  var t=null;new MutationObserver(function(){clearTimeout(t);t=setTimeout(decorate,120)}).observe(document.body,{childList:true,subtree:true});
-  decorate();setTimeout(decorate,800);setTimeout(decorate,2000);setInterval(decorate,3000);
+  var t=null;new MutationObserver(function(){clearTimeout(t);t=setTimeout(apply,120)}).observe(document.body,{childList:true,subtree:true});
+  apply();setTimeout(apply,800);setTimeout(apply,2000);setInterval(apply,3000);
 })();
 </script>
 </body></html>
