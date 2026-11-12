@@ -404,8 +404,15 @@ async function save(){
   try{ zlParsed=validateZlText($('zl-bulk').value); }catch(ve){ return Msg('这会导致页面显示错，请修正：'+ve.message,false); }
   var zlRowsEarly=zlParsed.rows;
   warns=warns.concat(zlParsed.warnings);
+  var delSet={};
+  try{var _dd=window.__daGetDeleted?window.__daGetDeleted():{};delSet=(_dd&&_dd['ziliao'])||{};}catch(e){}
+  if(Object.keys(delSet).length){
+    var beforeN=zlRowsEarly.length;
+    zlRowsEarly=zlRowsEarly.filter(function(r){return !delSet[String(r.issue)]});
+    warns.push('已排除表格中删除的期号：'+Object.keys(delSet).join('、')+'（'+beforeN+'→'+zlRowsEarly.length+' 行）');
+  }
   try{
-    var daZ=(window.__daGetZiliao?window.__daGetZiliao():[])||[];try{console.log('[zl-merge] daZ='+daZ.length+' has317='+daZ.some(function(x){return String(x.issue)==='317'}))}catch(e){}
+    var daZ=(window.__daGetZiliao?window.__daGetZiliao():[])||[];if(Object.keys(delSet).length)daZ=daZ.filter(function(x){return !delSet[String(parseInt(x.issue,10))]});try{console.log('[zl-merge] daZ='+daZ.length+' has317='+daZ.some(function(x){return String(x.issue)==='317'}))}catch(e){}
     if(daZ.length){
       var ZC0='鼠牛虎兔龙蛇马羊猴鸡狗猪';
       var ZOF=function(n){return ['马','蛇','龙','兔','虎','牛','鼠','猪','狗','鸡','猴','羊'][(parseInt(n,10)-1+12)%12]};
@@ -456,7 +463,7 @@ async function save(){
     try { await verifySaved(newPlay, newDraw); }
     catch (ve) { Msg('已提交，但读回校验失败：' + ve.message + '（请刷新后重试恢复）', false); setState('校验失败：' + ve.message); finallyRestore(); return; }
     await recordShas();
-    try{ if(window.__daSetZiliao)window.__daSetZiliao(zlRows.map(function(r){return {issue:String(r.issue),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})); }catch(e){}
+    try{ if(window.__daSetZiliao)window.__daSetZiliao(zlRows.map(function(r){return {issue:String(r.issue),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})); if(window.__daClearDeleted)window.__daClearDeleted('ziliao'); }catch(e){}
     Msg('已提交，读回校验通过；约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
     poll(newDraw.updated);
     draw=newDraw;play=newPlay;renderPreview();
@@ -622,8 +629,11 @@ loadAll().then(function(){LOADED=true;setSaveEnabled(true);commitList()}).catch(
     {id:'pingte',name:'平特①肖',file:'data/pingte.json',note:'1 个平特肖 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'zod',t:'平特肖',w:'76px',p:'龙'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
     {id:'ds4',name:'单双四肖',file:'data/danshuangsixiao.json',note:'单组四肖 + 双组四肖 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'dan',t:'单组四肖',w:'96px',p:'狗鼠龙虎'},{k:'shuang',t:'双组四肖',w:'96px',p:'猪鸡羊兔'},{k:'sp',t:'特开',w:'76px',p:'留空'}]}
   ];
-  var state={cur:0,data:{},raw:{}};
+  var state={cur:0,data:{},raw:{},deleted:{}};
   window.__daGetZiliao=function(){return JSON.parse(JSON.stringify(state.data['ziliao']||[]))};
+window.__daGetDeleted=function(){return JSON.parse(JSON.stringify(state.deleted||{}))};
+window.__daClearDeleted=function(b){if(!b){state.deleted={}}else{delete state.deleted[b]}};
+window.__daUndoDelete=function(b,issue){try{if(state.deleted&&state.deleted[b])delete state.deleted[b][String(parseInt(issue,10))]}catch(e){}};
   window.__daSetZiliao=function(rows){state.data['ziliao']=(rows||[]).slice();if(state.cur===0)daRender()};
   function fetchData(rel){
   var attempts=[];
@@ -647,7 +657,7 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
     var tb='';rows.forEach(function(r,i){tb+='<tr><td style="text-align:center;color:#888">'+(i+1)+'</td>';b.cols.forEach(function(c){var v=String(r[c.k]==null?'':r[c.k]).replace(/"/g,'&quot;');tb+='<td><input data-r="'+i+'" data-k="'+c.k+'" value="'+esc(v)+'" placeholder="'+esc(c.p||'')+'"></td>'});tb+='<td><button class="gray small" data-del="'+i+'">删</button></td></tr>'});
     $d('da-tbody').innerHTML=tb||'<tr><td colspan="'+(b.cols.length+2)+'" style="color:#999">暂无数据，点「加行」或「生成本期空行」</td></tr>';
     $d('da-tbody').querySelectorAll('input').forEach(function(inp){inp.addEventListener('input',function(){state.data[b.id][parseInt(inp.getAttribute('data-r'),10)][inp.getAttribute('data-k')]=inp.value;softCheck()})});
-    $d('da-tbody').querySelectorAll('button[data-del]').forEach(function(btn){btn.addEventListener('click',function(){state.data[b.id].splice(parseInt(btn.getAttribute('data-del'),10),1);daRender()})});
+    $d('da-tbody').querySelectorAll('button[data-del]').forEach(function(btn){btn.addEventListener('click',function(){var ii=parseInt(btn.getAttribute('data-del'),10);var row=state.data[b.id][ii];if(row&&parseInt(row.issue,10)){state.deleted[b.id]=state.deleted[b.id]||{};state.deleted[b.id][String(parseInt(row.issue,10))]=1}state.data[b.id].splice(ii,1);daRender();setState('da-state','已从列表移除，点「保存本板块」生效（顶部保存也会排除该行）','da-ok')})});
     softCheck();
     var st=state.status&&state.status[b.id];
     if(st&&!st.ok){var el=$d('da-warn');el.style.display='block';el.innerHTML='⚠ 板块「'+b.name+'」'+(st.missing?'data 文件不存在（保存时会新建）':'载入失败')+'：'+esc(b.file)+'<br>原因：'+esc(st.error||'')+(st.missing?'':'<br>其它板块可正常编辑保存；可点「重新载入线上资料」重试')+(el.innerHTML&&el.innerHTML.indexOf('软提示')>=0?'<hr style="border:0;border-top:1px dashed #E8C86A;margin:6px 0">'+el.innerHTML:'')}
@@ -661,9 +671,9 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
   }
   function rowsNow(){return state.data[BOARDS[state.cur].id]||[]}
   function blankRow(){var b=BOARDS[state.cur];var r={};b.cols.forEach(function(c){r[c.k]=''});return r}
-  function addRow(){var rows=rowsNow();var last=rows[rows.length-1]||{};var r=blankRow();r.issue=last.issue?String((parseInt(last.issue,10)||0)+1):'';rows.push(r);daRender()}
-  function copyPrev(){var b=BOARDS[state.cur];var rows=rowsNow();if(!rows.length)return;var last=rows[rows.length-1];var r={};b.cols.forEach(function(c){r[c.k]=last[c.k]||''});r.issue=String((parseInt(last.issue,10)||0)+1);rows.push(r);daRender()}
-  function newIssueRow(){var rows=rowsNow();var max=0;rows.forEach(function(r){var n=parseInt(r.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);daRender()}
+  function addRow(){var rows=rowsNow();var last=rows[rows.length-1]||{};var r=blankRow();r.issue=last.issue?String((parseInt(last.issue,10)||0)+1):'';rows.push(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender()}
+  function copyPrev(){var b=BOARDS[state.cur];var rows=rowsNow();if(!rows.length)return;var last=rows[rows.length-1];var r={};b.cols.forEach(function(c){r[c.k]=last[c.k]||''});r.issue=String((parseInt(last.issue,10)||0)+1);rows.push(r);if(window.__daUndoDelete)window.__daUndoDelete(b.id,r.issue);daRender()}
+  function newIssueRow(){var rows=rowsNow();var max=0;rows.forEach(function(r){var n=parseInt(r.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender()}
   function saveBoard(){var b=BOARDS[state.cur];if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}
     var badRows=rowsNow().filter(function(x){return !parseInt(x.issue,10)}).length;
     var obj=SAVE[b.id](rowsNow(),state.raw[b.id]||{});var bfile=b.file;
@@ -673,7 +683,7 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
         delete SHA_CACHE[bfile];
         await saveFile(bfile,obj,'资料录入：'+b.name+'（自助后台）');
         try{ await fetch('https://api.github.com/repos/'+REPO+'/actions/workflows/pages.yml/dispatches',{method:'POST',headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({ref:BRANCH})}); }catch(e){}
-        state.raw[b.id]=obj;state.status=state.status||{};state.status[b.id]={ok:true};
+        state.raw[b.id]=obj;state.status=state.status||{};state.status[b.id]={ok:true};if(window.__daClearDeleted)window.__daClearDeleted(b.id);
         setState('da-state','✅ 已提交「'+b.name+'」；约 90 秒生效（已自动触发 Pages 构建）','da-ok');
         daRender();
       }catch(e){setState('da-state','保存失败：'+(e&&e.message?e.message:'未知错误')+'（文件：'+bfile+'）','da-warn')}
