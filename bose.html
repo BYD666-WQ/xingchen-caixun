@@ -38,7 +38,7 @@ table.bt td b{color:#8A0000}
 <div class="note">数据来源：站内公开属性表 <b>data/num-attrs.json</b>（49 条，已校验 1–49 无缺号）。同一号码的生肖随年份变化，本表为当前站内口径；五行/波色为固定分类。</div>
 <div class="nav"><a href="index.html">首页</a><a class="on" href="ziliao.html">资料大全</a><a href="guilv.html">规律走势</a><a href="index.html">寻宝</a><a href="gallery.html">图库</a></div>
 <script>
-(function(){var S=['https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/',''];
+(function(){var S=['','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/'];
 function get(p){var i=0,NAMES=['raw','jsdelivr','local'];function go(){if(i>=S.length)return Promise.reject(new Error('x'));var k=i;var u=S[i++]+p+'?t='+Date.now();try{window.__dataOrder=window.__dataOrder||[];window.__dataOrder.push({try:NAMES[k]||String(k),path:p});console.log('[data-order] try '+(NAMES[k]||k)+' '+p)}catch(e){}return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json().then(function(j){try{window.__dataOrder.push({hit:NAMES[k]||String(k),path:p});console.log('[data-order] hit '+(NAMES[k]||k)+' '+p)}catch(e){}return j})}).catch(function(){try{window.__dataOrder.push({fail:NAMES[k]||String(k),path:p})}catch(e){}return go()})}return go()}
 function empty(){document.getElementById('wrap').innerHTML='<div class="block"><div class="hd"><b>暂无数据</b></div><div class="bd">属性表加载失败，请稍后刷新重试。</div></div>'}
 function cls(c){return c==='红'?'r':(c==='蓝'?'b':'g')}
