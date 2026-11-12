@@ -37,8 +37,17 @@ td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
 body{padding-bottom:76px}
 #msg{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);max-width:92vw;padding:10px 14px;border-radius:8px;color:#fff;background:#333;display:none;z-index:30;white-space:pre-wrap;font-size:13px}
 .commit{font-size:12px;color:#666;border-top:1px solid #eee;padding:6px 0;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.da-tabs{display:flex;gap:6px;overflow-x:auto;padding:6px 0;white-space:nowrap;margin:6px 0}
+.da-tabs button{background:#fff;color:#333;border:1px solid #d8d8d8;border-radius:5px;padding:6px 10px;font-size:12px;font-weight:600;min-height:32px}
+.da-tabs button.on{background:#07a35a;color:#fff;border-color:#07a35a}
+#da-table{width:100%;border-collapse:collapse;font-size:12px}
+#da-table th,#da-table td{border:1px solid #e6e6e6;padding:3px 4px;text-align:left;vertical-align:middle}
+#da-table th{background:#f5f7f5;font-size:11px;color:#555;white-space:nowrap}
+#da-table td input{min-height:28px;font-size:12px;padding:2px 4px;width:100%}
+.da-warn{font-size:12px;color:#8a3a00;background:#FFF6D6;border:1px solid #E8C86A;border-radius:5px;padding:6px 8px;margin:6px 0;line-height:1.6}
+.da-ok{font-size:12px;color:#0b7a45}
 </style></head><body>
-<header><b>香港摇钱树 · 内容管理</b><span id="who" style="font-size:12px;opacity:.9"></span></header>
+<header><b>新港摇钱树 · 内容管理</b><span id="who" style="font-size:12px;opacity:.9"></span></header>
 <div class="wrap">
 <div id="guide" style="background:#e8f7ef;border:1px solid #b9e3cd;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;line-height:1.75;color:#0b6b3d">
   <b>3 步完成修改：</b><br>① 在下面粘贴密钥（只需一次） → ② 填号码/资料 → ③ 点底部「保存并发布」
@@ -114,6 +123,21 @@ body{padding-bottom:76px}
 </div></details></div>
 
 </div>
+<div class="panel" id="panel-data"><details><summary>⑦ 资料自助录入（多板块）</summary><div class="body">
+  <div class="row"><button class="gray" id="da-reload">重新载入线上资料</button><span id="da-src" style="font-size:12px;color:#888">未载入</span></div>
+  <div class="da-tabs" id="da-tabs"></div>
+  <div class="row" style="margin:6px 0">
+    <button id="da-add">＋ 加行</button>
+    <button class="gray" id="da-copy">复制上一期</button>
+    <button class="gray" id="da-empty">生成本期空行</button>
+    <button id="da-save">保存本板块</button>
+    <span id="da-count" style="font-size:12px;color:#888"></span>
+  </div>
+  <div class="da-warn" id="da-warn" style="display:none"></div>
+  <div style="overflow:auto"><table id="da-table"><thead id="da-thead"></thead><tbody id="da-tbody"></tbody></table></div>
+  <p id="da-note" style="font-size:12px;color:#888;margin:6px 0 0"></p>
+  <div id="da-state" class="da-ok" style="margin-top:4px">保存后约 90 秒生效（自动触发 Pages 构建）</div>
+</div></details></div>
 <div id="savebar">
   <span id="save-state">未保存</span>
   <button id="btn-save-bar" style="min-height:44px;padding:0 18px">保存并发布</button>
@@ -511,4 +535,93 @@ if (BACKEND === 'worker') {
 function enableSave(){setSaveEnabled(true);LOADED=true}
 function setSaveEnabled(on){['btn-save','btn-save-bar','btn-save-top'].forEach(function(id){var b=$(id);if(b)b.disabled=!on})}
 loadAll().then(function(){LOADED=true;setSaveEnabled(true);commitList()}).catch(function(e){LOADED=false;setSaveEnabled(false);Msg('载入失败，已禁用保存：'+e.message,false)});
+
+/* ===== 资料自助录入（多板块） ===== */
+(function(){
+  var $d=function(id){return document.getElementById(id)};
+  var ZC='鼠牛虎兔龙蛇马羊猴鸡狗猪';
+  var SEQ=['马','蛇','龙','兔','虎','牛','鼠','猪','狗','鸡','猴','羊'];
+  var JSD='https://cdn.jsdelivr.net/gh/'+REPO+'@'+BRANCH+'/';
+  function zOf(n){return n?SEQ[(n-1)%12]:''}
+  function pad2(n){return (n<10?'0':'')+n}
+  function pair(s){s=String(s||'').trim();var re=new RegExp('(['+ZC+'])\\s*(\\d{1,2})');var m=s.match(re);if(!m)return null;var n=parseInt(m[2],10);return n>=1&&n<=49?{z:m[1],c:pad2(n)}:null}
+  function pairs(listStr,limit){return String(listStr||'').split(/\s+/).filter(Boolean).map(pair).filter(Boolean).slice(0,limit)}
+  function zsOf(s,limit){return String(s||'').split('').filter(function(c){return ZC.indexOf(c)>=0}).slice(0,limit)}
+  function pairStr(list){return (list||[]).map(function(x){return x.z+x.c}).join(' ')}
+  var LOAD={},SAVE={};
+  LOAD.ziliao=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})};
+  SAVE.ziliao=function(rows,base){base=base||{};base.name=base.name||'新香港';base.rows=rows.map(function(x){var n=parseInt(x.num,10);var ok=n>=1&&n<=49;return {issue:parseInt(x.issue,10)||0,oddEven:(x.oe==='单'||x.oe==='双')?x.oe:'',threeZodiac:zsOf(x.zs,3),result:ok?{c:pad2(n),z:zOf(n)}:{c:'',z:''},text:'内幕【提前公开】',status:ok?'live':'upcoming',updated:new Date().toISOString()}});base.updated=new Date().toISOString();return base};
+  LOAD.wuxiao=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):'',list:pairStr(r.list)}})};
+  SAVE.wuxiao=function(rows,base){base=base||{name:'五肖五码'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,special:pair(x.sp)||{z:'',c:''},list:pairs(x.list,5)}});return base};
+  LOAD.santou=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),heads:(r.heads||[]).join(' '),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.santou=function(rows,base){base=base||{name:'三头中特'};base.rows=rows.map(function(x){var hs=String(x.heads||'').replace(/[^0-9]/g,' ').trim().split(/\s+/).filter(Boolean).map(function(v){return parseInt(v,10)}).filter(function(n){return n>=0&&n<=4}).slice(0,3);return {issue:parseInt(x.issue,10)||0,heads:hs,special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.shuangbo=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),waves:(r.waves||[]).join('+'),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.shuangbo=function(rows,base){base=base||{name:'必赢双波'};base.rows=rows.map(function(x){var ws=String(x.waves||'').split(/[^红蓝绿]+/).filter(Boolean).slice(0,2);return {issue:parseInt(x.issue,10)||0,waves:ws,special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.danshuang=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),oe:r.oddEven||'',zs:(r.zodiacs||[]).join(''),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.danshuang=function(rows,base){base=base||{name:'单双'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,oddEven:(x.oe==='单数'||x.oe==='双数')?x.oe:'',zodiacs:zsOf(x.zs,3),special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.liuxiao=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),list:pairStr(r.list),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.liuxiao=function(rows,base){base=base||{name:'六肖六码',author:'小小码神'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,list:pairs(x.list,6),special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.qiwei=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),tails:String(r.tails||''),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.qiwei=function(rows,base){base=base||{name:'七尾中特'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,tails:String(x.tails||'').replace(/[^0-9]/g,'').slice(0,7),special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.sisha=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),zs:(r.sisha||[]).join(''),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.sisha=function(rows,base){base=base||{name:'死杀三肖'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,sisha:zsOf(x.zs,3),special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.pingte=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),zod:r.zod||'',sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.pingte=function(rows,base){base=base||{name:'平特①肖'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,zod:zsOf(x.zod,1).join(''),special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.ds4=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),dan:(r.dan||[]).join(''),shuang:(r.shuang||[]).join(''),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.ds4=function(rows,base){base=base||{name:'单双四肖'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,dan:zsOf(x.dan,4),shuang:zsOf(x.shuang,4),special:pair(x.sp)||{z:'',c:''}}});return base};
+  var BOARDS=[
+    {id:'ziliao',name:'内幕·单双③肖',file:'data/manual-ziliao.json',note:'单双 + 主三肖 + 开奖结果；新一期可只填期号/单双/三肖，开奖号留空=待开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'oe',t:'单/双',w:'56px',p:'单/双'},{k:'zs',t:'主三肖',w:'84px',p:'兔蛇羊'},{k:'num',t:'开奖号',w:'70px',p:'留空'}]},
+    {id:'wuxiao',name:'五肖五码',file:'data/wuxiao.json',note:'5 组「生肖+号码」+ 特开；新一期特开留空显示 ?。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'list',t:'五肖五码（5组）',p:'鼠07 牛18 龙39 鸡10 猪20'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'santou',name:'三头中特',file:'data/santou.json',note:'3 个头（0-4）+ 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'heads',t:'三头',w:'90px',p:'1 2 3'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'shuangbo',name:'必赢双波',file:'data/shuangbo.json',note:'两个波（红/蓝/绿，用 + 分隔）+ 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'waves',t:'双波',w:'90px',p:'红+绿'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'danshuang',name:'单双',file:'data/danshuang.json',note:'单数/双数 + 三肖 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'oe',t:'单双',w:'76px',p:'单数/双数'},{k:'zs',t:'三肖',w:'84px',p:'牛鸡羊'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'liuxiao',name:'六肖六码',file:'data/liuxiao.json',note:'6 组「生肖+号码」+ 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'list',t:'六肖六码（6组）',p:'鼠04 羊12 鼠07 猪08 牛06 龙39'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'qiwei',name:'七尾中特',file:'data/qiwei.json',note:'7 位尾数 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'tails',t:'七尾',w:'100px',p:'1236789'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'sisha',name:'死杀三肖',file:'data/sisha.json',note:'3 肖 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'zs',t:'三肖',w:'84px',p:'猪羊鸡'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'pingte',name:'平特①肖',file:'data/pingte.json',note:'1 个平特肖 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'zod',t:'平特肖',w:'76px',p:'龙'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'ds4',name:'单双四肖',file:'data/danshuangsixiao.json',note:'单组四肖 + 双组四肖 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'dan',t:'单组四肖',w:'96px',p:'狗鼠龙虎'},{k:'shuang',t:'双组四肖',w:'96px',p:'猪鸡羊兔'},{k:'sp',t:'特开',w:'76px',p:'留空'}]}
+  ];
+  var state={cur:0,data:{},raw:{}};
+  function fetchData(rel){var S=['',JSD,RAW+'data/'];var tries=[];var i=0;function go(){if(i<S.length)return fetch(S[i++]+rel+'?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(go);
+      if(token())return fetch('https://api.github.com/repos/'+REPO+'/contents/'+rel+'?ref='+BRANCH+'&t='+Date.now(),{headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json'}}).then(function(r){return r.json()}).then(function(j){var t=decodeURIComponent(escape(atob(String(j.content||'').replace(/\n/g,''))));return JSON.parse(t)});
+      return Promise.reject(new Error('no source'));
+    }return go()}
+  function setState(id,txt,cls){var el=$d(id);if(!el)return;el.textContent=txt;if(cls)el.className=cls;el.style.display='block'}
+  function loadAll(){setState('da-src','载入中…');return Promise.all(BOARDS.map(function(b){return fetchData(b.file).then(function(j){state.raw[b.id]=j;state.data[b.id]=LOAD[b.id](j)}).catch(function(){state.raw[b.id]={};state.data[b.id]=[]})})).then(function(){var n=BOARDS.filter(function(b){return (state.data[b.id]||[]).length}).length;setState('da-src','已载入 '+n+'/'+BOARDS.length+' 个板块');daRender()})}
+  function renderTabs(){var h='';BOARDS.forEach(function(b,i){h+='<button data-i="'+i+'" class="'+(i===state.cur?'on':'')+'">'+b.name+'</button>'});$d('da-tabs').innerHTML=h;$d('da-tabs').querySelectorAll('button').forEach(function(btn){btn.addEventListener('click',function(){state.cur=parseInt(btn.getAttribute('data-i'),10);daRender()})})}
+  function daRender(){renderTabs();var b=BOARDS[state.cur];$d('da-note').textContent=b.note;var rows=state.data[b.id]||[];$d('da-count').textContent='共 '+rows.length+' 行';
+    var th='<tr><th style="width:36px">#</th>';b.cols.forEach(function(c){th+='<th style="width:'+(c.w||'auto')+'">'+c.t+'</th>'});th+='<th style="width:42px">操作</th></tr>';$d('da-thead').innerHTML=th;
+    var tb='';rows.forEach(function(r,i){tb+='<tr><td style="text-align:center;color:#888">'+(i+1)+'</td>';b.cols.forEach(function(c){var v=String(r[c.k]==null?'':r[c.k]).replace(/"/g,'&quot;');tb+='<td><input data-r="'+i+'" data-k="'+c.k+'" value="'+v+'" placeholder="'+(c.p||'')+'"></td>'});tb+='<td><button class="gray small" data-del="'+i+'">删</button></td></tr>'});
+    $d('da-tbody').innerHTML=tb||'<tr><td colspan="'+(b.cols.length+2)+'" style="color:#999">暂无数据，点「加行」或「生成本期空行」</td></tr>';
+    $d('da-tbody').querySelectorAll('input').forEach(function(inp){inp.addEventListener('input',function(){state.data[b.id][parseInt(inp.getAttribute('data-r'),10)][inp.getAttribute('data-k')]=inp.value;softCheck()})});
+    $d('da-tbody').querySelectorAll('button[data-del]').forEach(function(btn){btn.addEventListener('click',function(){state.data[b.id].splice(parseInt(btn.getAttribute('data-del'),10),1);daRender()})});
+    softCheck();
+  }
+  function softCheck(){var b=BOARDS[state.cur];var rows=state.data[b.id]||[];var w=[];
+    rows.forEach(function(r,i){if(!/^\d{3,4}$/.test(String(r.issue||'')))w.push('第 '+(i+1)+' 行「期号」建议填 3-4 位数字');
+      if(r.sp!==undefined&&String(r.sp||'').trim()!==''&&!pair(r.sp))w.push('第 '+(i+1)+' 行「特开」建议填「生肖+号码」（例：鸡22），留空表示 ?');
+      if(r.list!==undefined&&String(r.list||'').trim()!==''&&pairs(r.list,99).length===0)w.push('第 '+(i+1)+' 行「'+b.cols[1].t+'」没识别到「生肖+号码」组合');
+      if(r.zs!==undefined&&String(r.zs||'').trim()!==''){var bad=String(r.zs).split('').filter(function(c){return ZC.indexOf(c)<0});if(bad.length)w.push('第 '+(i+1)+' 行「'+b.cols[2].t+'」忽略非生肖字符「'+bad.join('')+'」')}});
+    var el=$d('da-warn');if(w.length){el.style.display='block';el.innerHTML='⚠ 软提示（不会阻止保存）：<br>'+w.slice(0,12).map(function(x){return '· '+x}).join('<br>')+(w.length>12?'<br>· …共 '+w.length+' 条':'')}else el.style.display='none';
+  }
+  function rowsNow(){return state.data[BOARDS[state.cur].id]||[]}
+  function blankRow(){var b=BOARDS[state.cur];var r={};b.cols.forEach(function(c){r[c.k]=''});return r}
+  function addRow(){var rows=rowsNow();var last=rows[rows.length-1]||{};var r=blankRow();r.issue=last.issue?String((parseInt(last.issue,10)||0)+1):'';rows.push(r);daRender()}
+  function copyPrev(){var b=BOARDS[state.cur];var rows=rowsNow();if(!rows.length)return;var last=rows[rows.length-1];var r={};b.cols.forEach(function(c){r[c.k]=last[c.k]||''});r.issue=String((parseInt(last.issue,10)||0)+1);rows.push(r);daRender()}
+  function newIssueRow(){var rows=rowsNow();var max=0;rows.forEach(function(r){var n=parseInt(r.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);daRender()}
+  function saveBoard(){var b=BOARDS[state.cur];if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}
+    var obj=SAVE[b.id](rowsNow(),state.raw[b.id]||{});var txt=JSON.stringify(obj,null,1);
+    var url='https://api.github.com/repos/'+REPO+'/contents/'+b.file;
+    setState('da-state','提交中…（'+b.name+'）','da-ok');
+    fetch(url+'?ref='+BRANCH+'&t='+Date.now(),{headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json'}}).then(function(r){return r.json()}).then(function(cur){var payload={message:'资料录入：'+b.name+'（自助后台）',content:btoa(unescape(encodeURIComponent(txt))),branch:BRANCH};if(cur&&cur.sha)payload.sha=cur.sha;return fetch(url,{method:'PUT',headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify(payload)})}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(){
+      return fetch('https://api.github.com/repos/'+REPO+'/actions/workflows/pages.yml/dispatches',{method:'POST',headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({ref:BRANCH})}).catch(function(){});
+    }).then(function(){setState('da-state','✅ 已提交「'+b.name+'」；约 90 秒生效（已自动触发 Pages 构建）','da-ok');state.raw[b.id]=obj}).catch(function(e){setState('da-state','保存失败：'+e.message,'da-warn')});
+  }
+  $d('da-reload').addEventListener('click',loadAll);
+  $d('da-add').addEventListener('click',addRow);
+  $d('da-copy').addEventListener('click',copyPrev);
+  $d('da-empty').addEventListener('click',newIssueRow);
+  $d('da-save').addEventListener('click',saveBoard);
+  loadAll();
+})();
 </script></body></html>
