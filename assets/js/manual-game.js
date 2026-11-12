@@ -669,7 +669,7 @@
       });
     }
     setTimeout(refreshDraw, 1500);
-    setInterval(refreshDraw, 30000);
+    setInterval(refreshDraw, 12000);
   
   // 三彩种收口：新港 / 新澳 / 香港 —— 删老澳与快乐8，重排顺序，清重复倒计时
   (function () {
