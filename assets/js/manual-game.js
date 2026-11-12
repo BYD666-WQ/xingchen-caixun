@@ -633,7 +633,7 @@
 
   // draw.json 直读：刷新各彩种块的期号与号码（不用等 Pages 构建）
   (function () {
-    var MAP = { '\u65b0\u6fb3\u5f69': 'Macau', '\u8001\u6fb3\u5f69': 'MacauOld', '\u9999\u6e2f\u5f69': 'HongKong', '\u5feb\u4e508': 'Happy8' };
+    var MAP = { '\u65b0\u6fb3\u5f69': 'Macau', '\u9999\u6e2f\u5f69': 'HongKong' };
     function colorOf(c) {
       var n = parseInt(c, 10);
       var R = [1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46], B = [3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
