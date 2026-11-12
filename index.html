@@ -385,78 +385,113 @@ details.mini>summary::-webkit-details-marker{display:none}
     document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.classList.toggle('on',i===KEYS.indexOf(k))});
   }
   window.__xcShow=show;
-  window.__applyDraw=function(dr,md){var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});try{vfApply(md)}catch(e){}D={newhk:md,newmo:by.Macau,hk:by.HongKong};buildCards();fill();tick();show(KEYS[window.__pendingTab||0])};
+  window.__applyDraw=function(dr,md){var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});var vfActive=false;try{vfActive=vfApply(md)}catch(e){}D={newhk:md,newmo:by.Macau,hk:by.HongKong};buildCards();tick();if(vfActive){try{vfRestore()}catch(e){}}else{fill();show(KEYS[window.__pendingTab||0])}};
   window.__showTab=function(k){var M={newhk:0,newmo:1,hk:2,'新港':0,'新澳':1,'新澳彩':1,'香港':2,'香港彩':2};var i=(k in M)?M[k]:-1;if(i>=0){if(D[KEYS[i]])show(KEYS[i]);else{window.__pendingTab=i;document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,j){t.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}}return i>=0};
   document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.addEventListener('click',function(){window.__pendingTab=i;if(D[KEYS[i]])show(KEYS[i]);else{document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(x,j){x.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}})})
 
-  /* ===== 新港 visibleFrom：定时公布 + 到点揭晓 ===== */
-  var VF_KEY='Xc9vF2026', VF=null;
+  /* ===== 新港 visibleFrom：定时公布 + 到点揭晓（2026-11-13 改：每球 10s，可中断恢复） ===== */
+  var VF_KEY='Xc9vF2026';
+  var FIRST_DELAY_MS=1500, REVEAL_INTERVAL_MS=10000, SPECIAL_EXTRA_MS=5000, SETTLE_MS=10000, FLIP_MS=400;
+  var VF=null;
+  function vfRevealAt(i){return FIRST_DELAY_MS+i*REVEAL_INTERVAL_MS+(i>=6?SPECIAL_EXTRA_MS:0)}
+  function vfTotal(){return vfRevealAt(6)+SETTLE_MS}
   function vfDec(enc){try{var bin=atob(String(enc||'')),arr=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i)^VF_KEY.charCodeAt(i%VF_KEY.length);return JSON.parse(new TextDecoder('utf-8').decode(arr))}catch(e){return null}}
-  function vfTile(i,nums,stage){
-    var t=nums[i];if(!t)return '<div class="tile gray"><div class="num">?</div><div class="zod">?</div></div>';
-    var num=(stage>=1)?t.c:'?';var zod=(stage>=2)?(t.z||''):'?';var col=(stage>=3)?numCls(parseInt(t.c,10)):'';
-    return '<div class="tile '+col+'"><div class="num">'+num+'</div><div class="zod">'+zod+'</div></div>';
+  function vfEnsureUI(){
+    if(!document.getElementById('xc-vf-style')){var st=document.createElement('style');st.id='xc-vf-style';st.textContent='@keyframes vfFlip{0%{transform:rotateX(88deg);opacity:.25}100%{transform:none;opacity:1}}.tile.vf-in{animation:vfFlip .4s ease}';document.head.appendChild(st)}
+    if(!document.getElementById('xc-vf-progress')){var p=document.createElement('div');p.id='xc-vf-progress';p.style.cssText='display:none;margin:4px 0 6px;padding:6px 8px;border-radius:6px;background:#FFF3D6;border:1px dashed #E8C98A;color:#8a5a2a;font:700 13px/1.4 "Microsoft YaHei",Arial,sans-serif;text-align:center';var ob=document.getElementById('xc-openbar');if(ob&&ob.parentNode)ob.parentNode.insertBefore(p,ob.nextSibling);else document.body.insertBefore(p,document.body.firstChild)}
   }
-  function vfBallHtml(nums,stage){
-    var h='';for(var i=0;i<6;i++)h+=vfTile(i,nums,typeof stage==='function'?stage(i):stage);
-    h+='<span class="plus">+</span>';h+=vfTile(6,nums,typeof stage==='function'?stage(6):stage);return h;
+  function vfProgress(t){vfEnsureUI();var p=document.getElementById('xc-vf-progress');if(!p)return;p.textContent=t;p.style.display='block'}
+  function vfGrayTile(){return '<div class="tile gray"><div class="num">?</div><div class="zod">?</div></div>'}
+  function vfTile(i,nums,count,hl){
+    var shown=i<count,t=nums&&nums[i];
+    if(!shown||!t)return vfGrayTile();
+    return '<div class="tile '+numCls(parseInt(t.c,10))+(hl===i?' vf-in':'')+'"><div class="num">'+t.c+'</div><div class="zod">'+(t.z||'')+'</div></div>';
   }
-  function vfRender(nums,stage){
-    var ob=document.getElementById('xc-ob-balls');if(ob)ob.innerHTML=vfBallHtml(nums,stage);
-    var cb=document.getElementById('blk-newhk');if(cb){var bb=cb.querySelector('.balls');if(bb)bb.innerHTML=vfBallHtml(nums,stage)}
+  function vfBalls(nums,count,hl){var h='';for(var i=0;i<6;i++)h+=vfTile(i,nums,count,hl);h+='<span class="plus">+</span>';h+=vfTile(6,nums,count,hl);return h}
+  function vfRender(nums,count,hl){
+    vfEnsureUI();
+    var ob=document.getElementById('xc-ob-balls');if(ob)ob.innerHTML=vfBalls(nums,count,hl);
+    var cb=document.getElementById('blk-newhk');if(cb){var bb=cb.querySelector('.balls');if(bb)bb.innerHTML=vfBalls(nums,count,hl)}
   }
   function vfSetHead(issue){var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent=shortIssue(issue)+'期开';var ob=document.getElementById('xc-openbar');if(ob)ob.setAttribute('data-issue',shortIssue(issue));var cb=document.getElementById('blk-newhk');if(cb){var b=cb.querySelector('.hd b');if(b)b.textContent='新港第'+shortIssue(issue)+'期'}}
-  function vfReveal(nums){
-    if(!nums||!nums.length){VF.phase='waiting';return}
-    VF.phase='revealing';vfSetHead(VF.issue);
+  function vfClearTimer(){if(VF&&VF.timer){clearTimeout(VF.timer);VF.timer=null}}
+  function vfRestore(){
+    if(!VF)return;vfSetHead(VF.issue);
+    if(VF.phase==='done'){vfRender(VF.nums||[],7,-1);vfProgress('本期已开出')}
+    else if(VF.phase==='waiting'){vfRender([],0,-1);vfProgress('等待开奖数据…')}
+    else{var c=VF.revealed||0;vfRender(VF.nums||[],c,-1);vfProgress(c>=7?'开奖中… 7/7':'开奖中… '+c+'/7')}
+  }
+  function vfDone(){
+    vfClearTimer();VF.phase='done';VF.played=true;
+    if(VF.nums&&VF.nums.length){try{VF.md.nums=VF.nums;D.newhk=VF.md;fill();show('newhk')}catch(e){}}
+    vfRender(VF.nums||[],7,-1);vfProgress('本期已开出');
+  }
+  function vfScheduleNext(){
+    if(!VF||VF.phase!=='revealing')return;
+    var elapsed=Date.now()-VF.vf;
+    if(VF.revealed>=7){
+      var wait=Math.max(0,vfTotal()-elapsed);
+      vfProgress('开奖中… 7/7');
+      VF.timer=setTimeout(vfDone,wait);return;
+    }
+    var nextAt=vfRevealAt(VF.revealed);
+    var wait=Math.max(0,nextAt-elapsed);
+    vfProgress('开奖中… '+VF.revealed+'/7');
+    VF.timer=setTimeout(function(){
+      if(!VF||VF.phase!=='revealing')return;
+      VF.revealed++;vfRender(VF.nums,VF.revealed,VF.revealed-1);vfScheduleNext();
+    },wait);
+  }
+  function vfStart(nums){
     var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var finish=function(){md.nums=nums;try{D.newhk=md;fill();show('newhk')}catch(e){}VF.phase='done';VF.played=true;VF.nums=nums};
-    var md=VF.md;
-    if(reduced){vfRender(nums,3);finish();return}
-    var STEP=300,Z=120,C=240;
-    for(var i=0;i<7;i++){(function(idx){
-      setTimeout(function(){if(VF.phase!=='revealing')return;vfRender(nums,function(k){return k<idx?3:(k===idx?1:0)})},idx*STEP);
-      setTimeout(function(){if(VF.phase!=='revealing')return;vfRender(nums,function(k){return k<idx?3:(k===idx?2:0)})},idx*STEP+Z);
-      setTimeout(function(){if(VF.phase!=='revealing')return;vfRender(nums,function(k){return k<idx?3:(k===idx?3:0)})},idx*STEP+C);
-    })(i)}
-    setTimeout(finish,6*STEP+C+80);
+    VF.nums=nums||[];VF.phase='revealing';
+    if(reduced){VF.revealed=7;vfDone();return}
+    var elapsed=Date.now()-VF.vf;
+    var count=0;while(count<7&&vfRevealAt(count)<=elapsed)count++;
+    VF.revealed=count;vfRender(VF.nums,count,-1);
+    if(count>=7&&elapsed>=vfTotal()){vfDone();return}
+    vfScheduleNext();
   }
   function vfDue(){
-    if(!VF||VF.phase==='revealing'||VF.phase==='done')return;
+    if(!VF||VF.phase==='done')return;
     var md=VF.md;md.issue=VF.issue;md.nums=[];try{D.newhk=md;fill();show('newhk')}catch(e){}
-    vfSetHead(VF.issue);vfRender([],0);VF.phase='pending';
-    setTimeout(function(){
-      var nums=VF.enc?vfDec(VF.enc):null;
-      if(nums&&nums.length){VF.nums=nums;vfReveal(nums);return}
-      VF.phase='waiting';
-    },300);
+    vfSetHead(VF.issue);vfRender([],0,-1);VF.phase='pending';vfProgress('开奖中… 0/7');
+    var nums=VF.enc?vfDec(VF.enc):null;
+    if(nums&&nums.length){VF.nums=nums;VF.phase='revealing';vfStart(nums)}
+    else{VF.phase='waiting';vfProgress('等待开奖数据…')}
   }
   function vfApply(md){
-    if(!md)return;
+    if(!md)return false;
     var vf=md.visibleFrom?Date.parse(md.visibleFrom):0;
-    if(!vf)return;
-    if(VF&&VF.issue===md.issue&&VF.phase!=='done'){
-      if(VF.phase==='idle'){if(VF.prevIssue)md.issue=VF.prevIssue;if(VF.prevNums)md.nums=VF.prevNums}
-      if(VF.phase==='waiting'&&VF.enc){var ns=vfDec(VF.enc);if(ns&&ns.length)vfReveal(ns)}
-      return;
+    if(!vf)return false;
+    var nums=null;
+    if(md.numsEnc){nums=vfDec(md.numsEnc)}
+    else if(md.nums&&md.nums.length){nums=md.nums}
+    if(VF&&VF.issue===md.issue){
+      md.issue=VF.issue;
+      if(VF.phase==='done'){if(nums)md.nums=nums;return false}
+      if(VF.nums&&VF.nums.length)md.nums=VF.nums;else md.nums=[];
+      if(VF.phase==='waiting'&&nums&&nums.length){VF.nums=nums;VF.phase='revealing';vfStart(nums)}
+      return true;
     }
     if(Date.now()>=vf){
-      if(md.numsEnc&&(!md.nums||!md.nums.length)){var ns=vfDec(md.numsEnc);if(ns)md.nums=ns}
-      VF={issue:md.issue,enc:md.numsEnc,md:md,phase:'done',played:true};
-      return;
+      VF={vf:vf,issue:md.issue,enc:md.numsEnc,md:md,phase:'pending',revealed:0,nums:[],played:false,timer:null};
+      if(nums&&nums.length){VF.phase='revealing';vfStart(nums)}else{vfSetHead(md.issue);vfRender([],0,-1);VF.phase='waiting';vfProgress('等待开奖数据…')}
+      return true;
     }
-    var origIssue=md.issue,prev=(md.history||[])[0]||null;
-    VF={issue:origIssue,enc:md.numsEnc,md:md,phase:'idle',played:false,prevIssue:prev&&prev.issue,prevNums:prev&&prev.nums};
-    if(prev&&prev.nums&&prev.nums.length){md.issue=prev.issue;md.nums=prev.nums}
-    else{md.issue=origIssue-1;md.nums=[]}
+    var prev=(md.history||[])[0]||null;
+    VF={vf:vf,issue:md.issue,enc:md.numsEnc,md:md,phase:'idle',revealed:0,nums:[],played:false,timer:null,prevIssue:prev&&prev.issue,prevNums:prev&&prev.nums};
+    if(prev&&prev.nums&&prev.nums.length){md.issue=prev.issue;md.nums=prev.nums}else{md.issue=md.issue-1;md.nums=[]}
     VF.timer=setTimeout(vfDue,Math.max(0,vf-Date.now()));
+    return false;
   }
+  window.__vfState=function(){return VF?{issue:VF.issue,phase:VF.phase,revealed:VF.revealed,elapsed:Date.now()-VF.vf,played:VF.played}:null};
   Promise.all([get('data/manual-draw.json'),get('data/draw.json')]).then(function(r){
     var md=r[0]||{},dr=r[1]||{};var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
-    try{vfApply(md)}catch(e){console.log('[vf]',e&&e.message)}
+    var vfActive=false;try{vfActive=vfApply(md)}catch(e){console.log('[vf]',e&&e.message)}
     D={newhk:md,newmo:by.Macau,hk:by.HongKong};
-    buildCards();fill();tick();setInterval(tick,1000);
-    show(KEYS[window.__pendingTab||0]);
+    buildCards();tick();setInterval(tick,1000);
+    if(vfActive){try{vfRestore()}catch(e){}}else{fill();show(KEYS[window.__pendingTab||0])}
   }).catch(function(e){console.log('[tt]',e&&e.message)});
 })();
 </script><script>
