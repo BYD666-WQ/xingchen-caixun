@@ -608,10 +608,14 @@ details.mini>summary::-webkit-details-marker{display:none}
 
 <script id="xc-block-rules">
 (function(){
-  /* 规则（板块级）：
-     B. 每板块最多展示最新 10 期：数据按「旧→新」渲染（与其它板块一致），超过 10 行时丢弃最老的（前 N 行）。
-     C. 板块级连续两期未中：取最近两个「已开奖」行的结果（跳过待开/未知），若都为未中，则整块 display:none；
-        一旦最新结果出现命中（或待开），自动恢复展示。注释即实现口径。 */
+  /* 规则（2026-11-13 更正：按段删行，不是板块隐藏）
+     B. 每板块最多展示最新 10 期：按「旧→新」顺序渲染，过滤完成后超过 10 行则丢弃最老的前 N 行（只丢弃展示，不改数据）；不足 10 显示实际条数。
+     C. 连续未中按段删除（例子）：
+        中-未中-中    → 3 行都保留（单个未中照常展示）
+        中-未中-未中  → 后两行整段删除、前面保留
+        未中-未中-未中-中 → 前 3 行整段删除、最后的中保留
+        待开/未知既不算未中，也不打断连续段（跳过）。
+        实现：按升序（期号小→大）扫描已开奖行，取连续「未中」的最长段；段长≥2 整段从 DOM 删除，段长=1 保留。 */
   var SEL=['#nm-final','#wuxiao','#santou','#shuangbo','#danshuang','#liuxiao','#qiwei','#sisha','#pingte','#ds4'];
   var ROW='.row:not(.xc-stat):not(.xc-note),.wx-row,.st-row,.sb-row,.ds-row,.lx-row,.qw-row,.ss-row,.pt-row,.ds4-row';
   function rowsOf(sec){return [].slice.call(sec.querySelectorAll(ROW)).filter(function(r){return r.closest(SEL.join(','))===sec})}
@@ -631,12 +635,19 @@ details.mini>summary::-webkit-details-marker{display:none}
     SEL.forEach(function(sel){
       var sec=document.querySelector(sel);if(!sec)return;
       var rows=rowsOf(sec);
-      if(rows.length>10){rows.slice(0,rows.length-10).forEach(function(r){r.parentNode&&r.parentNode.removeChild(r)});rows=rowsOf(sec)}
-      var known=rows.map(resultOf).filter(function(x){return x!==null});
-      var last2=known.slice(-2);
-      var hide=last2.length===2&&last2[0]===false&&last2[1]===false;
-      sec.style.display=hide?'none':'';
-      sec.setAttribute('data-xc-rule',hide?'hidden-2miss':(rows.length>=10?'latest10':''));
+      var settled=rows.map(function(r){return {row:r,res:resultOf(r)}}).filter(function(x){return x.res!==null});
+      var i=0;
+      while(i<settled.length){
+        if(settled[i].res===false){
+          var j=i;while(j<settled.length&&settled[j].res===false)j++;
+          if(j-i>=2){for(var k=i;k<j;k++){var r=settled[k].row;if(r.parentNode)r.parentNode.removeChild(r)}}
+          i=j;
+        }else i++;
+      }
+      rows=rowsOf(sec);
+      if(rows.length>10){rows.slice(0,rows.length-10).forEach(function(r){r.parentNode&&r.parentNode.removeChild(r)})}
+      sec.style.display='';
+      sec.setAttribute('data-xc-rule','latest10');
     });
   }
   var t=null;new MutationObserver(function(){clearTimeout(t);t=setTimeout(apply,120)}).observe(document.body,{childList:true,subtree:true});
