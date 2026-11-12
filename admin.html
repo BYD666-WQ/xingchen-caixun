@@ -172,6 +172,7 @@ var RAW='https://raw.githubusercontent.com/'+REPO+'/'+BRANCH+'/';
 var draw=null, play=null, LOADED=false;
 var SHA_CACHE = {};
 var DATA_PATHS = ['data/manual-draw.json','data/manual-play.json','data/site-copy.json','data/manual-ziliao.json'];
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function $(id){return document.getElementById(id)}
 function Msg(t,ok){var m=$('msg');m.style.display='block';m.style.background=ok?'#0b7a45':'#a33';m.textContent=t;clearTimeout(m._t);m._t=setTimeout(function(){m.style.display='none'},6000)}
 
@@ -265,8 +266,8 @@ function renderZl(zl){
 function renderHistory(){
   var tb=$('hist-tbl').querySelector('tbody');var h=(draw&&draw.history)||[];
   tb.innerHTML=h.map(function(row,i){
-    return '<tr><td><input data-hi="'+i+'" data-k="issue" value="'+row.issue+'" style="min-height:40px;width:80px"></td>'+
-      '<td><input data-hi="'+i+'" data-k="nums" value="'+row.nums.map(function(n){return n.c}).join(' ')+'" style="min-height:40px;font-size:13px"></td>'+
+    return '<tr><td><input data-hi="'+i+'" data-k="issue" value="'+esc(row.issue)+'" style="min-height:40px;width:80px"></td>'+
+      '<td><input data-hi="'+i+'" data-k="nums" value="'+esc(row.nums.map(function(n){return n.c}).join(' '))+'" style="min-height:40px;font-size:13px"></td>'+
       '<td><button class="small gray" data-del="'+i+'" style="min-width:40px">删</button></td></tr>';
   }).join('');
   tb.querySelectorAll('input').forEach(function(inp){inp.addEventListener('change',function(){
@@ -279,7 +280,7 @@ function renderHistory(){
 function commitList(){
   if(!token())return;
   api('https://api.github.com/repos/'+REPO+'/commits?per_page=10').then(function(list){
-    $('commits').innerHTML=list.map(function(c){return '<div class="commit"><span>'+c.sha.slice(0,7)+' '+c.commit.message.split('\n')[0].slice(0,26)+'</span><button class="small gray" data-rb="'+c.sha+'">回滚</button></div>'}).join('');
+    $('commits').innerHTML=list.map(function(c){return '<div class="commit"><span>'+esc(c.sha.slice(0,7))+' '+esc(c.commit.message.split('\n')[0].slice(0,26))+'</span><button class="small gray" data-rb="'+c.sha+'">回滚</button></div>'}).join('');
     $('commits').querySelectorAll('button[data-rb]').forEach(function(b){b.addEventListener('click',function(){rollback(b.getAttribute('data-rb'))})});
   }).catch(function(){});
 }
@@ -613,20 +614,20 @@ function setState(id,txt,cls){var el=$d(id);if(!el)return;el.textContent=txt;if(
 function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&&state.status[b.id];var bad=st&&!st.ok;h+='<button data-i="'+i+'" class="'+(i===state.cur?'on':'')+(bad?' bad':'')+'" title="'+(bad?(st.missing?'文件不存在（保存时新建）':'载入失败'):'')+'">'+b.name+(bad?' ⚠':'')+'</button>'});$d('da-tabs').innerHTML=h;$d('da-tabs').querySelectorAll('button').forEach(function(btn){btn.addEventListener('click',function(){state.cur=parseInt(btn.getAttribute('data-i'),10);daRender()})})}
   function daRender(){renderTabs();var b=BOARDS[state.cur];$d('da-note').textContent=b.note;var rows=state.data[b.id]||[];$d('da-count').textContent='共 '+rows.length+' 行';
     var th='<tr><th style="width:36px">#</th>';b.cols.forEach(function(c){th+='<th style="width:'+(c.w||'auto')+'">'+c.t+'</th>'});th+='<th style="width:42px">操作</th></tr>';$d('da-thead').innerHTML=th;
-    var tb='';rows.forEach(function(r,i){tb+='<tr><td style="text-align:center;color:#888">'+(i+1)+'</td>';b.cols.forEach(function(c){var v=String(r[c.k]==null?'':r[c.k]).replace(/"/g,'&quot;');tb+='<td><input data-r="'+i+'" data-k="'+c.k+'" value="'+v+'" placeholder="'+(c.p||'')+'"></td>'});tb+='<td><button class="gray small" data-del="'+i+'">删</button></td></tr>'});
+    var tb='';rows.forEach(function(r,i){tb+='<tr><td style="text-align:center;color:#888">'+(i+1)+'</td>';b.cols.forEach(function(c){var v=String(r[c.k]==null?'':r[c.k]).replace(/"/g,'&quot;');tb+='<td><input data-r="'+i+'" data-k="'+c.k+'" value="'+esc(v)+'" placeholder="'+esc(c.p||'')+'"></td>'});tb+='<td><button class="gray small" data-del="'+i+'">删</button></td></tr>'});
     $d('da-tbody').innerHTML=tb||'<tr><td colspan="'+(b.cols.length+2)+'" style="color:#999">暂无数据，点「加行」或「生成本期空行」</td></tr>';
     $d('da-tbody').querySelectorAll('input').forEach(function(inp){inp.addEventListener('input',function(){state.data[b.id][parseInt(inp.getAttribute('data-r'),10)][inp.getAttribute('data-k')]=inp.value;softCheck()})});
     $d('da-tbody').querySelectorAll('button[data-del]').forEach(function(btn){btn.addEventListener('click',function(){state.data[b.id].splice(parseInt(btn.getAttribute('data-del'),10),1);daRender()})});
     softCheck();
     var st=state.status&&state.status[b.id];
-    if(st&&!st.ok){var el=$d('da-warn');el.style.display='block';el.innerHTML='⚠ 板块「'+b.name+'」'+(st.missing?'data 文件不存在（保存时会新建）':'载入失败')+'：'+b.file+'<br>原因：'+(st.error||'')+(st.missing?'':'<br>其它板块可正常编辑保存；可点「重新载入线上资料」重试')+(el.innerHTML&&el.innerHTML.indexOf('软提示')>=0?'<hr style="border:0;border-top:1px dashed #E8C86A;margin:6px 0">'+el.innerHTML:'')}
+    if(st&&!st.ok){var el=$d('da-warn');el.style.display='block';el.innerHTML='⚠ 板块「'+b.name+'」'+(st.missing?'data 文件不存在（保存时会新建）':'载入失败')+'：'+esc(b.file)+'<br>原因：'+esc(st.error||'')+(st.missing?'':'<br>其它板块可正常编辑保存；可点「重新载入线上资料」重试')+(el.innerHTML&&el.innerHTML.indexOf('软提示')>=0?'<hr style="border:0;border-top:1px dashed #E8C86A;margin:6px 0">'+el.innerHTML:'')}
   }
   function softCheck(){var b=BOARDS[state.cur];var rows=state.data[b.id]||[];var w=[];
     rows.forEach(function(r,i){if(!/^\d{3,4}$/.test(String(r.issue||'')))w.push('第 '+(i+1)+' 行「期号」建议填 3-4 位数字');
       if(r.sp!==undefined&&String(r.sp||'').trim()!==''&&!pair(r.sp))w.push('第 '+(i+1)+' 行「特开」建议填「生肖+号码」（例：鸡22），留空表示 ?');
       if(r.list!==undefined&&String(r.list||'').trim()!==''&&pairs(r.list,99).length===0)w.push('第 '+(i+1)+' 行「'+b.cols[1].t+'」没识别到「生肖+号码」组合');
       if(r.zs!==undefined&&String(r.zs||'').trim()!==''){var bad=String(r.zs).split('').filter(function(c){return ZC.indexOf(c)<0});if(bad.length)w.push('第 '+(i+1)+' 行「'+b.cols[2].t+'」忽略非生肖字符「'+bad.join('')+'」')}});
-    var el=$d('da-warn');if(w.length){el.style.display='block';el.innerHTML='⚠ 软提示（不会阻止保存）：<br>'+w.slice(0,12).map(function(x){return '· '+x}).join('<br>')+(w.length>12?'<br>· …共 '+w.length+' 条':'')}else el.style.display='none';
+    var el=$d('da-warn');if(w.length){el.style.display='block';el.innerHTML='⚠ 软提示（不会阻止保存）：<br>'+w.slice(0,12).map(function(x){return '· '+esc(x)}).join('<br>')+(w.length>12?'<br>· …共 '+w.length+' 条':'')}else el.style.display='none';
   }
   function rowsNow(){return state.data[BOARDS[state.cur].id]||[]}
   function blankRow(){var b=BOARDS[state.cur];var r={};b.cols.forEach(function(c){r[c.k]=''});return r}

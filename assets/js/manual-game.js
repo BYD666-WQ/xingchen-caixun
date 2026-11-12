@@ -2,6 +2,7 @@
    数据来自 data/manual-draw.json；标注「示例」直到接入 GitHub Actions 手动开奖 */
 (function () {
   'use strict';
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 
   // 数据直读：raw.githubusercontent 主源（提交秒级生效，无需构建）→ 本地 Pages 副本兜底
   // 三源数据直读：jsDelivr（主，purge 快）→ raw.githubusercontent（次）→ Pages 本地（兜底）
@@ -9,7 +10,7 @@
   var XC_RAW = 'https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/';
   function xcVer() { return Math.floor(Date.now() / 60000); }
   async function fetchJSON(path) {
-    var sources = [XC_JD, XC_RAW, base()];
+    var sources = [base(), XC_JD, XC_RAW];
     for (var i = 0; i < 3; i++) {
       for (var s = 0; s < sources.length; s++) {
         try {
@@ -32,9 +33,9 @@
     xiao.setAttribute('data-xc-labeled', '1');
     var z = String(zodiac || '').trim();
     if (!z) return;
-    var html = '<b style="font-size:13px;font-weight:700;line-height:1.15">' + z + '</b>';
+    var html = '<b style="font-size:13px;font-weight:700;line-height:1.15">' + esc(z) + '</b>';
     if (XC_SHOW_WUXING && wuxing) {
-      html += '<span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.72)"> · ' + String(wuxing).trim() + '</span>';
+      html += '<span style="font-size:9px;font-weight:400;color:rgba(255,255,255,.72)"> · ' + esc(String(wuxing).trim()) + '</span>';
     }
     xiao.innerHTML = html;
     xiao.style.whiteSpace = 'nowrap';
@@ -82,7 +83,7 @@
       if (!hkTab || !hkBlock || !hkNameEl) return;
       // 1) 新 tab（放在香港彩前）
       var tab = document.createElement('div');
-      tab.innerHTML = '<span style="font-weight:700">' + (d.name || '\u65b0\u5f69\u79cd') + '</span>';
+      tab.innerHTML = '<span style="font-weight:700">' + esc(d.name || '\u65b0\u5f69\u79cd') + '</span>';
       tab.style.cursor = 'pointer';
       hkTab.parentNode.insertBefore(tab, hkTab);
       // 2) 新号码块（克隆香港彩块）
@@ -281,9 +282,9 @@
       list.forEach(function (h) {
         var balls = (h.nums || []).map(function (n) {
           var col = n.color === '\u7ea2' ? '#e71607' : (n.color === '\u84dd' ? '#2873e6' : '#1fb61d');
-          return '<span style="display:inline-block;min-width:26px;text-align:center;margin:2px;padding:2px 4px;border-radius:4px;background:' + col + ';color:#fff;font-weight:700">' + n.c + '<i style="display:block;font-style:normal;font-size:10px;font-weight:400">' + (n.wuxing || '') + '/' + (n.z || '') + '</i></span>';
+          return '<span style="display:inline-block;min-width:26px;text-align:center;margin:2px;padding:2px 4px;border-radius:4px;background:' + col + ';color:#fff;font-weight:700">' + esc(n.c) + '<i style="display:block;font-style:normal;font-size:10px;font-weight:400">' + esc(n.wuxing || '') + '/' + esc(n.z || '') + '</i></span>';
         }).join('');
-        inner += '<tr><td style="padding:6px 8px;border-top:1px solid #eee">' + h.issue + ' \u671f</td><td style="padding:6px 8px;border-top:1px solid #eee">' + balls + '</td></tr>';
+        inner += '<tr><td style="padding:6px 8px;border-top:1px solid #eee">' + esc(h.issue) + ' \u671f</td><td style="padding:6px 8px;border-top:1px solid #eee">' + balls + '</td></tr>';
       });
       inner += '</table></div>';
       box.innerHTML = inner;
@@ -318,10 +319,10 @@
       list.forEach(function (h) {
         var balls = (h.nums || []).map(function (n) {
           var col = n.color === '\u7ea2' ? '#e71607' : (n.color === '\u84dd' ? '#2873e6' : '#1fb61d');
-          return '<span style="display:inline-block;min-width:26px;text-align:center;margin:2px;padding:2px 4px;border-radius:4px;background:' + col + ';color:#fff;font-weight:700">' + n.c +
-            '<i style="display:block;font-style:normal;font-size:10px;font-weight:400">' + (n.wuxing || '') + '/' + (n.z || '') + '</i></span>';
+          return '<span style="display:inline-block;min-width:26px;text-align:center;margin:2px;padding:2px 4px;border-radius:4px;background:' + col + ';color:#fff;font-weight:700">' + esc(n.c) +
+            '<i style="display:block;font-style:normal;font-size:10px;font-weight:400">' + esc(n.wuxing || '') + '/' + esc(n.z || '') + '</i></span>';
         }).join('');
-        html += '<tr><td style="padding:6px 8px;border-top:1px solid #eee;white-space:nowrap">' + h.issue + ' \u671f</td><td style="padding:6px 8px;border-top:1px solid #eee">' + balls + '</td></tr>';
+        html += '<tr><td style="padding:6px 8px;border-top:1px solid #eee;white-space:nowrap">' + esc(h.issue) + ' \u671f</td><td style="padding:6px 8px;border-top:1px solid #eee">' + balls + '</td></tr>';
       });
       html += '</table></div>';
       box.innerHTML = html;
@@ -356,7 +357,7 @@
         if (!c) return;
         if (c.brand) {
           var num = String(c.brandNumber || c.bannerNumber || '').trim().slice(0, 8);
-          var html = c.brand + (num ? '<b style="font-size:1.18em;font-weight:900;color:#d60000;margin-left:4px;vertical-align:-1px">' + num + '</b>' : '');
+          var html = esc(c.brand) + (num ? '<b style="font-size:1.18em;font-weight:900;color:#d60000;margin-left:4px;vertical-align:-1px">' + esc(num) + '</b>' : '');
           var logo = document.querySelector('.xc-logo');
           if (logo) logo.innerHTML = html;
           var fb = document.querySelector('.xc-footer-brand');
@@ -393,19 +394,19 @@
         if (title) title.textContent = '\u9999\u6e2f\u6447\u94b1\u6811\u3010\u5355\u53cc\u2462\u8096\u3011';
         inner.innerHTML = d.rows.map(function (it) {
           if (it.status === 'upcoming') {
-            return '<div class="nmsx-festive-row"><span class="nmsx-festive-issue">\u65b0\u9999\u6e2f' + it.issue + '\u671f:\u5185\u5e55</span>' +
+            return '<div class="nmsx-festive-row"><span class="nmsx-festive-issue">\u65b0\u9999\u6e2f' + esc(it.issue) + '\u671f:\u5185\u5e55</span>' +
               '<span class="nmsx-festive-type">\u3010\u63d0\u524d\u516c\u5f00\u3011</span><span class="ziliaokl">\u70b9\u51fb\u67e5\u770b</span></div>';
           }
           var oe = it.oddEven === '\u5355' ? '\u5355\u6570' : '\u53cc\u6570';
           var zs = (it.threeZodiac || []).join('');
           var res = it.result ? (it.result.z + it.result.c) : '';
           return '<div class="nmsx-festive-row">' +
-            '<span class="nmsx-festive-issue">\u65b0\u9999\u6e2f' + it.issue + '\u671f:\u5185\u5e55</span>' +
+            '<span class="nmsx-festive-issue">\u65b0\u9999\u6e2f' + esc(it.issue) + '\u671f:\u5185\u5e55</span>' +
             '<span class="nmsx-festive-type">\u3010' + oe + '\u3011</span>' +
             '<span class="nmsx-festive-main">\u4e3b</span>' +
-            '<span class="nmsx-festive-zodiac">\u3010' + zs + '\u3011</span>' +
+            '<span class="nmsx-festive-zodiac">\u3010' + esc(zs) + '\u3011</span>' +
             '<span>\u5f00</span>' +
-            '<span class="nmsx-festive-result">' + res + '</span>' +
+            '<span class="nmsx-festive-result">' + esc(res) + '</span>' +
             '<span class="nmsx-festive-accurate">\u51c6</span>' +
             '</div>';
         }).join('');
@@ -523,7 +524,7 @@
       var num = (c && c.bannerNumber) || '7798';
       var box = document.querySelector('.amcz-domain');
       if (!box) return;
-      box.innerHTML = '<div id="xc-banner-num">' + String(num).slice(0, 12) + '</div>';
+      box.innerHTML = '<div id="xc-banner-num">' + esc(String(num).slice(0, 12)) + '</div>';
     }).catch(function () {});
 
   // 资料区：13 张 sevenxiaosevenma 全部逐表重建为新香港数据
@@ -565,8 +566,8 @@
     function fmt(list) { return list.map(function (n) { return n.c || n; }); }
     function ball(c, z, color) {
       var bg = color === '\u7ea2' ? '#e71607' : (color === '\u84dd' ? '#2873e6' : '#1fb61d');
-      return '<span style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:' + bg + ';color:#fff;margin:3px;font:700 14px/1 \'Microsoft YaHei\',Arial,sans-serif">' + c +
-        '<i style="font-style:normal;font-size:9px;opacity:.85">' + (z || '') + '</i></span>';
+      return '<span style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:' + bg + ';color:#fff;margin:3px;font:700 14px/1 \'Microsoft YaHei\',Arial,sans-serif">' + esc(c) +
+        '<i style="font-style:normal;font-size:9px;opacity:.85">' + esc(z || '') + '</i></span>';
     }
     Promise.all([
       fetch(base() + 'data/site-copy.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }),
@@ -581,9 +582,9 @@
       box.id = 'xc-layout-a';
       box.style.cssText = 'max-width:720px;margin:8px auto;padding:12px 10px;background:#fffdf6;border:1px solid #e8dcc8;border-radius:10px;text-align:center';
       box.innerHTML =
-        '<div id="xc-a-title" style="font:900 26px/1.3 \'Microsoft YaHei\',Arial,sans-serif;color:#c0392b">' + brand +
-        (num ? '<span style="color:#d60000;margin-left:4px">' + num + '</span>' : '') + '</div>' +
-        '<div id="xc-a-draw" style="margin:10px 0 6px;font:700 13px/1.6 \'Microsoft YaHei\',Arial,sans-serif;color:#333">\u65b0\u9999\u6e2f\u7b2c' + (d.issue || '') + '\u671f</div>' +
+        '<div id="xc-a-title" style="font:900 26px/1.3 \'Microsoft YaHei\',Arial,sans-serif;color:#c0392b">' + esc(brand) +
+        (num ? '<span style="color:#d60000;margin-left:4px">' + esc(num) + '</span>' : '') + '</div>' +
+        '<div id="xc-a-draw" style="margin:10px 0 6px;font:700 13px/1.6 \'Microsoft YaHei\',Arial,sans-serif;color:#333">\u65b0\u9999\u6e2f\u7b2c' + esc(d.issue || '') + '\u671f</div>' +
         '<div id="xc-a-balls" style="display:flex;flex-wrap:wrap;justify-content:center">' + balls + '</div>' +
         '<div id="xc-a-tabs" style="display:flex;gap:8px;justify-content:center;margin:10px 0 4px">' +
         ['\u65b0\u6fb3\u5f69','\u8001\u6fb3\u5f69','\u65b0\u9999\u6e2f','\u9999\u6e2f\u5f69'].map(function (nm) {
