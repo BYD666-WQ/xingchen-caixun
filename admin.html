@@ -83,6 +83,7 @@ body{padding-bottom:76px}
   <label>当前期号</label><input id="g-issue" inputmode="numeric">
   <label>开奖时间文案</label><input id="g-drawtime">
   <label>每天几点开奖（倒计时用，HH:MM）</label><input id="g-dailytime" inputmode="numeric">
+  <label>公布时间（visibleFrom，默认=本期开奖时刻，可改早/改晚）</label><input id="g-visiblefrom" type="datetime-local">
   <label>开奖号码（6 个正码 + 1 个特别号）</label><input id="g-nums" placeholder="可整串粘贴，如 07 12 23 34 45 06 18">
   <div id="nums-hint" style="font-size:12px;color:#888;margin-top:4px">支持整串粘贴自动拆分（空格/逗号/14 位连写均可）</div>
   <p style="font-size:12px;color:#888;margin:4px 0 0">号码按你输入的顺序保存，不做排序；顺序即正码顺序。</p>
@@ -196,6 +197,11 @@ function attrsOf(num){var k=pad(parseInt(num,10));return ATTRS[k]||{}}
 function parseNums(s){return String(s||'').trim().replace(/,/g,' ').split(/\s+/).filter(Boolean).map(function(x){return pad(parseInt(x,10))})}
 function numsWithAttrs(list){return list.map(function(c){var a=attrsOf(c);return {c:c,z:a.z||'',color:a.c||'',wuxing:a.w||''}})}
 function token(){return localStorage.getItem(KEY)||''}
+var VF_KEY='Xc9vF2026';
+function vfEnc(obj){try{var s=JSON.stringify(obj),b=new TextEncoder().encode(s),out=new Uint8Array(b.length);for(var i=0;i<b.length;i++)out[i]=b[i]^VF_KEY.charCodeAt(i%VF_KEY.length);var bin='';out.forEach(function(x){bin+=String.fromCharCode(x)});return btoa(bin)}catch(e){return ''}}
+function vfDec(enc){try{var bin=atob(String(enc||'')),arr=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i)^VF_KEY.charCodeAt(i%VF_KEY.length);return JSON.parse(new TextDecoder('utf-8').decode(arr))}catch(e){return null}}
+function vfLocal(iso){if(!iso)return '';var d=new Date(iso);if(isNaN(d.getTime()))return '';return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
+function vfDefaultLocal(){var d=new Date();d.setHours(21,34,0,0);if(d.getTime()>Date.now())d.setDate(d.getDate()-1);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T21:34'}
 async function api(url,opt){opt=opt||{};opt.headers=Object.assign({'Authorization':'Bearer '+token(),'Accept':'application/vnd.github+json'},opt.headers||{});var r=await fetch(url,opt);var j=null;try{j=await r.json()}catch(e){}if(!r.ok){var err=new Error((j&&j.message)||('HTTP '+r.status));err.status=r.status;throw err}return j}
 async function shaOf(path){
   var u = 'https://api.github.com/repos/' + REPO + '/contents/' + path + '?ref=' + BRANCH + '&t=' + Date.now();
@@ -257,7 +263,9 @@ async function loadAll(){
   draw=dr;play=pl;LOADED=true;
   $('g-name').value=dr.name||''; $('g-issue').value=dr.issue||''; $('g-drawtime').value=dr.drawTime||'';
   $('g-dailytime').value=dr.dailyTime||'21:34';
-  $('g-nums').value=(dr.nums||[]).map(function(n){return n.c}).join(' ');
+  var vfEl=$('g-visiblefrom');if(vfEl)vfEl.value=dr.visibleFrom?vfLocal(dr.visibleFrom):vfDefaultLocal();
+  var loadedNums=dr.nums||[];if((!loadedNums.length)&&dr.numsEnc){var dn=vfDec(dr.numsEnc);if(dn&&dn.length)loadedNums=dn}
+  $('g-nums').value=loadedNums.map(function(n){return n.c}).join(' ');
   try { var zl = BACKEND === 'worker' ? (cfg.files['ziliao']||{}) : await loadJSON('data/manual-ziliao.json'); window.__ZL=zl; renderZl(zl); } catch(e){}
   $('p-issue').value=pl.issue||''; $('p-oe').value=pl.oddEven||'单'; $('p-zs').value=(pl.threeZodiac||[]).join(' ');
   $('p-note').value=pl.note||'';
@@ -411,6 +419,14 @@ async function save(){
     history:hb.history,
     updated:new Date().toISOString()
   };
+  var vfInput=$('g-visiblefrom')?$('g-visiblefrom').value:'';
+  var vfMs=vfInput?new Date(vfInput).getTime():0;
+  var publishLabel='';
+  if(vfInput&&!isNaN(vfMs)){
+    newDraw.visibleFrom=new Date(vfMs).toISOString();
+    var dl=new Date(vfMs);publishLabel=dl.getFullYear()+'/'+pad(dl.getMonth()+1)+'/'+pad(dl.getDate())+' '+pad(dl.getHours())+':'+pad(dl.getMinutes());
+    if(vfMs>Date.now()){newDraw.numsEnc=vfEnc(newDraw.nums);newDraw.nums=[]}
+  }
   var newPlay={name:newDraw.name,issue:newDraw.issue,oddEven:$('p-oe').value,threeZodiac:zs,note:$('p-note').value.trim(),status:'live',updated:new Date().toISOString()};
   var zlParsed;
   try{ zlParsed=validateZlText($('zl-bulk').value); }catch(ve){ return Msg('这会导致页面显示错，请修正：'+ve.message,false); }
@@ -481,7 +497,7 @@ async function save(){
     catch (ve) { Msg('已提交，但读回校验失败：' + ve.message + '（请刷新后重试恢复）', false); setState('校验失败：' + ve.message); finallyRestore(); return; }
     await recordShas();
     try{ if(window.__daSetZiliao)window.__daSetZiliao(zlRows.map(function(r){return {issue:String(r.issue),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})); if(window.__daClearDeleted)window.__daClearDeleted('ziliao'); }catch(e){}
-    Msg('已提交，读回校验通过；约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
+    Msg('已提交，读回校验通过；'+(publishLabel?('已按 '+publishLabel+' 公布；'):'')+'约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
     poll(newDraw.updated);
     draw=newDraw;play=newPlay;renderPreview();
   }catch(e){
