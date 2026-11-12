@@ -1,31 +1,26 @@
 {
  "ok": true,
  "status": "success",
- "message": "数据已更新（实时彩种 4）",
- "updated": "2026-11-12 21:39:51",
- "updatedAt": "2026-11-12T21:39:51+08:00",
- "lastSuccess": "2026-11-12 21:39:51",
+ "message": "数据已更新（实时彩种 2）",
+ "updated": "2026-11-12 21:42:22",
+ "updatedAt": "2026-11-12T21:42:22+08:00",
+ "lastSuccess": "2026-11-12 21:42:22",
  "newest_seen_ts": "316",
  "newest_seen_ids": [
   "Macau:316",
-  "MacauOld:316",
   "HongKong:120"
  ],
- "read_count": 4,
- "new_count": 3,
+ "read_count": 2,
+ "new_count": 0,
  "probe_ok": true,
  "receipt_gap_alert": false,
  "digest_frozen_alert": false,
  "liveRules": [
   "Macau",
-  "MacauOld",
-  "HongKong",
-  "Happy8"
+  "HongKong"
  ],
  "latest_by_rule": {
   "Macau": 316,
-  "MacauOld": 316,
-  "HongKong": 120,
-  "Happy8": 302
+  "HongKong": 120
  }
 }
