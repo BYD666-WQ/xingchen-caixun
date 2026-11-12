@@ -1,0 +1,9 @@
+{
+ "reveal": {
+  "mode": "fixed",
+  "seconds": 10,
+  "min": 8,
+  "max": 15,
+  "specialExtra": 5
+ }
+}

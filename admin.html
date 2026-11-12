@@ -147,6 +147,16 @@ body{padding-bottom:76px}
   <p id="da-note" style="font-size:12px;color:#888;margin:6px 0 0"></p>
   <div id="da-state" class="da-ok" style="margin-top:4px">保存后约 90 秒生效（自动触发 Pages 构建）</div>
 </div></details></div>
+<div class="panel" id="panel-reveal"><details><summary>⑧ 开奖揭晓节奏</summary><div class="body">
+  <p style="font-size:12px;color:#888;margin:0 0 6px">控制新港到点后每球揭晓间隔；保存后下一期开奖生效。</p>
+  <label>模式</label>
+  <select id="reveal-mode"><option value="fixed">固定秒数</option><option value="random">随机区间</option></select>
+  <label>固定秒数（1–120，默认 10）</label><input id="reveal-seconds" inputmode="numeric" value="10">
+  <label>随机区间（min / max，秒，1–120，min≤max）</label>
+  <div class="row"><input id="reveal-min" inputmode="numeric" value="8" style="flex:1"><input id="reveal-max" inputmode="numeric" value="15" style="flex:1"></div>
+  <label>第 7 球（特码）前额外等待秒数（默认 5）</label><input id="reveal-special" inputmode="numeric" value="5">
+  <div class="row" style="margin-top:8px"><button id="btn-save-reveal">保存节奏</button><span id="reveal-state" style="font-size:12px;color:#888"></span></div>
+</div></details></div>
 <div id="savebar">
   <span id="save-state">未保存</span>
   <button id="btn-save-bar" style="min-height:44px;padding:0 18px">保存并发布</button>
@@ -740,4 +750,31 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
   $d('da-save').addEventListener('click',saveBoard);
   loadAll();
 })();
+
+function loadRevealConfig(){
+  return loadJSON('data/site-config.json').then(function(c){
+    window.__siteCfg=c||{};
+    var r=(c&&c.reveal)||{};var set=function(id,v){var el=$(id);if(el&&v!==undefined&&v!==null)el.value=v};
+    set('reveal-mode',r.mode||'fixed');set('reveal-seconds',isFinite(r.seconds)?r.seconds:10);
+    set('reveal-min',isFinite(r.min)?r.min:8);set('reveal-max',isFinite(r.max)?r.max:15);set('reveal-special',isFinite(r.specialExtra)?r.specialExtra:5);
+  }).catch(function(){});
+}
+function clampNum(v,def,lo,hi){var n=parseInt(v,10);if(!isFinite(n))n=def;return Math.max(lo,Math.min(hi,n))}
+function saveRevealConfig(){
+  var mode=$('reveal-mode')?$('reveal-mode').value:'fixed';
+  var seconds=clampNum($('reveal-seconds')&&$('reveal-seconds').value,10,1,120);
+  var min=clampNum($('reveal-min')&&$('reveal-min').value,8,1,120);
+  var max=clampNum($('reveal-max')&&$('reveal-max').value,15,1,120);
+  if(mode==='random'&&min>max){var t=min;min=max;max=t}
+  var specialExtra=clampNum($('reveal-special')&&$('reveal-special').value,5,0,120);
+  var base=window.__siteCfg||{};
+  base.reveal={mode:mode,seconds:seconds,min:min,max:max,specialExtra:specialExtra};
+  setState('reveal-state','保存中…');
+  return saveFile('data/site-config.json',base,'CMS: update reveal config').then(function(){
+    window.__siteCfg=base;topToast('已更新，下一期开奖生效',true,false);setState('reveal-state','已更新，下一期开奖生效');
+  }).catch(function(e){setState('reveal-state','保存失败：'+(e&&e.message||e));});
+}
+if(document.getElementById('btn-save-reveal'))document.getElementById('btn-save-reveal').addEventListener('click',saveRevealConfig);
+setTimeout(loadRevealConfig,2500);
+
 </script></body></html>
