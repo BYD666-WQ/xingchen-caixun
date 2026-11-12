@@ -306,7 +306,7 @@ function finallyRestore(){
 }
 function validateZlText(txt){
   var lines=String(txt||'').split('\n').map(function(s){return s.trim()}).filter(Boolean);
-  var out=[],warns=[];
+  var out=[],warns=[],unparsed=[];
   var ZC='鼠牛虎兔龙蛇马羊猴鸡狗猪';
   var ZRE=new RegExp('^['+ZC+']{3}$');
   var ZONLY=new RegExp('^['+ZC+']+$');
@@ -317,7 +317,7 @@ function validateZlText(txt){
     if(!p.length)continue;
     if(/NaN/i.test(lines[i]))hard('资料区第'+ln+'行出现 NaN——这会导致页面显示错，请修正后再保存');
     var itok=p[0],issue=parseInt(itok,10);
-    if(!/^\d{3,4}$/.test(itok)){var iv=isNaN(issue)?0:issue;warns.push('第'+ln+'行期号「'+itok+'」建议用数字（本次按 '+iv+' 保存）');issue=iv}
+    if(!/^\d{3,4}$/.test(itok)){unparsed.push({line:ln,text:lines[i]});warns.push('第'+ln+'行未识别（原文已保留 unparsed）：'+lines[i]);continue}
     var oe='',zsArr=[],res='';
     for(var j=1;j<p.length;j++){
       var tok=p[j];
@@ -334,7 +334,7 @@ function validateZlText(txt){
   }
   if(missZs)warns.push('有 '+missZs+' 行三肖留空（页面显示「—」，不影响保存）');
   if(missOe)warns.push('有 '+missOe+' 行单双留空（不影响保存）');
-  return {rows:out,warnings:warns};
+  return {rows:out,warnings:warns,unparsed:unparsed};
 }
 window.__validateZlText=validateZlText;
 async function pagesDispatch(){
@@ -404,6 +404,31 @@ async function save(){
   try{ zlParsed=validateZlText($('zl-bulk').value); }catch(ve){ return Msg('这会导致页面显示错，请修正：'+ve.message,false); }
   var zlRowsEarly=zlParsed.rows;
   warns=warns.concat(zlParsed.warnings);
+  try{
+    var daZ=(window.__daGetZiliao?window.__daGetZiliao():[])||[];try{console.log('[zl-merge] daZ='+daZ.length+' has317='+daZ.some(function(x){return String(x.issue)==='317'}))}catch(e){}
+    if(daZ.length){
+      var ZC0='鼠牛虎兔龙蛇马羊猴鸡狗猪';
+      var ZOF=function(n){return ['马','蛇','龙','兔','虎','牛','鼠','猪','狗','鸡','猴','羊'][(parseInt(n,10)-1+12)%12]};
+      var ZS0=function(v){return String(v||'').split('').filter(function(c){return ZC0.indexOf(c)>=0}).slice(0,3)};
+      var mm={};zlRowsEarly.forEach(function(r){mm[String(r.issue)]=r});
+      var mergedCnt=0;
+      daZ.forEach(function(x){var n=parseInt(x.issue,10)||0;if(!n)return;mergedCnt++;
+        var num=parseInt(x.num,10);var ok=num>=1&&num<=49;
+        mm[String(n)]={issue:n,oddEven:(x.oe==='单'||x.oe==='双')?x.oe:'',threeZodiac:ZS0(x.zs),result:ok?{c:('0'+num).slice(-2),z:ZOF(num)}:{c:'',z:''},text:'内幕【提前公开】',status:ok?'live':'upcoming',updated:new Date().toISOString()};
+      });
+      zlRowsEarly=Object.keys(mm).map(function(k){return mm[k]}).sort(function(a,b){return b.issue-a.issue});
+      warns.push('已合并「资料自助录入」表格中的 '+mergedCnt+' 行（保存两者并集，避免丢行）');
+    }
+    if(zlParsed.unparsed&&zlParsed.unparsed.length)warns.push('有 '+zlParsed.unparsed.length+' 行无法识别，原文已保留（unparsed 字段），保存后请修正');
+  }catch(e){warns.push('合并资料表格失败：'+(e&&e.message||e))}
+  try{console.log('[zl-save] parsed='+zlParsed.rows.length+' merged='+zlRowsEarly.length+' issues='+zlRowsEarly.map(function(r){return r.issue}).join(','))}catch(e){}
+  try{
+    var inSet={};String($('zl-bulk').value||'').split('\n').forEach(function(line){var m=line.trim().match(/^(\d{3,4})/);if(m)inSet[m[1]]=1});
+    (window.__daGetZiliao?window.__daGetZiliao():[]).forEach(function(x){var n=parseInt(x.issue,10);if(n)inSet[String(n)]=1});
+    var outSet={};zlRowsEarly.forEach(function(r){outSet[String(r.issue)]=1});
+    var miss=Object.keys(inSet).filter(function(k){return !outSet[k]});
+    if(miss.length)warns.push('⚠ 期号未写入：'+miss.join('、')+'（请检查原文后重试）');
+  }catch(e){}
   var zlAuto=buildZlRows(zlRowsEarly,newIssueVal);
   if(zlAuto.pushed)warns.push('已自动补 '+newIssueVal+' 期资料行（三肖/单双/开奖号留空），请到资料区补齐');
   zlRowsEarly=zlAuto.rows;
@@ -412,8 +437,9 @@ async function save(){
   $('btn-save-bar').disabled=true;if($('btn-save-top'))$('btn-save-top').disabled=true;setState('提交中…（号码顺序：'+orderTxt+'）');
   try{
     var copy={brand:$('c-brand').value.trim(),brandNumber:(($('c-banner')||{}).value||'').trim(),bannerNumber:(($('c-banner')||{}).value||'').trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
-    var zlRows = zlRowsEarly;
+    var zlRows = zlRowsEarly;try{console.log('[zl-save] final='+zlRows.length+' issues='+zlRows.map(function(r){return r.issue}).join(','))}catch(e){}
     var newZl={name:newDraw.name,rows:zlRows,updated:new Date().toISOString()};
+    if(zlParsed.unparsed&&zlParsed.unparsed.length)newZl.unparsed=zlParsed.unparsed;
     try{ window.__ZL=newZl; renderZl(newZl); }catch(e){}
     if (BACKEND === 'worker') {
       await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'ziliao',data:newZl})});
@@ -430,6 +456,7 @@ async function save(){
     try { await verifySaved(newPlay, newDraw); }
     catch (ve) { Msg('已提交，但读回校验失败：' + ve.message + '（请刷新后重试恢复）', false); setState('校验失败：' + ve.message); finallyRestore(); return; }
     await recordShas();
+    try{ if(window.__daSetZiliao)window.__daSetZiliao(zlRows.map(function(r){return {issue:String(r.issue),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})); }catch(e){}
     Msg('已提交，读回校验通过；约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
     poll(newDraw.updated);
     draw=newDraw;play=newPlay;renderPreview();
@@ -596,6 +623,8 @@ loadAll().then(function(){LOADED=true;setSaveEnabled(true);commitList()}).catch(
     {id:'ds4',name:'单双四肖',file:'data/danshuangsixiao.json',note:'单组四肖 + 双组四肖 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'dan',t:'单组四肖',w:'96px',p:'狗鼠龙虎'},{k:'shuang',t:'双组四肖',w:'96px',p:'猪鸡羊兔'},{k:'sp',t:'特开',w:'76px',p:'留空'}]}
   ];
   var state={cur:0,data:{},raw:{}};
+  window.__daGetZiliao=function(){return JSON.parse(JSON.stringify(state.data['ziliao']||[]))};
+  window.__daSetZiliao=function(rows){state.data['ziliao']=(rows||[]).slice();if(state.cur===0)daRender()};
   function fetchData(rel){
   var attempts=[];
   function attempt(name,fn,ms){var st=Date.now();return fn().then(function(j){return {ok:true,source:name,data:j,ms:Date.now()-st}},function(e){attempts.push(name+': '+srcErr(e,ms));return {ok:false}})}
@@ -636,6 +665,7 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
   function copyPrev(){var b=BOARDS[state.cur];var rows=rowsNow();if(!rows.length)return;var last=rows[rows.length-1];var r={};b.cols.forEach(function(c){r[c.k]=last[c.k]||''});r.issue=String((parseInt(last.issue,10)||0)+1);rows.push(r);daRender()}
   function newIssueRow(){var rows=rowsNow();var max=0;rows.forEach(function(r){var n=parseInt(r.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);daRender()}
   function saveBoard(){var b=BOARDS[state.cur];if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}
+    var badRows=rowsNow().filter(function(x){return !parseInt(x.issue,10)}).length;
     var obj=SAVE[b.id](rowsNow(),state.raw[b.id]||{});var bfile=b.file;
     setState('da-state','提交中…（'+b.name+'）','da-ok');
     (async function(){
