@@ -382,6 +382,8 @@ function buildHistory(prevIssue,prevNums,newIssue,history){
     hist.unshift({issue:prevIssue,nums:prevNums.map(function(n){return {c:n.c,z:n.z||'',color:n.color||'',wuxing:n.wuxing||''}})});
     pushed=true;
   }
+  hist=hist.filter(function(h){return String(h.issue)!==String(newIssue)});
+  var _seen={};hist=hist.filter(function(h){var k=String(h.issue);if(_seen[k])return false;_seen[k]=1;return true});
   hist.sort(function(a,b){return parseInt(b.issue,10)-parseInt(a.issue,10)});
   return {history:hist,pushed:pushed};
 }
