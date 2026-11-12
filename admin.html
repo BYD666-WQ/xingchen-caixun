@@ -437,8 +437,13 @@ async function save(){
     if(miss.length)warns.push('⚠ 期号未写入：'+miss.join('、')+'（请检查原文后重试）');
   }catch(e){}
   var zlAuto=buildZlRows(zlRowsEarly,newIssueVal);
-  if(zlAuto.pushed)warns.push('已自动补 '+newIssueVal+' 期资料行（三肖/单双/开奖号留空），请到资料区补齐');
-  zlRowsEarly=zlAuto.rows;
+  if(zlAuto.pushed && delSet[String(newIssueVal)]){
+    zlRowsEarly=zlAuto.rows.filter(function(r){return String(r.issue)!==String(newIssueVal)});
+    warns.push('本期 '+newIssueVal+' 已在表格中删除，未自动补行');
+  } else {
+    if(zlAuto.pushed)warns.push('已自动补 '+newIssueVal+' 期资料行（三肖/单双/开奖号留空），请到资料区补齐');
+    zlRowsEarly=zlAuto.rows;
+  }
   showWarn(warns);
   var btn=$('btn-save');btn.disabled=true;btn.textContent='提交中…';
   $('btn-save-bar').disabled=true;if($('btn-save-top'))$('btn-save-top').disabled=true;setState('提交中…（号码顺序：'+orderTxt+'）');
