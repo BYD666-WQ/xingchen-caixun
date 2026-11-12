@@ -48,7 +48,13 @@ body{padding-bottom:76px}
 #da-table td input{min-height:28px;font-size:12px;padding:2px 4px;width:100%}
 .da-warn{font-size:12px;color:#8a3a00;background:#FFF6D6;border:1px solid #E8C86A;border-radius:5px;padding:6px 8px;margin:6px 0;line-height:1.6}
 .da-ok{font-size:12px;color:#0b7a45}
+#xc-toast{position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:2147483000;display:none;border-radius:8px;padding:10px 34px 10px 12px;font-size:13px;line-height:1.5;box-shadow:0 6px 18px rgba(0,0,0,.18);color:#fff;background:#0b7a45}
+#xc-toast.err{background:#a33}
+#xc-toast .x{position:absolute;right:6px;top:4px;width:26px;height:26px;border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:50%;font-size:16px;line-height:1}
+@keyframes daFlash{0%{background:#FFF3C4}70%{background:#FFF3C4}100%{background:transparent}}
+#da-tbody tr.da-new td{animation:daFlash 2s ease}
 </style></head><body>
+<div id="xc-toast"><span id="xc-toast-t"></span><button class="x" id="xc-toast-x">×</button></div>
 <header><b>新港摇钱树 · 内容管理</b><span id="who" style="font-size:12px;opacity:.9"></span></header>
 <div class="wrap">
 <div id="guide" style="background:#e8f7ef;border:1px solid #b9e3cd;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;line-height:1.75;color:#0b6b3d">
@@ -175,9 +181,15 @@ var SHA_CACHE = {};
 var DATA_PATHS = ['data/manual-draw.json','data/manual-play.json','data/site-copy.json','data/manual-ziliao.json'];
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function $(id){return document.getElementById(id)}
-function Msg(t,ok){var m=$('msg');m.style.display='block';m.style.background=ok?'#0b7a45':'#a33';m.textContent=t;clearTimeout(m._t);m._t=setTimeout(function(){m.style.display='none'},6000)}
+function topToast(t,ok,sticky){
+  try{var el=$('xc-toast');if(!el)return;var tx=$('xc-toast-t');if(tx)tx.innerHTML=t;el.className=ok?'':'err';el.style.display='block';el._sticky=!!sticky;
+    if(el._timer)clearTimeout(el._timer);if(!sticky)el._timer=setTimeout(function(){el.style.display='none'},4000);
+  }catch(e){}
+}
+if(document.getElementById('xc-toast-x'))document.getElementById('xc-toast-x').addEventListener('click',function(){var el=document.getElementById('xc-toast');if(el)el.style.display='none'});
+function Msg(t,ok){try{topToast(t,!!ok,!ok)}catch(e){}var m=$('msg');m.style.display='block';m.style.background=ok?'#0b7a45':'#a33';m.textContent=t;clearTimeout(m._t);m._t=setTimeout(function(){m.style.display='none'},6000)}
 
-function showWarn(list){var el=$('zl-warn');if(!el)return;if(!list||!list.length){el.style.display='none';el.innerHTML='';return}el.style.display='block';el.innerHTML='⚠ 保存提示（不会阻止保存）：<br>'+list.map(function(x){return '· '+x}).join('<br>')}
+function showWarn(list){try{if(list&&list.length)topToast('⚠ '+esc(list[0])+(list.length>1?(' 等 '+list.length+' 条'):''),false,true)}catch(e){}var el=$('zl-warn');if(!el)return;if(!list||!list.length){el.style.display='none';el.innerHTML='';return}el.style.display='block';el.innerHTML='⚠ 保存提示（不会阻止保存）：<br>'+list.map(function(x){return '· '+x}).join('<br>')}
 function clearWarn(){showWarn([])}function pad(n){return (n<10?'0':'')+n}
 function ballColor(c){return c==='红'?'#e71607':(c==='蓝'?'#2873e6':'#1fb61d')}
 function attrsOf(num){var k=pad(parseInt(num,10));return ATTRS[k]||{}}
@@ -661,7 +673,7 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
     var th='<tr><th style="width:36px">#</th>';b.cols.forEach(function(c){th+='<th style="width:'+(c.w||'auto')+'">'+c.t+'</th>'});th+='<th style="width:42px">操作</th></tr>';$d('da-thead').innerHTML=th;
     var tb='';rows.forEach(function(r,i){tb+='<tr><td style="text-align:center;color:#888">'+(i+1)+'</td>';b.cols.forEach(function(c){var v=String(r[c.k]==null?'':r[c.k]).replace(/"/g,'&quot;');tb+='<td><input data-r="'+i+'" data-k="'+c.k+'" value="'+esc(v)+'" placeholder="'+esc(c.p||'')+'"></td>'});tb+='<td><button class="gray small" data-del="'+i+'">删</button></td></tr>'});
     $d('da-tbody').innerHTML=tb||'<tr><td colspan="'+(b.cols.length+2)+'" style="color:#999">暂无数据，点「加行」或「生成本期空行」</td></tr>';
-    $d('da-tbody').querySelectorAll('input').forEach(function(inp){inp.addEventListener('input',function(){state.data[b.id][parseInt(inp.getAttribute('data-r'),10)][inp.getAttribute('data-k')]=inp.value;softCheck()})});
+    $d('da-tbody').querySelectorAll('input').forEach(function(inp){inp.addEventListener('input',function(){state.data[b.id][parseInt(inp.getAttribute('data-r'),10)][inp.getAttribute('data-k')]=inp.value;softCheck()});if(inp.getAttribute('data-k')==='issue'){inp.addEventListener('blur',function(){sortBoard(false)})}});
     $d('da-tbody').querySelectorAll('button[data-del]').forEach(function(btn){btn.addEventListener('click',function(){var ii=parseInt(btn.getAttribute('data-del'),10);var row=state.data[b.id][ii];if(row&&parseInt(row.issue,10)){state.deleted[b.id]=state.deleted[b.id]||{};state.deleted[b.id][String(parseInt(row.issue,10))]=1}state.data[b.id].splice(ii,1);daRender();setState('da-state','已从列表移除，点「保存本板块」生效（顶部保存也会排除该行）','da-ok')})});
     softCheck();
     var st=state.status&&state.status[b.id];
@@ -674,12 +686,14 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
       if(r.zs!==undefined&&String(r.zs||'').trim()!==''){var bad=String(r.zs).split('').filter(function(c){return ZC.indexOf(c)<0});if(bad.length)w.push('第 '+(i+1)+' 行「'+b.cols[2].t+'」忽略非生肖字符「'+bad.join('')+'」')}});
     var el=$d('da-warn');if(w.length){el.style.display='block';el.innerHTML='⚠ 软提示（不会阻止保存）：<br>'+w.slice(0,12).map(function(x){return '· '+esc(x)}).join('<br>')+(w.length>12?'<br>· …共 '+w.length+' 条':'')}else el.style.display='none';
   }
+  function highlightTop(){setTimeout(function(){var tr=$d('da-tbody').querySelector('tr');if(tr){tr.classList.add('da-new');tr.scrollIntoView({block:'center'});setTimeout(function(){try{tr.classList.remove('da-new')}catch(e){}},2200)}},30)}
+  function sortBoard(silent){var b=BOARDS[state.cur];var rows=state.data[b.id]||[];rows.sort(function(x,y){return (parseInt(y.issue,10)||0)-(parseInt(x.issue,10)||0)});daRender();if(!silent)topToast('已按期号排序',true)}
   function rowsNow(){return state.data[BOARDS[state.cur].id]||[]}
   function blankRow(){var b=BOARDS[state.cur];var r={};b.cols.forEach(function(c){r[c.k]=''});return r}
-  function addRow(){var rows=rowsNow();var last=rows[rows.length-1]||{};var r=blankRow();r.issue=last.issue?String((parseInt(last.issue,10)||0)+1):'';rows.push(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender()}
-  function copyPrev(){var b=BOARDS[state.cur];var rows=rowsNow();if(!rows.length)return;var last=rows[rows.length-1];var r={};b.cols.forEach(function(c){r[c.k]=last[c.k]||''});r.issue=String((parseInt(last.issue,10)||0)+1);rows.push(r);if(window.__daUndoDelete)window.__daUndoDelete(b.id,r.issue);daRender()}
+  function addRow(){var rows=rowsNow();var last=rows[rows.length-1]||{};var r=blankRow();r.issue=last.issue?String((parseInt(last.issue,10)||0)+1):'';rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender();highlightTop()}
+  function copyPrev(){var b=BOARDS[state.cur];var rows=rowsNow();if(!rows.length)return;var last=rows[rows.length-1];var r={};b.cols.forEach(function(c){r[c.k]=last[c.k]||''});r.issue=String((parseInt(last.issue,10)||0)+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(b.id,r.issue);daRender();highlightTop()}
   function newIssueRow(){var rows=rowsNow();var max=0;rows.forEach(function(r){var n=parseInt(r.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender()}
-  function saveBoard(){var b=BOARDS[state.cur];if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}
+  function saveBoard(){sortBoard(true);var b=BOARDS[state.cur];if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}
     var badRows=rowsNow().filter(function(x){return !parseInt(x.issue,10)}).length;
     var obj=SAVE[b.id](rowsNow(),state.raw[b.id]||{});var bfile=b.file;
     setState('da-state','提交中…（'+b.name+'）','da-ok');

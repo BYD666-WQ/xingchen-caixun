@@ -604,4 +604,51 @@ details.mini>summary::-webkit-details-marker{display:none}
   Promise.all(files.map(fetchJ)).then(function(j){sig=getSig(j);stats();schedule()}).catch(function(){schedule()});
 })();
 </script>
+<style id="xc-hist-style">
+.xc-hide.xc-hide{display:none!important}
+.xc-hist-btn{display:block;width:100%;margin:6px 0 2px;border:1px dashed #E8C98A;background:#FFF8E8;color:#8a5a2a;font:700 13px/1.2 "Microsoft YaHei",Arial,sans-serif;border-radius:6px;padding:8px 0;cursor:pointer}
+.xc-hist-btn:active{background:#FBEBC8}
+.xc-hist-mask{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.55);display:flex;align-items:flex-end}
+.xc-hist-panel{width:100%;max-height:76vh;background:#fff;border-radius:12px 12px 0 0;display:flex;flex-direction:column}
+.xc-hist-hd{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #eee;font-weight:900;color:#2B1B0E}
+.xc-hist-hd b{font-size:15px}.xc-hist-hd .x{margin-left:auto;width:34px;height:34px;border:0;border-radius:50%;background:#f2f2f2;font-size:18px}
+.xc-hist-bd{overflow:auto;padding:4px 0 14px}
+</style>
+<script id="xc-hist-script">
+(function(){
+  var SEL='#nm-final,#wuxiao,#santou,#shuangbo,#danshuang,#liuxiao,#qiwei,#sisha,#pingte,#ds4';
+  var ROW='.row:not(.xc-stat):not(.xc-note),.wx-row,.st-row,.sb-row,.ds-row,.lx-row,.qw-row,.ss-row,.pt-row,.ds4-row';
+  var mask=null;
+  function closeMask(){if(mask){mask.remove();mask=null}document.querySelectorAll('.xc-hist-btn').forEach(function(b){b.textContent=b.getAttribute('data-label')||'历史统计'})}
+  function openMask(title,html,n){
+    closeMask();
+    mask=document.createElement('div');mask.className='xc-hist-mask';
+    mask.innerHTML='<div class="xc-hist-panel"><div class="xc-hist-hd"><b>'+title+' · 历史统计</b><span style="font-size:11px;color:#999">共 '+n+' 期</span><button class="x">×</button></div><div class="xc-hist-bd">'+html+'</div></div>';
+    mask.addEventListener('click',function(e){if(e.target===mask)closeMask()});
+    mask.querySelector('.x').addEventListener('click',closeMask);
+    document.body.appendChild(mask);
+  }
+  function decorate(){
+    document.querySelectorAll(SEL).forEach(function(sec){
+      if(!sec||!sec.parentNode)return;
+      var old=sec.querySelector(':scope > .xc-hist-btn');if(old)old.remove();
+      var rows=[].slice.call(sec.querySelectorAll(ROW)).filter(function(r){return r.closest(SEL)===sec});
+      if(rows.length<=5)return;
+      var allHtml=rows.map(function(r){var c=r.cloneNode(true);c.classList.remove('xc-hide');return c.outerHTML}).join('');
+      rows.forEach(function(r,i){if(i>=5)r.classList.add('xc-hide');else r.classList.remove('xc-hide')});
+      var btn=document.createElement('button');btn.className='xc-hist-btn';btn.setAttribute('data-label','历史统计 ('+rows.length+'期) ▼');
+      var name=(sec.querySelector('h5')!==null?sec.querySelector('h5').textContent:'').trim()||'历史';
+      btn.textContent='历史统计 ('+rows.length+'期) ▼';
+      btn.addEventListener('click',function(){
+        if(mask){closeMask();return}
+        openMask(name,allHtml,rows.length);
+        btn.textContent='收起历史 ▲';
+      });
+      sec.appendChild(btn);
+    });
+  }
+  var t=null;new MutationObserver(function(){clearTimeout(t);t=setTimeout(decorate,120)}).observe(document.body,{childList:true,subtree:true});
+  decorate();setTimeout(decorate,800);setTimeout(decorate,2000);setInterval(decorate,3000);
+})();
+</script>
 </body></html>
