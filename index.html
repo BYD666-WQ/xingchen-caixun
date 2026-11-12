@@ -385,7 +385,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.classList.toggle('on',i===KEYS.indexOf(k))});
   }
   window.__xcShow=show;
-  window.__applyDraw=function(dr,md){var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});var vfActive=false;try{vfActive=vfApply(md)}catch(e){}D={newhk:md,newmo:by.Macau,hk:by.HongKong};buildCards();tick();if(vfActive){try{vfRestore()}catch(e){}}else{fill();show(KEYS[window.__pendingTab||0])}};
+  window.__applyDraw=function(dr,md){var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});D={newhk:md,newmo:by.Macau,hk:by.HongKong};buildCards();tick();var vfActive=false;try{vfActive=vfApply(md)}catch(e){}fill();show(KEYS[window.__pendingTab||0]);if(vfActive){try{vfRestore()}catch(e){}}};
   window.__showTab=function(k){var M={newhk:0,newmo:1,hk:2,'新港':0,'新澳':1,'新澳彩':1,'香港':2,'香港彩':2};var i=(k in M)?M[k]:-1;if(i>=0){if(D[KEYS[i]])show(KEYS[i]);else{window.__pendingTab=i;document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,j){t.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}}return i>=0};
   document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.addEventListener('click',function(){window.__pendingTab=i;if(D[KEYS[i]])show(KEYS[i]);else{document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(x,j){x.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}})})
 
@@ -452,7 +452,8 @@ details.mini>summary::-webkit-details-marker{display:none}
   }
   function vfDone(){
     vfClearTimer();VF.phase='done';VF.played=true;
-    if(VF.nums&&VF.nums.length){try{VF.md.nums=VF.nums;D.newhk=VF.md;fill();show('newhk')}catch(e){}}
+    if(VF.nums&&VF.nums.length){try{VF.md.nums=VF.nums;D.newhk=VF.md;fill();show('newhk')}catch(e){console.log('[vfdone] ERR '+e)}}
+    console.log('[vfdone] after fill cds='+document.querySelectorAll('.xc-cd').length)
     vfRender(VF.nums||[],7,-1);vfProgress('本期已开出');
   }
   function vfScheduleNext(){
@@ -519,10 +520,11 @@ details.mini>summary::-webkit-details-marker{display:none}
   Promise.all([get('data/manual-draw.json'),get('data/draw.json'),get('data/site-config.json')]).then(function(r){
     var md=r[0]||{},dr=r[1]||{},cfg=r[2]||null;var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
     VF_CFG=vfNormCfg(cfg);window.__vfConfig=function(){return JSON.parse(JSON.stringify(VF_CFG))};
-    var vfActive=false;try{vfActive=vfApply(md)}catch(e){console.log('[vf]',e&&e.message)}
     D={newhk:md,newmo:by.Macau,hk:by.HongKong};
     buildCards();tick();setInterval(tick,1000);
-    if(vfActive){try{vfRestore()}catch(e){}}else{fill();show(KEYS[window.__pendingTab||0])}
+    var vfActive=false;try{vfActive=vfApply(md)}catch(e){console.log('[vf]',e&&e.message)}
+    fill();show(KEYS[window.__pendingTab||0]);
+    if(vfActive){try{vfRestore()}catch(e){}}
   }).catch(function(e){console.log('[tt]',e&&e.message)});
 })();
 </script><script>
