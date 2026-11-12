@@ -404,10 +404,11 @@ details.mini>summary::-webkit-details-marker{display:none}
     var html=rows.map(function(d){
       var c=String(d.result&&d.result.c||'');
       var ok=/^\d{1,2}$/.test(c)&&d.status!=='upcoming';
-      if(!ok)return '<div class="row"><i>'+d.issue+'期</i><b>【待开】</b></div>';
+      var oddTxt=(d.oddEven==='双'?'双数':(d.oddEven==='单'?'单数':'—'));
+      var zs=(d.threeZodiac||[]).map(zOk).filter(Boolean);
+      if(!ok)return '<div class="row xc-nr upcoming"><i>'+d.issue+'期</i><b>【'+oddTxt+'】</b><span>主'+(zs.length?zs.join(''):'—')+'</span><b class="wait">【待开】</b></div>';
       var oddHit=(d.oddEven===((parseInt(c,10)%2===0)?'双':'单'));
       if(oddHit)oHit++;
-      var zs=(d.threeZodiac||[]).map(zOk).filter(Boolean);
       var zNow=zOk(d.result&&d.result.z);
       var zHitNow=zs.length===3&&zNow&&zs.indexOf(zNow)>=0;
       if(zHitNow)zHit++;
