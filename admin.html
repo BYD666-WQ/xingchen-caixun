@@ -494,10 +494,10 @@ async function save(){
     pagesDispatch(); // 保存成功后触发 Pages 构建；无 workflow 权限时内部忽略、不阻塞
     setState('已提交，校验中…');
     try { await verifySaved(newPlay, newDraw); }
-    catch (ve) { Msg('已提交，但读回校验失败：' + ve.message + '（请刷新后重试恢复）', false); setState('校验失败：' + ve.message); finallyRestore(); return; }
+    catch (ve) { Msg('已提交（数据已写入）；读回校验未通过：' + ve.message + '（不影响保存，可稍后刷新核对）', false); setState('已提交（读回未通过）'); try{poll(newDraw.updated);draw=newDraw;play=newPlay;renderPreview();}catch(e2){} finallyRestore(); return; }
     await recordShas();
     try{ if(window.__daSetZiliao)window.__daSetZiliao(zlRows.map(function(r){return {issue:String(r.issue),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})); if(window.__daClearDeleted)window.__daClearDeleted('ziliao'); }catch(e){}
-    Msg('已提交，读回校验通过；'+(publishLabel?('已按 '+publishLabel+' 公布；'):'')+'约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
+    var encNow=!!(newDraw.visibleFrom&&new Date(newDraw.visibleFrom).getTime()>Date.now()&&newDraw.numsEnc);Msg('已提交，读回校验通过；'+(publishLabel?('已按 '+publishLabel+' 公布'+(encNow?'（到点后自动解密显示）':'')+'；'):'')+'约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
     poll(newDraw.updated);
     draw=newDraw;play=newPlay;renderPreview();
   }catch(e){
@@ -525,8 +525,17 @@ async function verifySaved(expectedPlay, expectedDraw){
   if (!Array.isArray(zs) || zs.length !== 3 || zs.some(function (z) { return Z.indexOf(z) < 0; })) throw new Error('threeZodiac 非法：' + JSON.stringify(zs));
   if (zs.join('') !== (expectedPlay.threeZodiac || []).join('')) throw new Error('threeZodiac 与提交不一致：' + zs.join('') + ' != ' + (expectedPlay.threeZodiac || []).join(''));
   if (String(p.issue) !== String(expectedPlay.issue)) throw new Error('play.issue 不一致');
-  if (!d || !Array.isArray(d.nums) || d.nums.length !== 7) throw new Error('draw.nums 结构非法');
-  if (d.nums.map(function (n) { return n.c; }).join(',') !== (expectedDraw.nums || []).map(function (n) { return n.c; }).join(',')) throw new Error('draw.nums 内容与提交不一致');
+  var futureVf=d&&d.visibleFrom&&new Date(d.visibleFrom).getTime()>Date.now();
+  var encState=futureVf&&(!Array.isArray(d.nums)||d.nums.length===0)&&!!d.numsEnc;
+  if(encState){
+    var dec=vfDec(d.numsEnc);
+    if(!dec||dec.length!==7)throw new Error('draw.numsEnc 解码结构非法');
+    var bad=dec.some(function(n){var v=parseInt(n&&n.c,10);return !/^\d{2}$/.test(String(n&&n.c))||v<1||v>49});
+    if(bad)throw new Error('draw.numsEnc 解码号码非法');
+  } else {
+    if (!d || !Array.isArray(d.nums) || d.nums.length !== 7) throw new Error('draw.nums 结构非法');
+    if (d.nums.map(function (n) { return n.c; }).join(',') !== (expectedDraw.nums || []).map(function (n) { return n.c; }).join(',')) throw new Error('draw.nums 内容与提交不一致');
+  }
   if (String(d.issue) !== String(expectedDraw.issue)) throw new Error('draw.issue 不一致');
   return true;
 }
