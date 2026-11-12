@@ -384,7 +384,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.classList.toggle('on',i===KEYS.indexOf(k))});
   }
   window.__xcShow=show;
-  window.__showTab=function(k){var i=KEYS.indexOf(k);if(i>=0){if(D[k])show(k);else{window.__pendingTab=i;document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,j){t.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}}return i>=0};
+  window.__showTab=function(k){var M={newhk:0,newmo:1,hk:2,'新港':0,'新澳':1,'新澳彩':1,'香港':2,'香港彩':2};var i=(k in M)?M[k]:-1;if(i>=0){if(D[KEYS[i]])show(KEYS[i]);else{window.__pendingTab=i;document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,j){t.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}}return i>=0};
   document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.addEventListener('click',function(){window.__pendingTab=i;if(D[KEYS[i]])show(KEYS[i]);else{document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(x,j){x.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}})})
   Promise.all([get('data/manual-draw.json'),get('data/draw.json')]).then(function(r){
     var md=r[0]||{},dr=r[1]||{};var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
