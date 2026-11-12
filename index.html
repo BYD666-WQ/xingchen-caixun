@@ -375,6 +375,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     });
   }
   function show(k){
+    window.__curTab=k;
     var d=D[k]||{};
     KEYS.forEach(function(x){var c=document.getElementById('blk-'+x);if(c)c.style.display=(x===k?'':'none')});
     var ob=document.getElementById('xc-openbar');var obi=document.getElementById('xc-ob-issue');
@@ -384,6 +385,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.classList.toggle('on',i===KEYS.indexOf(k))});
   }
   window.__xcShow=show;
+  window.__applyDraw=function(dr,md){var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});D={newhk:md,newmo:by.Macau,hk:by.HongKong};buildCards();fill();tick();show(KEYS[window.__pendingTab||0])};
   window.__showTab=function(k){var M={newhk:0,newmo:1,hk:2,'新港':0,'新澳':1,'新澳彩':1,'香港':2,'香港彩':2};var i=(k in M)?M[k]:-1;if(i>=0){if(D[KEYS[i]])show(KEYS[i]);else{window.__pendingTab=i;document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,j){t.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}}return i>=0};
   document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.addEventListener('click',function(){window.__pendingTab=i;if(D[KEYS[i]])show(KEYS[i]);else{document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(x,j){x.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}})})
   Promise.all([get('data/manual-draw.json'),get('data/draw.json')]).then(function(r){
@@ -438,7 +440,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     var rows=(zl&&zl.rows||[]).slice(0,10);var ex=mount();if(!ex)return;
     var hist=rows.map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');return '<div class="row"><i>'+d.issue+'期</i><span>'+(ok?((d.threeZodiac||[]).join('')+' 开'+(d.result.z||'')+c):'待开')+'</span></div>'}).join('');
     var zt=['鼠 07 19 31 43','牛 06 18 30 42','虎 05 17 29 41','兔 04 16 28 40','龙 03 15 27 39','蛇 02 14 26 38','马 01 13 25 37 49','羊 12 24 36 48','猴 11 23 35 47','鸡 10 22 34 46','狗 09 21 33 45','猪 08 20 32 44'];
-    ex.insertAdjacentHTML('beforeend','<section class="mini"><h5>历史开奖记录</h5>'+hist+'</section>'+
+    ex.innerHTML = ('<section class="mini"><h5>历史开奖记录</h5>'+hist+'</section>'+
       '<section class="mini"><h5>玄机诗象</h5><div style="padding:10px;font-size:17px;line-height:1.7;color:#6b4a10">本期玄机：龙争虎斗，马到成功；留意单数生肖，特码看虎马羊。</div></section>'+
       '<section class="mini"><h5>生肖号码大表</h5><div class="zgrid">'+zt.map(function(s){var p=s.split(' ');return '<div style="border:1px solid #E8D098;border-radius:4px;text-align:center;padding:4px 2px;font-size:12px;background:#FFFDF6"><b style="color:#C90000;font-size:15px;display:block">'+p[0]+'</b>'+p.slice(1).join(' ')+'</div>'}).join('')+'</div></section>');
   }).catch(function(e){});
@@ -556,4 +558,50 @@ details.mini>summary::-webkit-details-marker{display:none}
     place();setTimeout(place,400);setTimeout(place,1200);setTimeout(place,2400);setTimeout(place,4000);setTimeout(place,6000);
   }).catch(function(){});
 })();
-</script><script src="assets/js/subnav.js"></script></body></html>
+</script><script src="assets/js/subnav.js"></script><script id="xc-realtime">
+(function(){
+  if(window.__rtStarted)return;window.__rtStarted=1;
+  var files=['data/draw.json','data/manual-draw.json','data/manual-ziliao.json'];
+  var sig='',timer=null,delay=12000,fails=0,polls=0,updates=0,hiddenPolls=0,paused=false;
+  window.__rtStats={polls:0,updates:0,lastDelay:12000,fails:0,hiddenPolls:0,lastErr:''};
+  function stats(){var o=window.__rtStats||{};o.polls=polls;o.updates=updates;o.lastDelay=delay;o.fails=fails;o.hiddenPolls=hiddenPolls;o.lastErr=o.lastErr||'';window.__rtStats=o}
+  function fetchJ(rel){var u=rel+(rel.indexOf('?')>=0?'&':'?')+'t='+Date.now();return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})}
+  function getSig(j){var by={};(j[0].games||[]).forEach(function(g){by[g.rule]=g});return [j[0].updated,j[1].updated,j[2].updated,by.Macau&&by.Macau.issue,by.HongKong&&by.HongKong.issue,j[1].issue].join('|')}
+  function runStored(text){try{var s=document.createElement('script');s.textContent=text;document.body.appendChild(s);s.parentNode&&s.parentNode.removeChild(s)}catch(e){}}
+  var stored=[];
+  function capture(){
+    [].forEach.call(document.querySelectorAll('script:not([src])'),function(s){
+      var t=s.textContent||'';
+      if(t.length>800&&t.indexOf('__rtStats')<0&&t.indexOf('xc-realtime')<0&&(t.indexOf('nm-final')>=0||t.indexOf('历史开奖记录')>=0||t.indexOf('xc-blocks2')>=0||t.indexOf('xc-blocks3')>=0||t.indexOf('wuxiao.json')>=0))stored.push(t);
+    });
+  }
+  function poll(){
+    if(paused)return;
+    polls++;
+    Promise.all(files.map(fetchJ)).then(function(j){
+      var s=getSig(j);
+      if(sig&&s!==sig){
+        updates++;
+        if(window.__applyDraw)window.__applyDraw(j[0],j[1]);
+        stored.forEach(runStored);
+      }
+      sig=s;fails=0;delay=12000;stats();window.__rtDebug={polls:polls,sig:s,fetched:j[0].updated+'/'+j[0].games[0].issue,updates:updates};schedule();
+    }).catch(function(e){
+      fails++;window.__rtStats.lastErr=String(e&&e.message||e);
+      delay=fails===1?30000:60000;stats();schedule();
+    });
+  }
+  function schedule(){if(timer)clearTimeout(timer);if(paused)return;timer=setTimeout(poll,delay);stats()}
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='hidden'){paused=true;if(timer)clearTimeout(timer);hiddenPolls++;}
+    else{paused=false;delay=12000;poll();}
+    stats();
+  });
+  window.__rtTick=function(){poll()};
+  window.__rtStoredCount=function(){return stored.length};
+  capture();
+  // first check establishes signature; do not render yet
+  Promise.all(files.map(fetchJ)).then(function(j){sig=getSig(j);stats();schedule()}).catch(function(){schedule()});
+})();
+</script>
+</body></html>
