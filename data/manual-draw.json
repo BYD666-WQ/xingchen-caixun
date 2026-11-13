@@ -1,58 +1,54 @@
 {
  "name": "新香港",
- "issue": 318,
+ "issue": 317,
  "drawTime": "每天 21:34",
  "dailyTime": "01:05",
  "status": "sample",
- "nums": [],
- "history": [
+ "nums": [
   {
-   "issue": 317,
-   "nums": [
-    {
-     "c": "28",
-     "z": "兔",
-     "color": "绿",
-     "wuxing": "土"
-    },
-    {
-     "c": "47",
-     "z": "猴",
-     "color": "蓝",
-     "wuxing": "木"
-    },
-    {
-     "c": "10",
-     "z": "鸡",
-     "color": "蓝",
-     "wuxing": "火"
-    },
-    {
-     "c": "25",
-     "z": "马",
-     "color": "蓝",
-     "wuxing": "木"
-    },
-    {
-     "c": "02",
-     "z": "蛇",
-     "color": "红",
-     "wuxing": "火"
-    },
-    {
-     "c": "19",
-     "z": "鼠",
-     "color": "红",
-     "wuxing": "火"
-    },
-    {
-     "c": "13",
-     "z": "马",
-     "color": "红",
-     "wuxing": "金"
-    }
-   ]
+   "c": "28",
+   "z": "兔",
+   "color": "绿",
+   "wuxing": "土"
   },
+  {
+   "c": "47",
+   "z": "猴",
+   "color": "蓝",
+   "wuxing": "木"
+  },
+  {
+   "c": "10",
+   "z": "鸡",
+   "color": "蓝",
+   "wuxing": "火"
+  },
+  {
+   "c": "25",
+   "z": "马",
+   "color": "蓝",
+   "wuxing": "木"
+  },
+  {
+   "c": "02",
+   "z": "蛇",
+   "color": "红",
+   "wuxing": "火"
+  },
+  {
+   "c": "19",
+   "z": "鼠",
+   "color": "红",
+   "wuxing": "火"
+  },
+  {
+   "c": "13",
+   "z": "马",
+   "color": "红",
+   "wuxing": "金"
+  }
+ ],
+ "history": [
   {
    "issue": 316,
    "nums": [
@@ -713,7 +709,7 @@
   }
  ],
  "updated": "2026-11-13T17:06:28.982Z",
- "visibleFrom": "2026-11-13T17:11:00.000Z",
- "publishedAt": "",
- "numsEnc": "AxgbFWQIEgYBek8bDGQIEtW67EEVVCVdXF1EelkbntWvEh4ULxZBHyhVEggUvv+RVDseSxBVelkbQncQHBBMelkbnt+8Eh4UOwxVGTQQChDey/4bWmRFRUpfNgQbTGTVsZkUJU9CVCUQChAEakEVVDwQChDf4MIbWmRRX15ZKkEDVKGJjxAaehRMDi9cVxAMeoWJwmRPHEkUO0EDVHULEh4UIkEDVK+MqRAaegBWGilAEggUv9iGVGoQR0dOMQ1eVHwQ1q6eeh4VDWRREggUaFobWmRIEggUv+iuVGoQU11aNxEbTGTao68UdEFOAz5bXlUUYkHf6u4QTR5NegAbTGQGBhAaehkbTGTbiJMUdEFaGSpdQhAMeoSD1GQeEkVDIApXEWQIEtSq8EFEWj0QUxAMelMNVGoQShAMeoa84mQeElFZNAxLVHwQ2KGrek8bATNKWVxRelkbn8GjEk9r"
+ "visibleFrom": "2026-11-13T13:39:02.072Z",
+ "publishedAt": "2026-11-13T13:39:02.072Z",
+ "numsEnc": ""
 }
