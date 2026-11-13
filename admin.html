@@ -274,7 +274,9 @@ function autoIssueInfo(){
   var hm=((SITE_CFG.drawTimes&&SITE_CFG.drawTimes.newhk)||'21:34');
   var q=String(hm).split(':');var now=new Date();
   var t=new Date(now.getFullYear(),now.getMonth(),now.getDate(),parseInt(q[0],10)||21,parseInt(q[1],10)||34,0,0);
-  if(t.getTime()<=now.getTime())t.setDate(t.getDate()+1);
+  var existing=(draw&&draw.visibleFrom)?new Date(draw.visibleFrom):null;
+  if(existing&&!isNaN(existing.getTime())&&existing.getTime()>now.getTime()&&!(draw&&draw.publishedAt)){t=existing}
+  else if(t.getTime()<=now.getTime()){t=new Date(now.getTime())}
   return {issue:issue,vf:t,cur:cur,published:published,hm:hm};
 }
 function vfLocalStr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
