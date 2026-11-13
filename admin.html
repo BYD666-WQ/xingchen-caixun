@@ -558,7 +558,8 @@ async function save(){
   $('btn-save-bar').disabled=true;if($('btn-save-top'))$('btn-save-top').disabled=true;setState('提交中…（号码顺序：'+orderTxt+'）');
   try{
     var copy={brand:$('c-brand').value.trim(),brandNumber:(($('c-banner')||{}).value||'').trim(),bannerNumber:(($('c-banner')||{}).value||'').trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
-    var zlRows = zlRowsEarly;try{console.log('[zl-save] final='+zlRows.length+' issues='+zlRows.map(function(r){return r.issue}).join(','))}catch(e){}
+    var zlRows = zlRowsEarly;
+    if(zlRows.length>10)return Msg('已满 10 条，请先删除一条再加（本次解析 '+zlRows.length+' 行，未保存）',false);try{console.log('[zl-save] final='+zlRows.length+' issues='+zlRows.map(function(r){return r.issue}).join(','))}catch(e){}
     var newZl={name:newDraw.name,rows:zlRows,updated:new Date().toISOString()};
     if(zlParsed.unparsed&&zlParsed.unparsed.length)newZl.unparsed=zlParsed.unparsed;
     try{ window.__ZL=newZl; renderZl(newZl); }catch(e){}
@@ -796,10 +797,10 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
   function sortBoard(silent){var b=BOARDS[state.cur];var rows=state.data[b.id]||[];rows.sort(function(x,y){return (parseInt(y.issue,10)||0)-(parseInt(x.issue,10)||0)});daRender();if(!silent)topToast('已按期号排序',true)}
   function rowsNow(){return state.data[BOARDS[state.cur].id]||[]}
   function blankRow(){var b=BOARDS[state.cur];var r={};b.cols.forEach(function(c){r[c.k]=''});return r}
-  function addRow(){var rows=rowsNow();var max=0;rows.forEach(function(x){var n=parseInt(x.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender();highlightTop()}
-  function copyPrev(){var b=BOARDS[state.cur];var rows=rowsNow();if(!rows.length)return;var last=rows[rows.length-1];var r={};b.cols.forEach(function(c){r[c.k]=last[c.k]||''});var max=0;rows.forEach(function(x){var n=parseInt(x.issue,10);if(n>max)max=n});r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(b.id,r.issue);daRender();highlightTop()}
-  function newIssueRow(){var rows=rowsNow();var max=0;rows.forEach(function(r){var n=parseInt(r.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender()}
-  function saveBoard(){sortBoard(true);var b=BOARDS[state.cur];if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}
+  function addRow(){var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}var max=0;rows.forEach(function(x){var n=parseInt(x.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender();highlightTop()}
+  function copyPrev(){var b=BOARDS[state.cur];var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}if(!rows.length)return;var last=rows[rows.length-1];var r={};b.cols.forEach(function(c){r[c.k]=last[c.k]||''});var max=0;rows.forEach(function(x){var n=parseInt(x.issue,10);if(n>max)max=n});r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(b.id,r.issue);daRender();highlightTop()}
+  function newIssueRow(){var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}var max=0;rows.forEach(function(r){var n=parseInt(r.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender()}
+  function saveBoard(){sortBoard(true);var b=BOARDS[state.cur];if(rowsNow().length>10){setState('da-state','已满 10 条，请先删除一条再加','da-warn');topToast('已满 10 条，请先删除一条再加',false,true);return}if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}
     var badRows=rowsNow().filter(function(x){return !parseInt(x.issue,10)}).length;
     var obj=SAVE[b.id](rowsNow(),state.raw[b.id]||{});var bfile=b.file;
     setState('da-state','提交中…（'+b.name+'）','da-ok');
