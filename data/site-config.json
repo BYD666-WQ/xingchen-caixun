@@ -42,7 +42,7 @@
  },
  "historyLimit": 40,
  "maintenance": {
-  "enabled": true,
+  "enabled": false,
   "code": "SATM6T",
   "hint": ""
  }
