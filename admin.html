@@ -473,7 +473,15 @@ function buildZlRows(rows,newIssue){
   return {rows:out,pushed:pushed};
 }
 window.__buildZlRows=buildZlRows;
+var __saveBusy=false;
 async function save(){
+  if(__saveBusy)return __saveBusy;
+  var ids=['btn-save','btn-save-bar','btn-save-top'];
+  __saveBusy=true;busySet(ids,true);
+  try{return await saveImpl()}
+  finally{busySet(ids,false);__saveBusy=false}
+}
+async function saveImpl(){
   if(!token()){Msg('请先保存密钥（页面顶部）',false);setState('缺少密钥');return}
   if(!LOADED){Msg('未载入成功，禁止保存（请刷新页面）',false);setState('载入失败');return}
   var nums=parseNums($('g-nums').value);
@@ -563,8 +571,7 @@ async function save(){
   $('btn-save-bar').disabled=true;if($('btn-save-top'))$('btn-save-top').disabled=true;setState('提交中…（号码顺序：'+orderTxt+'）');
   try{
     var copy={brand:$('c-brand').value.trim(),brandNumber:(($('c-banner')||{}).value||'').trim(),bannerNumber:(($('c-banner')||{}).value||'').trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
-    var zlRows = zlRowsEarly;
-    if(zlRows.length>10)return Msg('已满 10 条，请先删除一条再加（本次解析 '+zlRows.length+' 行，未保存）',false);try{console.log('[zl-save] final='+zlRows.length+' issues='+zlRows.map(function(r){return r.issue}).join(','))}catch(e){}
+    var zlRows = zlRowsEarly;try{console.log('[zl-save] final='+zlRows.length+' issues='+zlRows.map(function(r){return r.issue}).join(','))}catch(e){}
     var newZl={name:newDraw.name,rows:zlRows,updated:new Date().toISOString()};
     if(zlParsed.unparsed&&zlParsed.unparsed.length)newZl.unparsed=zlParsed.unparsed;
     try{ window.__ZL=newZl; renderZl(newZl); }catch(e){}
@@ -589,7 +596,7 @@ async function save(){
     draw=newDraw;play=newPlay;renderPreview();
   }catch(e){
     if (e.code === 'CONFLICT') { Msg('数据已被别处更新（sha 不一致），请刷新页面后重试', false); setState('冲突：请刷新'); }
-    else { Msg('保存失败：' + e.message, false); setState('保存失败：' + e.message); }
+    else { Msg('保存失败（开奖号码/期号/公布时间等字段）：' + e.message, false); setState('保存失败（开奖字段）：' + e.message); }
   }
   finallyRestore();
   commitList();
@@ -684,6 +691,7 @@ $('btn-bulk').addEventListener('click',function(){
 $('btn-save').addEventListener('click',save);
 $('btn-save-bar').addEventListener('click',save);
 if($('btn-save-top'))$('btn-save-top').addEventListener('click',save);
+function busySet(ids,on){ids.forEach(function(id){var b=document.getElementById(id);if(!b)return;if(on){b._origTxt=b._origTxt||b.textContent;b.disabled=true;b.textContent='保存中…';b.style.opacity='.65';b.style.cursor='not-allowed'}else{b.disabled=false;if(b._origTxt)b.textContent=b._origTxt;b.style.opacity='';b.style.cursor=''}})}
 function setState(t){var el=$('save-state');if(el)el.textContent=t}
 function tokText(t){return t ? ('\u2713 \u5df2\u4fdd\u5b58\uff08\u672c\u673a\uff09\u2026' + t.slice(-4)) : '\u672a\u4fdd\u5b58\u5bc6\u94a5'}
 function refreshTokenState(){var el=$('token-state');if(el)el.textContent=tokText(token())}
@@ -805,7 +813,7 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
   function addRow(){var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}var max=0;rows.forEach(function(x){var n=parseInt(x.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender();highlightTop()}
   function copyPrev(){var b=BOARDS[state.cur];var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}if(!rows.length)return;var last=rows[rows.length-1];var r={};b.cols.forEach(function(c){r[c.k]=last[c.k]||''});var max=0;rows.forEach(function(x){var n=parseInt(x.issue,10);if(n>max)max=n});r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(b.id,r.issue);daRender();highlightTop()}
   function newIssueRow(){var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}var max=0;rows.forEach(function(r){var n=parseInt(r.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender()}
-  function saveBoard(){sortBoard(true);var b=BOARDS[state.cur];if(rowsNow().length>10){setState('da-state','已满 10 条，请先删除一条再加','da-warn');topToast('已满 10 条，请先删除一条再加',false,true);return}if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}
+  function saveBoard(){if(window.__boardBusy)return;sortBoard(true);var b=BOARDS[state.cur];if(rowsNow().length>10){setState('da-state','已满 10 条，请先删除一条再加','da-warn');topToast('已满 10 条，请先删除一条再加',false,true);return}if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}window.__boardBusy=true;busySet(['da-save'],true);
     var badRows=rowsNow().filter(function(x){return !parseInt(x.issue,10)}).length;
     var obj=SAVE[b.id](rowsNow(),state.raw[b.id]||{});var bfile=b.file;
     setState('da-state','提交中…（'+b.name+'）','da-ok');
@@ -817,7 +825,7 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
         state.raw[b.id]=obj;state.status=state.status||{};state.status[b.id]={ok:true};if(window.__daClearDeleted)window.__daClearDeleted(b.id);
         setState('da-state','✅ 已提交「'+b.name+'」；约 90 秒生效（已自动触发 Pages 构建）','da-ok');
         daRender();
-      }catch(e){setState('da-state','保存失败：'+(e&&e.message?e.message:'未知错误')+'（文件：'+bfile+'）','da-warn')}
+      }catch(e){setState('da-state','保存失败：'+(e&&e.message?e.message:'未知错误')+'（文件：'+bfile+'）','da-warn')}finally{busySet(['da-save'],false);window.__boardBusy=false}
     })();
   }
   $d('da-reload').addEventListener('click',loadAll);
@@ -827,7 +835,7 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
   $d('da-save').addEventListener('click',saveBoard);
   
 
-function saveDrawTimes(){
+async function saveDrawTimesImpl(){
   var out={};
   for(var i=0;i<3;i++){
     var key=['newhk','newmo','hk'][i];
@@ -846,7 +854,7 @@ function saveDrawTimes(){
     topToast('开奖时间/开奖日已更新，立即生效',true,false);setState('开奖时间已更新');
   }).catch(function(e){topToast('保存失败：'+(e&&e.message||e),false,true);setState('保存失败')});
 }
-if(document.getElementById('btn-save-times'))document.getElementById('btn-save-times').addEventListener('click',saveDrawTimes);
+if(document.getElementById('btn-save-times'))document.getElementById('btn-save-times').addEventListener('click',function(){if(window.__timesBusy)return;window.__timesBusy=true;busySet(['btn-save-times'],true);Promise.resolve(saveDrawTimesImpl()).finally(function(){busySet(['btn-save-times'],false);window.__timesBusy=false})});
 
 loadAll();
 })();
@@ -860,7 +868,7 @@ function loadRevealConfig(){
   }).catch(function(){});
 }
 function clampNum(v,def,lo,hi){var n=parseInt(v,10);if(!isFinite(n))n=def;return Math.max(lo,Math.min(hi,n))}
-function saveRevealConfig(){
+function saveRevealConfigImpl(){
   var mode=$('reveal-mode')?$('reveal-mode').value:'fixed';
   var seconds=clampNum($('reveal-seconds')&&$('reveal-seconds').value,10,1,120);
   var min=clampNum($('reveal-min')&&$('reveal-min').value,8,1,120);
@@ -874,7 +882,7 @@ function saveRevealConfig(){
     window.__siteCfg=base;topToast('已更新，下一期开奖生效',true,false);setState('reveal-state','已更新，下一期开奖生效');
   }).catch(function(e){setState('reveal-state','保存失败：'+(e&&e.message||e));});
 }
-if(document.getElementById('btn-save-reveal'))document.getElementById('btn-save-reveal').addEventListener('click',saveRevealConfig);
+if(document.getElementById('btn-save-reveal'))document.getElementById('btn-save-reveal').addEventListener('click',function(){if(window.__revealBusy)return;window.__revealBusy=true;busySet(['btn-save-reveal'],true);Promise.resolve(saveRevealConfigImpl()).finally(function(){busySet(['btn-save-reveal'],false);window.__revealBusy=false})});
 setTimeout(loadRevealConfig,2500);
 
 </script></body></html>
