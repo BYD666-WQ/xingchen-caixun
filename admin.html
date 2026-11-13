@@ -82,11 +82,11 @@ body{padding-bottom:76px}
   <div id="auto-issue-info" style="font-size:13px;background:#F3FBF6;border:1px solid #BFE8CF;color:#0b7a45;border-radius:6px;padding:8px;margin:4px 0 8px">自动：--</div>
   <div id="next-notice" style="display:none;font-size:13px;background:#FFF3D6;border:1px solid #E8C98A;color:#8a5a2a;border-radius:6px;padding:8px;margin:0 0 8px;font-weight:700"></div>
   <label>开奖时间 / 开奖日（勾选=开奖；香港默认二四六）</label>
-  <style>.trow{display:flex;align-items:center;gap:5px;margin:5px 0;white-space:nowrap}.trow b{width:30px;font-size:13px;flex:none}.trow .tin{width:54px;flex:none;text-align:center;padding:6px 2px}.trow .days{display:flex;gap:2px;flex:none}.daybtn{width:30px;height:30px;min-width:30px;padding:0;border:1px solid #D8D8D8;border-radius:6px;background:#F6F6F6;color:#777;font:700 11px/1 "Microsoft YaHei",Arial;flex:none}.daybtn.on{background:#0b7a45;border-color:#0b7a45;color:#fff}</style>
+  <style>.trow{display:flex;align-items:center;gap:5px;margin:5px 0;white-space:nowrap}.trow b{width:30px;font-size:13px;flex:none}.trow .tin{width:84px;height:42px;min-width:0;flex:none;text-align:center;padding:4px 2px;font-size:13px;box-sizing:border-box}.trow .days{display:flex;gap:2px;flex:none}.daybtn{width:30px;height:30px;min-width:30px;padding:0;border:1px solid #D8D8D8;border-radius:6px;background:#F6F6F6;color:#777;font:700 11px/1 "Microsoft YaHei",Arial;flex:none}.daybtn.on{background:#0b7a45;border-color:#0b7a45;color:#fff}</style>
   <div id="time-rows">
-    <div class="trow"><b>新港</b><input class="tin" id="g-time-newhk" inputmode="numeric" placeholder="21:34"><div class="days" id="g-days-newhk"></div></div>
-    <div class="trow"><b>新澳</b><input class="tin" id="g-time-newmo" inputmode="numeric" placeholder="21:30"><div class="days" id="g-days-newmo"></div></div>
-    <div class="trow"><b>香港</b><input class="tin" id="g-time-hk" inputmode="numeric" placeholder="21:30"><div class="days" id="g-days-hk"></div></div>
+    <div class="trow"><b>新港</b><input class="tin" id="g-time-newhk" type="time" step="60"><div class="days" id="g-days-newhk"></div></div>
+    <div class="trow"><b>新澳</b><input class="tin" id="g-time-newmo" type="time" step="60"><div class="days" id="g-days-newmo"></div></div>
+    <div class="trow"><b>香港</b><input class="tin" id="g-time-hk" type="time" step="60"><div class="days" id="g-days-hk"></div></div>
   </div>
   <details><summary>高级：期号 / 公布时间（自动推算，可手改兜底）</summary>
     <label>期号（自动）</label><input id="g-issue" inputmode="numeric">
