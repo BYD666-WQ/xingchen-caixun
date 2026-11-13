@@ -82,7 +82,7 @@ body{padding-bottom:76px}
   <label>彩种名称（tab 与标题）</label><input id="g-name">
   <div id="auto-issue-info" style="font-size:13px;background:#F3FBF6;border:1px solid #BFE8CF;color:#0b7a45;border-radius:6px;padding:8px;margin:4px 0 8px">自动：--</div>
   <label>开奖时间 / 开奖日（勾选=开奖；香港默认二四六）</label>
-  <style>.trow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0}.trow b{width:34px;font-size:13px}.trow .tin{width:76px}.trow .days label{font-size:12px;margin-right:3px;white-space:nowrap}</style>
+  <style>.trow{display:flex;align-items:center;gap:5px;margin:5px 0;white-space:nowrap}.trow b{width:30px;font-size:13px;flex:none}.trow .tin{width:54px;flex:none;text-align:center;padding:6px 2px}.trow .days{display:flex;gap:2px;flex:none}.daybtn{width:30px;height:30px;min-width:30px;padding:0;border:1px solid #D8D8D8;border-radius:6px;background:#F6F6F6;color:#777;font:700 11px/1 "Microsoft YaHei",Arial;flex:none}.daybtn.on{background:#0b7a45;border-color:#0b7a45;color:#fff}</style>
   <div id="time-rows">
     <div class="trow"><b>新港</b><input class="tin" id="g-time-newhk" inputmode="numeric" placeholder="21:34"><div class="days" id="g-days-newhk"></div></div>
     <div class="trow"><b>新澳</b><input class="tin" id="g-time-newmo" inputmode="numeric" placeholder="21:30"><div class="days" id="g-days-newmo"></div></div>
@@ -286,7 +286,8 @@ function normDrawTimes(dt){
 function renderDayChecks(key,days){
   var el=$('g-days-'+key);if(!el)return;
   var names=['日','一','二','三','四','五','六'];
-  el.innerHTML=names.map(function(n,i){return '<label><input type="checkbox" data-day="'+i+'"'+(days.indexOf(i)>=0?' checked':'')+'>'+n+'</label>'}).join('');
+  el.innerHTML=names.map(function(n,i){return '<button type="button" class="daybtn'+(days.indexOf(i)>=0?' on':'')+'" data-day="'+i+'" aria-pressed="'+(days.indexOf(i)>=0?'true':'false')+'">'+n+'</button>'}).join('');
+  if(!el._bound){el._bound=1;el.addEventListener('click',function(ev){var b=ev.target.closest('.daybtn');if(!b)return;b.classList.toggle('on');b.setAttribute('aria-pressed',b.classList.contains('on')?'true':'false')})}
 }
 function fillTimesUI(){
   var dt=normDrawTimes(SITE_CFG.drawTimes);window.__dtNorm=dt;
@@ -820,7 +821,7 @@ function saveDrawTimes(){
     var key=['newhk','newmo','hk'][i];
     var hm=String(($('g-time-'+key)||{}).value||'').trim();
     if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(hm)){topToast('开奖时间格式应为 HH:mm（新港/新澳/香港）',false,true);return}
-    var days=[].map.call(document.querySelectorAll('#g-days-'+key+' input:checked'),function(cb){return parseInt(cb.getAttribute('data-day'),10)});
+    var days=[].map.call(document.querySelectorAll('#g-days-'+key+' .daybtn.on'),function(btn){return parseInt(btn.getAttribute('data-day'),10)});
     if(!days.length){topToast('每个彩种至少选一个开奖日',false,true);return}
     out[key]={time:hm,days:days};
   }
