@@ -485,12 +485,16 @@ function buildZlRows(rows,newIssue){
 }
 window.__buildZlRows=buildZlRows;
 function nextDrawAfter(base,hm,days){var q=String(hm||'21:34').split(':');var t=new Date(base.getFullYear(),base.getMonth(),base.getDate(),parseInt(q[0],10)||21,parseInt(q[1],10)||34,0,0);for(var i=0;i<14;i++){if(t.getTime()>base.getTime()&&days.indexOf(t.getDay())>=0)return t;t.setDate(t.getDate()+1)}return t}
-function calcAutoVf(newIssue){
-  var dt=normDrawTimes(SITE_CFG.drawTimes).newhk,hm=dt.time;
-  var q=String(hm).split(':');var nowD=new Date();
-  var t=new Date(nowD.getFullYear(),nowD.getMonth(),nowD.getDate(),parseInt(q[0],10)||21,parseInt(q[1],10)||34,0,0);
+function calcAutoVf(newIssue,times){
+  var dt=(times&&times.newhk)||{};
+  var hm=String(dt.time||'').trim(),days=Array.isArray(dt.days)?dt.days:[];
+  if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(hm))throw new Error('drawTimes.newhk.time 非法：'+hm);
+  if(!days.length)throw new Error('drawTimes.newhk.days 为空');
+  var q=hm.split(':'),nowD=new Date();
+  var t=new Date(nowD.getFullYear(),nowD.getMonth(),nowD.getDate(),parseInt(q[0],10),parseInt(q[1],10),0,0);
   return (t.getTime()>nowD.getTime())?t:new Date(nowD.getTime());
 }
+
 
 var __vfTouched=false;
 function genMaintCode(){var ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<6;i++){var r=(window.crypto&&crypto.getRandomValues)?crypto.getRandomValues(new Uint8Array(1))[0]:Math.floor(Math.random()*256);s+=ch[r%ch.length]}return s}
@@ -572,12 +576,20 @@ async function saveImpl(){
     history:hb.history,
     updated:new Date().toISOString()
   };
-  try{var _c2=await loadJSON('data/site-config.json');if(_c2&&_c2.drawTimes){SITE_CFG.drawTimes=_c2.drawTimes}}catch(e){}
-  if(_newTimes)SITE_CFG.drawTimes=_newTimes;
-  var _autoVf=calcAutoVf(newIssueVal);
-  var vfInput=$('g-visiblefrom')?$('g-visiblefrom').value:'';
-  var vfMs=(window.__vfTouched&&vfInput)?new Date(vfInput).getTime():_autoVf.getTime();
-  if(!vfMs||isNaN(vfMs))vfMs=_autoVf.getTime();
+  var _freshTimes=null;
+  try{var _c2=await loadJSON('data/site-config.json');if(_c2&&_c2.drawTimes){_freshTimes=normDrawTimes(_c2.drawTimes)}}catch(e){}
+  var _useTimes,_timeSrc;
+  if(window.__timesTouched){_useTimes=_newTimes;_timeSrc='ui'}
+  else if(_freshTimes){_useTimes=_freshTimes;_newTimes=_freshTimes;SITE_CFG.drawTimes=_freshTimes;fillTimesUI();_timesChanged=false;_timeSrc='server'}
+  else{_useTimes=_newTimes;_timeSrc='ui-fallback'}
+  SITE_CFG.drawTimes=_useTimes;
+  var _autoVf;
+  try{_autoVf=calcAutoVf(newIssueVal,_useTimes)}catch(ve){return Msg('保存失败（drawTimes 非法/缺失）：'+ve.message+'；未写入',false)}
+  var vfMs=_autoVf.getTime();
+  var _diag='src='+_timeSrc+' drawTimes.newhk='+_useTimes.newhk.time+' days=['+_useTimes.newhk.days.join(',')+'] now='+fmtVfStr(new Date())+' → vf='+fmtVfStr(new Date(vfMs));
+  try{console.log('[vf-diag] '+_diag)}catch(e){}
+  try{topToast('诊断：'+_diag,true,false)}catch(e){}
+  if($('g-visiblefrom'))$('g-visiblefrom').value=vfLocalStr(new Date(vfMs));
   newDraw.visibleFrom=new Date(vfMs).toISOString();
   newDraw.publishedAt='';
   var dl=new Date(vfMs);var publishLabel=fmtVfStr(dl);
@@ -653,7 +665,7 @@ async function saveImpl(){
     catch (ve) { Msg('已提交（数据已写入）；读回校验未通过：' + ve.message + '（不影响保存，可稍后刷新核对）', false); setState('已提交（读回未通过）'); try{poll(newDraw.updated);draw=newDraw;play=newPlay;renderPreview();try{updateAutoInfo()}catch(e){}}catch(e2){} finallyRestore(); return; }
     await recordShas();
     try{ if(window.__daSetZiliao)window.__daSetZiliao(zlRows.map(function(r){return {issue:String(r.issue),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})); if(window.__daClearDeleted)window.__daClearDeleted('ziliao'); }catch(e){}
-    var encNow=!!(newDraw.visibleFrom&&new Date(newDraw.visibleFrom).getTime()>Date.now()&&newDraw.numsEnc);Msg('已存到第 '+newDraw.issue+' 期 · 公布 '+publishLabel+'（自动）'+(_timesChanged?'；已保存开奖时间':'')+(_maintChanged?'；已保存测试模式':'')+(encNow?'（到点后自动解密显示）':'')+'；约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
+    var encNow=!!(newDraw.visibleFrom&&new Date(newDraw.visibleFrom).getTime()>Date.now()&&newDraw.numsEnc);Msg('已存到第 '+newDraw.issue+' 期 · 公布 '+publishLabel+'（自动；'+_diag+'）'+(_timesChanged?'；已保存开奖时间':'')+(_maintChanged?'；已保存测试模式':'')+(encNow?'（到点后自动解密显示）':'')+'；约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
     poll(newDraw.updated);
     draw=newDraw;play=newPlay;renderPreview();
   }catch(e){
@@ -751,6 +763,7 @@ $('btn-bulk').addEventListener('click',function(){
   draw.history.sort(function(a,b){return b.issue-a.issue});renderHistory();Msg('导入 '+added+' 期，记得点「保存并发布」',true);
 });
 if($('g-visiblefrom'))$('g-visiblefrom').addEventListener('input',function(){window.__vfTouched=true});
+document.addEventListener('change',function(e){var t=e.target;if(t&&/^g-(hh|mm)-/.test(t.id||''))window.__timesTouched=true},true);
 if($('btn-save'))$('btn-save').addEventListener('click',save);
 $('btn-save-bar').addEventListener('click',save);
 if($('btn-save-top'))$('btn-save-top').addEventListener('click',save);
