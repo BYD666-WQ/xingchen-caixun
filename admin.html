@@ -80,10 +80,16 @@ body{padding-bottom:76px}
 <div class="panel"><details open><summary>① 彩种配置</summary><div class="body">
   <button id="btn-save-top" style="width:100%;min-height:48px;margin-bottom:10px;font-size:16px">保存并发布（改完点这里）</button>
   <label>彩种名称（tab 与标题）</label><input id="g-name">
-  <label>当前期号</label><input id="g-issue" inputmode="numeric">
-  <label>开奖时间文案</label><input id="g-drawtime">
-  <label>每天几点开奖（倒计时用，HH:MM）</label><input id="g-dailytime" inputmode="numeric">
-  <label>公布时间（visibleFrom，默认=本期开奖时刻，可改早/改晚）</label><input id="g-visiblefrom" type="datetime-local">
+  <div id="auto-issue-info" style="font-size:13px;background:#F3FBF6;border:1px solid #BFE8CF;color:#0b7a45;border-radius:6px;padding:8px;margin:4px 0 8px">自动：--</div>
+  <label>每天开奖时间（HH:mm，全站倒计时用；新港）</label>
+  <div class="row"><input id="g-time-newhk" inputmode="numeric" style="flex:1" placeholder="21:34"><button class="small" id="btn-save-times" type="button">保存开奖时间</button></div>
+  <div id="time-other" style="font-size:12px;color:#888;margin:2px 0 8px">新澳 21:30 · 香港 21:30（固定）</div>
+  <details><summary>高级：期号 / 公布时间（自动推算，可手改兜底）</summary>
+    <label>期号（自动）</label><input id="g-issue" inputmode="numeric">
+    <label>公布时间（自动）</label><input id="g-visiblefrom" type="datetime-local">
+    <label>开奖时间文案（兼容字段）</label><input id="g-drawtime">
+    <label>倒计时时间（兼容字段）</label><input id="g-dailytime" inputmode="numeric">
+  </details>
   <label>开奖号码（6 个正码 + 1 个特别号）</label><input id="g-nums" placeholder="可整串粘贴，如 07 12 23 34 45 06 18">
   <div id="nums-hint" style="font-size:12px;color:#888;margin-top:4px">支持整串粘贴自动拆分（空格/逗号/14 位连写均可）</div>
   <p style="font-size:12px;color:#888;margin:4px 0 0">号码按你输入的顺序保存，不做排序；顺序即正码顺序。</p>
@@ -255,6 +261,28 @@ async function loadJSON(rel){var e0,e1,e2,e3;
   try{if(!token())throw Object.assign(new Error('未填 token'),{status:0});var j=await srcFetchJson('https://api.github.com/repos/'+REPO+'/contents/'+rel+'?ref='+BRANCH+'&t='+Date.now(),{headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}},SRC_API_TO);var b64=String(j.content||'').replace(/\n/g,'');var txt=decodeURIComponent(escape(atob(b64)));return JSON.parse(txt)}catch(e){e3=e}
   throw new Error(rel+' 载入失败 → jsDelivr: '+srcErr(e1)+' | raw: '+srcErr(e2)+' | API: '+srcErr(e3,SRC_API_TO));
 }
+
+var SITE_CFG={};
+function fillTimesUI(){
+  if($('g-time-newhk'))$('g-time-newhk').value=(SITE_CFG.drawTimes&&SITE_CFG.drawTimes.newhk)||'21:34';
+  var o=$('time-other');if(o)o.textContent='新澳 '+((SITE_CFG.drawTimes&&SITE_CFG.drawTimes.newmo)||'21:30')+' · 香港 '+((SITE_CFG.drawTimes&&SITE_CFG.drawTimes.hk)||'21:30')+'（固定，改配置可调）';
+}
+function autoIssueInfo(){
+  var cur=draw&&draw.issue?parseInt(draw.issue,10):1;
+  var published=!!(draw&&draw.publishedAt);
+  var issue=published?cur+1:cur;
+  var hm=((SITE_CFG.drawTimes&&SITE_CFG.drawTimes.newhk)||'21:34');
+  var q=String(hm).split(':');var now=new Date();
+  var t=new Date(now.getFullYear(),now.getMonth(),now.getDate(),parseInt(q[0],10)||21,parseInt(q[1],10)||34,0,0);
+  if(t.getTime()<=now.getTime())t.setDate(t.getDate()+1);
+  return {issue:issue,vf:t,cur:cur,published:published,hm:hm};
+}
+function vfLocalStr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
+function fmtVfStr(d){return d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
+function updateAutoInfo(){
+  var el=$('auto-issue-info');if(!el)return;var ai=autoIssueInfo();
+  el.innerHTML='自动：第 <b>'+ai.issue+'</b> 期 · 公布 '+fmtVfStr(ai.vf)+'（'+(ai.published?'当前期已公布，自动 +1':'号码存当前期')+'）';
+}
 async function loadAll(){
   var t=Date.now();
   var dr, pl, cp = {};
@@ -271,9 +299,16 @@ async function loadAll(){
   $('c-brand').value=cp.brand||'香港摇钱树'; var _cb=$('c-banner'); if(_cb) _cb.value=cp.brandNumber||cp.bannerNumber||'7798'; $('c-slogan').value=cp.slogan||'官方开奖信息';
   $('c-notice').value=cp.notice||''; $('c-disclaimer').value=cp.disclaimer||'数据来自官方公开信息，仅供参考。';
   draw=dr;play=pl;LOADED=true;
-  $('g-name').value=dr.name||''; $('g-issue').value=dr.issue||''; $('g-drawtime').value=dr.drawTime||'';
-  $('g-dailytime').value=dr.dailyTime||'21:34';
-  var vfEl=$('g-visiblefrom');if(vfEl)vfEl.value=dr.visibleFrom?vfLocal(dr.visibleFrom):vfDefaultLocal();
+  try{SITE_CFG=await loadJSON('data/site-config.json')||{}}catch(e){SITE_CFG={}}
+  SITE_CFG.drawTimes=SITE_CFG.drawTimes||{newhk:'21:34',newmo:'21:30',hk:'21:30'};
+  fillTimesUI();
+  $('g-name').value=dr.name||'';
+  var ai=autoIssueInfo();
+  $('g-issue').value=ai.issue;
+  $('g-drawtime').value=dr.drawTime||('每天 '+SITE_CFG.drawTimes.newhk);
+  $('g-dailytime').value=SITE_CFG.drawTimes.newhk;
+  if($('g-visiblefrom'))$('g-visiblefrom').value=vfLocalStr(ai.vf);
+  updateAutoInfo();
   var loadedNums=dr.nums||[];if((!loadedNums.length)&&dr.numsEnc){var dn=vfDec(dr.numsEnc);if(dn&&dn.length)loadedNums=dn}
   $('g-nums').value=loadedNums.map(function(n){return n.c}).join(' ');
   try { var zl = BACKEND === 'worker' ? (cfg.files['ziliao']||{}) : await loadJSON('data/manual-ziliao.json'); window.__ZL=zl; renderZl(zl); } catch(e){}
@@ -415,7 +450,8 @@ async function save(){
   // 校验通过后再存 token
   localStorage.setItem(KEY,token());
   if ((draw&&draw.history||[]).length>0 && String($('zl-bulk').value||'').trim()===''){warns.push('资料区为空，保存后会清空历史记录——可先备份再保存')}
-  var newIssueVal=parseInt($('g-issue').value,10)||1;
+  var _ai=autoIssueInfo();
+  var newIssueVal=parseInt($('g-issue').value,10)||_ai.issue;
   var prevIssueRaw=(draw&&draw.issue)?parseInt(draw.issue,10):0;
   var hb=buildHistory(prevIssueRaw,(draw&&draw.nums)||[],newIssueVal,(draw&&draw.history)||[]);
   if(hb.pushed)warns.push('已自动把上一期 '+prevIssueRaw+' 压入历史记录');
@@ -433,12 +469,11 @@ async function save(){
   };
   var vfInput=$('g-visiblefrom')?$('g-visiblefrom').value:'';
   var vfMs=vfInput?new Date(vfInput).getTime():0;
-  var publishLabel='';
-  if(vfInput&&!isNaN(vfMs)){
-    newDraw.visibleFrom=new Date(vfMs).toISOString();
-    var dl=new Date(vfMs);publishLabel=dl.getFullYear()+'/'+pad(dl.getMonth()+1)+'/'+pad(dl.getDate())+' '+pad(dl.getHours())+':'+pad(dl.getMinutes());
-    if(vfMs>Date.now()){newDraw.numsEnc=vfEnc(newDraw.nums);newDraw.nums=[]}
-  }
+  if(!vfMs||isNaN(vfMs))vfMs=autoIssueInfo().vf.getTime();
+  newDraw.visibleFrom=new Date(vfMs).toISOString();
+  newDraw.publishedAt='';
+  var dl=new Date(vfMs);var publishLabel=fmtVfStr(dl);
+  if(vfMs>Date.now()){newDraw.numsEnc=vfEnc(newDraw.nums);newDraw.nums=[]}
   var newPlay={name:newDraw.name,issue:newDraw.issue,oddEven:$('p-oe').value,threeZodiac:zs,note:$('p-note').value.trim(),status:'live',updated:new Date().toISOString()};
   var zlParsed;
   try{ zlParsed=validateZlText($('zl-bulk').value); }catch(ve){ return Msg('这会导致页面显示错，请修正：'+ve.message,false); }
@@ -506,10 +541,10 @@ async function save(){
     pagesDispatch(); // 保存成功后触发 Pages 构建；无 workflow 权限时内部忽略、不阻塞
     setState('已提交，校验中…');
     try { await verifySaved(newPlay, newDraw); }
-    catch (ve) { Msg('已提交（数据已写入）；读回校验未通过：' + ve.message + '（不影响保存，可稍后刷新核对）', false); setState('已提交（读回未通过）'); try{poll(newDraw.updated);draw=newDraw;play=newPlay;renderPreview();}catch(e2){} finallyRestore(); return; }
+    catch (ve) { Msg('已提交（数据已写入）；读回校验未通过：' + ve.message + '（不影响保存，可稍后刷新核对）', false); setState('已提交（读回未通过）'); try{poll(newDraw.updated);draw=newDraw;play=newPlay;renderPreview();try{updateAutoInfo()}catch(e){}}catch(e2){} finallyRestore(); return; }
     await recordShas();
     try{ if(window.__daSetZiliao)window.__daSetZiliao(zlRows.map(function(r){return {issue:String(r.issue),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})); if(window.__daClearDeleted)window.__daClearDeleted('ziliao'); }catch(e){}
-    var encNow=!!(newDraw.visibleFrom&&new Date(newDraw.visibleFrom).getTime()>Date.now()&&newDraw.numsEnc);Msg('已提交，读回校验通过；'+(publishLabel?('已按 '+publishLabel+' 公布'+(encNow?'（到点后自动解密显示）':'')+'；'):'')+'约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
+    var encNow=!!(newDraw.visibleFrom&&new Date(newDraw.visibleFrom).getTime()>Date.now()&&newDraw.numsEnc);Msg('已存到第 '+newDraw.issue+' 期 · 公布 '+publishLabel+'（自动）'+(encNow?'（到点后自动解密显示）':'')+'；约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
     poll(newDraw.updated);
     draw=newDraw;play=newPlay;renderPreview();
   }catch(e){
@@ -750,7 +785,24 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
   $d('da-copy').addEventListener('click',copyPrev);
   $d('da-empty').addEventListener('click',newIssueRow);
   $d('da-save').addEventListener('click',saveBoard);
-  loadAll();
+  
+
+function saveDrawTimes(){
+  var hm=String(($('g-time-newhk')||{}).value||'').trim();
+  if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(hm)){topToast('开奖时间格式应为 HH:mm，如 21:34',false,true);return}
+  SITE_CFG.drawTimes=SITE_CFG.drawTimes||{newhk:'21:34',newmo:'21:30',hk:'21:30'};
+  SITE_CFG.drawTimes.newhk=hm;
+  if(!token()){topToast('请先在页面顶部保存密钥',false,true);return}
+  setState('保存开奖时间…');
+  saveFile('data/site-config.json',SITE_CFG,'CMS: update draw times').then(function(){
+    try{pagesDispatch()}catch(e){}
+    fillTimesUI();updateAutoInfo();
+    topToast('开奖时间已更新，立即生效',true,false);setState('开奖时间已更新');
+  }).catch(function(e){topToast('保存失败：'+(e&&e.message||e),false,true);setState('保存失败')});
+}
+if(document.getElementById('btn-save-times'))document.getElementById('btn-save-times').addEventListener('click',saveDrawTimes);
+
+loadAll();
 })();
 
 function loadRevealConfig(){

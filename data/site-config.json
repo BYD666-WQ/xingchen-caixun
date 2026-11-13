@@ -5,5 +5,11 @@
   "min": 8,
   "max": 15,
   "specialExtra": 5
- }
+ },
+ "drawTimes": {
+  "newhk": "21:34",
+  "newmo": "21:30",
+  "hk": "21:30"
+ },
+ "historyLimit": 40
 }
