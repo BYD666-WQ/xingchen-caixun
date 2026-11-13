@@ -389,7 +389,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.classList.toggle('on',i===KEYS.indexOf(k))});
   }
   window.__xcShow=show;
-  window.__applyDraw=function(dr,md){var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});D={newhk:md,newmo:by.Macau,hk:by.HongKong};buildCards();tick();var vfActive=false;try{vfActive=vfApply(md)}catch(e){}
+  window.__applyDraw=function(dr,md){md=mdCompat(md);var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});D={newhk:md,newmo:by.Macau,hk:by.HongKong};buildCards();tick();var vfActive=false;try{vfActive=vfApply(md)}catch(e){}
     if(!vfActive&&window.__xcWaiting&&xcHasNums(md)){try{xcEnsureWaiting();vfActive=(window.__xcWaiting===false)}catch(e){}}
     if(vfActive){try{vfRestore()}catch(e){}}else{fill();show(KEYS[window.__pendingTab||0])}try{xcEnsureWaiting()}catch(e){}};
   window.__showTab=function(k){var M={newhk:0,newmo:1,hk:2,'新港':0,'新澳':1,'新澳彩':1,'香港':2,'香港彩':2};var i=(k in M)?M[k]:-1;if(i>=0){if(D[KEYS[i]])show(KEYS[i]);else{window.__pendingTab=i;document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,j){t.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}}return i>=0};
@@ -398,6 +398,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   /* ===== 新港 visibleFrom：定时公布 + 到点揭晓（2026-11-13 改：每球 10s，可中断恢复） ===== */
   var VF_KEY='Xc9vF2026';
   var FIRST_DELAY_MS=1500, SETTLE_MS=10000, FLIP_MS=400;
+  function mdCompat(md){if(md&&md.current&&md.current.issue!==undefined){var c=md.current;return {name:md.name,issue:c.issue,nums:c.nums||[],numsEnc:c.numsEnc,visibleFrom:c.visibleFrom,publishedAt:c.publishedAt||md.publishedAt,history:md.history||[],updated:md.updated,drawTime:md.drawTime,dailyTime:md.dailyTime}}return md}
   var VF_CFG={mode:'fixed',seconds:10,min:8,max:15,specialExtra:5};
   var VF=null;
   function vfNormCfg(c){
@@ -573,7 +574,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   window.__vfTimeline=function(){return VF&&VF.timeline?VF.timeline.slice():null};
   window.__vfState=function(){return VF?{issue:VF.issue,phase:VF.phase,revealed:VF.revealed,elapsed:Date.now()-VF.vf,played:VF.played}:null};
   Promise.all([get('data/manual-draw.json'),get('data/draw.json'),get('data/site-config.json')]).then(function(r){
-    var md=r[0]||{},dr=r[1]||{},cfg=r[2]||null;var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
+    var md=mdCompat(r[0]||{}),dr=r[1]||{},cfg=r[2]||null;var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
     VF_CFG=vfNormCfg(cfg);window.__vfConfig=function(){return JSON.parse(JSON.stringify(VF_CFG))};
     try{
       var _dt=(cfg&&cfg.drawTimes)||{};
