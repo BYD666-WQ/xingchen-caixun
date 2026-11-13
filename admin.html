@@ -93,8 +93,10 @@ body{padding-bottom:76px}
   <details><summary>高级：期号 / 公布时间（自动推算，可手改兜底）</summary>
     <label>期号（自动）</label><input id="g-issue" inputmode="numeric">
     <label>公布时间（自动）</label><input id="g-visiblefrom" type="datetime-local">
-    <label>开奖时间文案（兼容字段）</label><input id="g-drawtime">
-    <label>倒计时时间（兼容字段）</label><input id="g-dailytime" inputmode="numeric">
+    <details><summary>开发用兼容字段（不用管）</summary>
+      <label>开奖时间文案（兼容）</label><input id="g-drawtime">
+      <label>倒计时时间（兼容）</label><input id="g-dailytime" inputmode="numeric">
+    </details>
   </details>
   <label>开奖号码（6 个正码 + 1 个特别号）</label><input id="g-nums" placeholder="可整串粘贴，如 07 12 23 34 45 06 18">
   <div id="nums-hint" style="font-size:12px;color:#888;margin-top:4px">支持整串粘贴自动拆分（空格/逗号/14 位连写均可）</div>
@@ -298,12 +300,10 @@ function autoIssueInfo(){
   var cur=draw&&draw.issue?parseInt(draw.issue,10):1;
   var published=!!(draw&&draw.publishedAt);
   var issue=published?cur+1:cur;
-  var hm=(normDrawTimes(SITE_CFG.drawTimes).newhk.time||'21:34');
+  var _dt=normDrawTimes(SITE_CFG.drawTimes).newhk;var hm=_dt.time,days=_dt.days;
   var q=String(hm).split(':');var now=new Date();
   var t=new Date(now.getFullYear(),now.getMonth(),now.getDate(),parseInt(q[0],10)||21,parseInt(q[1],10)||34,0,0);
-  var existing=(draw&&draw.visibleFrom)?new Date(draw.visibleFrom):null;
-  if(existing&&!isNaN(existing.getTime())&&existing.getTime()>now.getTime()&&!(draw&&draw.publishedAt)){t=existing}
-  else if(t.getTime()<=now.getTime()){t=new Date(now.getTime())}
+  for(var _i=0;_i<14;_i++){if(t.getTime()>now.getTime()&&days.indexOf(t.getDay())>=0)break;t.setDate(t.getDate()+1)}
   return {issue:issue,vf:t,cur:cur,published:published,hm:hm};
 }
 function vfLocalStr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
@@ -336,7 +336,7 @@ async function loadAll(){
   var ai=autoIssueInfo();
   $('g-issue').value=ai.issue;
   $('g-drawtime').value=dr.drawTime||('每天 '+SITE_CFG.drawTimes.newhk);
-  $('g-dailytime').value=SITE_CFG.drawTimes.newhk;
+  $('g-dailytime').value=normDrawTimes(SITE_CFG.drawTimes).newhk.time;
   if($('g-visiblefrom'))$('g-visiblefrom').value=vfLocalStr(ai.vf);
   updateAutoInfo();
   var loadedNums=dr.nums||[];if((!loadedNums.length)&&dr.numsEnc){var dn=vfDec(dr.numsEnc);if(dn&&dn.length)loadedNums=dn}
