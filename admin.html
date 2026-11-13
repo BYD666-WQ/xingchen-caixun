@@ -313,6 +313,10 @@ function updateAutoInfo(){
   el.innerHTML='自动：第 <b>'+ai.issue+'</b> 期 · 公布 '+fmtVfStr(ai.vf)+'（'+(ai.published?'当前期已公布，自动 +1':'号码存当前期')+'）';
   var nn=$('next-notice');if(nn){if(ai.issue>ai.cur){nn.style.display='block';nn.textContent='当前期 '+ai.cur+' 已公布，下次保存将写入第 '+ai.issue+' 期'}else{nn.style.display='none';nn.textContent=''}}
 }
+function mdCompatAdmin(md){
+  if(md&&md.current&&md.current.issue!==undefined){var c=md.current;return {name:md.name,issue:c.issue,nums:c.nums||[],numsEnc:c.numsEnc,visibleFrom:c.visibleFrom,publishedAt:c.publishedAt||'',history:md.history||[],updated:md.updated,drawTime:md.drawTime,dailyTime:(typeof md.dailyTime==='string'?md.dailyTime:'21:34')}}
+  return md;
+}
 async function loadAll(){
   var t=Date.now();
   var dr, pl, cp = {};
@@ -328,6 +332,7 @@ async function loadAll(){
   }
   $('c-brand').value=cp.brand||'香港摇钱树'; var _cb=$('c-banner'); if(_cb) _cb.value=cp.brandNumber||cp.bannerNumber||'7798'; $('c-slogan').value=cp.slogan||'官方开奖信息';
   $('c-notice').value=cp.notice||''; $('c-disclaimer').value=cp.disclaimer||'数据来自官方公开信息，仅供参考。';
+  dr=mdCompatAdmin(dr);
   draw=dr;play=pl;LOADED=true;
   try{SITE_CFG=await loadJSON('data/site-config.json')||{}}catch(e){SITE_CFG={}}
   SITE_CFG.drawTimes=SITE_CFG.drawTimes||{newhk:'21:34',newmo:'21:30',hk:'21:30'};
