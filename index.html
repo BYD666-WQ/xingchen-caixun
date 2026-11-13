@@ -347,7 +347,9 @@ details.mini>summary::-webkit-details-marker{display:none}
 
 <div class="nav"><a class="on">首页</a><a>资料大全</a><a>规律走势</a><a>寻宝</a><a href="gallery.html">图库</a></div><script>
 (function(){
-  [].forEach.call(document.querySelectorAll('.tabs img, .tabs svg, .badge-img, .badge-svg'),function(e){e.remove()});
+  var tabsImgs=['assets/theme/tabs/xianggang.webp','assets/theme/tabs/xin-aocai.webp','assets/theme/tabs/xianggang.webp'];
+  function addBadge(a,i){var old=a.querySelector('svg,img');if(old)old.remove();var im=document.createElement('img');im.className='badge-img';im.alt='';im.src=tabsImgs[i];im.style.cssText='width:28px;height:28px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid #F6C65B;margin-right:5px';a.insertBefore(im,a.firstChild)}
+  document.querySelectorAll('.tabs a, .tabs .tab').forEach(addBadge);
   document.querySelectorAll('body > div, body > section, main > *, .wrap > *').forEach(function(e){
     if(e.id==='xc-extra')return;var r=e.getBoundingClientRect();if(r.height>24&&r.height<400){var t=(e.innerText||'').trim();if(!t&&!e.querySelector('img,svg'))e.style.display='none'}
   });
