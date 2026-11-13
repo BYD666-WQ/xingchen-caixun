@@ -473,6 +473,15 @@ function buildZlRows(rows,newIssue){
   return {rows:out,pushed:pushed};
 }
 window.__buildZlRows=buildZlRows;
+function nextDrawAfter(base,hm,days){var q=String(hm||'21:34').split(':');var t=new Date(base.getFullYear(),base.getMonth(),base.getDate(),parseInt(q[0],10)||21,parseInt(q[1],10)||34,0,0);for(var i=0;i<14;i++){if(t.getTime()>base.getTime()&&days.indexOf(t.getDay())>=0)return t;t.setDate(t.getDate()+1)}return t}
+function calcAutoVf(newIssue){
+  var dt=normDrawTimes(SITE_CFG.drawTimes).newhk,hm=dt.time;
+  var q=String(hm).split(':');var nowD=new Date();
+  var t=new Date(nowD.getFullYear(),nowD.getMonth(),nowD.getDate(),parseInt(q[0],10)||21,parseInt(q[1],10)||34,0,0);
+  return (t.getTime()>nowD.getTime())?t:new Date(nowD.getTime());
+}
+
+var __vfTouched=false;
 var __saveBusy=false;
 async function save(){
   if(__saveBusy)return __saveBusy;
@@ -514,9 +523,11 @@ async function saveImpl(){
     history:hb.history,
     updated:new Date().toISOString()
   };
+  try{var _c2=await loadJSON('data/site-config.json');if(_c2&&_c2.drawTimes){SITE_CFG.drawTimes=_c2.drawTimes;fillTimesUI();updateAutoInfo()}}catch(e){}
+  var _autoVf=calcAutoVf(newIssueVal);
   var vfInput=$('g-visiblefrom')?$('g-visiblefrom').value:'';
-  var vfMs=vfInput?new Date(vfInput).getTime():0;
-  if(!vfMs||isNaN(vfMs))vfMs=autoIssueInfo().vf.getTime();
+  var vfMs=(window.__vfTouched&&vfInput)?new Date(vfInput).getTime():_autoVf.getTime();
+  if(!vfMs||isNaN(vfMs))vfMs=_autoVf.getTime();
   newDraw.visibleFrom=new Date(vfMs).toISOString();
   newDraw.publishedAt='';
   var dl=new Date(vfMs);var publishLabel=fmtVfStr(dl);
@@ -688,6 +699,7 @@ $('btn-bulk').addEventListener('click',function(){
   });
   draw.history.sort(function(a,b){return b.issue-a.issue});renderHistory();Msg('导入 '+added+' 期，记得点「保存并发布」',true);
 });
+if($('g-visiblefrom'))$('g-visiblefrom').addEventListener('input',function(){window.__vfTouched=true});
 $('btn-save').addEventListener('click',save);
 $('btn-save-bar').addEventListener('click',save);
 if($('btn-save-top'))$('btn-save-top').addEventListener('click',save);

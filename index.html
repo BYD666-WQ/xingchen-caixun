@@ -389,7 +389,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.classList.toggle('on',i===KEYS.indexOf(k))});
   }
   window.__xcShow=show;
-  window.__applyDraw=function(dr,md){md=mdCompat(md);var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});D={newhk:md,newmo:by.Macau,hk:by.HongKong};buildCards();tick();var vfActive=false;try{vfActive=vfApply(md)}catch(e){}
+  window.__applyDraw=function(dr,md){md=mdCompat(md);try{vfForceDue(md)}catch(e){}var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});D={newhk:md,newmo:by.Macau,hk:by.HongKong};buildCards();tick();var vfActive=false;try{vfActive=vfApply(md)}catch(e){}
     if(!vfActive&&window.__xcWaiting&&xcHasNums(md)){try{xcEnsureWaiting();vfActive=(window.__xcWaiting===false)}catch(e){}}
     if(vfActive){try{vfRestore()}catch(e){}}else{fill();show(KEYS[window.__pendingTab||0])}try{xcEnsureWaiting()}catch(e){}};
   window.__showTab=function(k){var M={newhk:0,newmo:1,hk:2,'新港':0,'新澳':1,'新澳彩':1,'香港':2,'香港彩':2};var i=(k in M)?M[k]:-1;if(i>=0){if(D[KEYS[i]])show(KEYS[i]);else{window.__pendingTab=i;document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,j){t.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}}return i>=0};
@@ -499,10 +499,25 @@ details.mini>summary::-webkit-details-marker{display:none}
     if(nums&&nums.length){VF.nums=nums;VF.phase='revealing';vfStart(nums)}
     else{VF.phase='waiting';VF.md._xcWaiting=1;window.__xcWaiting=true;vfProgress('待开 · 等待开奖数据')}
   }
+  function vfForceDue(md){
+    try{
+      if(!md||!md.visibleFrom)return;
+      var has=!!(md.numsEnc||(md.nums&&md.nums.length));if(!has)return;
+      var vf=Date.parse(md.visibleFrom);if(!(vf>Date.now()))return;
+      if(Date.now()>=xcDueToday()){md.visibleFrom=new Date(Date.now()-1).toISOString()}
+    }catch(e){}
+  }
+  window.__vfForceDue=vfForceDue;
   function vfApply(md){
     if(!md)return false;
     var vf=md.visibleFrom?Date.parse(md.visibleFrom):0;
     if(!vf)return false;
+    try{
+      var _hasData=!!(md.numsEnc||(md.nums&&md.nums.length));
+      var _hm=TIME_TABLE['新港']||'21:34',_q=String(_hm).split(':'),_n=new Date();
+      var _due=new Date(_n.getFullYear(),_n.getMonth(),_n.getDate(),parseInt(_q[0],10)||21,parseInt(_q[1],10)||34,0,0);
+      if(_hasData&&vf>Date.now()&&_due.getTime()<=Date.now()){vf=Date.now()-1;md.visibleFrom=new Date(vf).toISOString()}
+    }catch(e){}
     var nums=null;
     if(md.numsEnc){nums=vfDec(md.numsEnc)}
     else if(md.nums&&md.nums.length){nums=md.nums}
@@ -584,6 +599,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       window.__drawTimes={};
       Object.keys(_cn).forEach(function(key){var o=_nd(_dt[key],key);window.__drawTimes[key]=o;TIME_TABLE[_cn[key]]=o.time;DAYS[_cn[key]]=o.days;});
     }catch(e){}
+    vfForceDue(md);
     D={newhk:md,newmo:by.Macau,hk:by.HongKong};
     buildCards();tick();setInterval(tick,1000);
     var vfActive=false;try{vfActive=vfApply(md)}catch(e){console.log('[vf]',e&&e.message)}
