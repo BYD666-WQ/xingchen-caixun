@@ -78,7 +78,6 @@ body{padding-bottom:76px}
 </div></details></div>
 
 <div class="panel"><details open><summary>① 彩种配置</summary><div class="body">
-  <button id="btn-save-top" style="width:100%;min-height:48px;margin-bottom:10px;font-size:16px">保存并发布（改完点这里）</button>
   <label>彩种名称（tab 与标题）</label><input id="g-name">
   <div id="auto-issue-info" style="font-size:13px;background:#F3FBF6;border:1px solid #BFE8CF;color:#0b7a45;border-radius:6px;padding:8px;margin:4px 0 8px">自动：--</div>
   <div id="next-notice" style="display:none;font-size:13px;background:#FFF3D6;border:1px solid #E8C98A;color:#8a5a2a;border-radius:6px;padding:8px;margin:0 0 8px;font-weight:700"></div>
@@ -136,7 +135,6 @@ body{padding-bottom:76px}
 
 <div class="panel"><details><summary>⑥ 发布与历史版本</summary><div class="body">
   <div class="row">
-    <button id="btn-save">保存并发布</button>
     <button class="gray" id="btn-refresh">重新载入线上数据</button>
   </div>
   <p style="font-size:12px;color:#888;margin:8px 0 0">保存后约 1–2 分钟生效；页面会自动轮询确认。token 仅存本机浏览器。</p>
@@ -723,7 +721,7 @@ $('btn-bulk').addEventListener('click',function(){
   draw.history.sort(function(a,b){return b.issue-a.issue});renderHistory();Msg('导入 '+added+' 期，记得点「保存并发布」',true);
 });
 if($('g-visiblefrom'))$('g-visiblefrom').addEventListener('input',function(){window.__vfTouched=true});
-$('btn-save').addEventListener('click',save);
+if($('btn-save'))$('btn-save').addEventListener('click',save);
 $('btn-save-bar').addEventListener('click',save);
 if($('btn-save-top'))$('btn-save-top').addEventListener('click',save);
 function busySet(ids,on){ids.forEach(function(id){var b=document.getElementById(id);if(!b)return;if(on){b._origTxt=b._origTxt||b.textContent;b.disabled=true;b.textContent='保存中…';b.style.opacity='.65';b.style.cursor='not-allowed'}else{b.disabled=false;if(b._origTxt)b.textContent=b._origTxt;b.style.opacity='';b.style.cursor=''}})}
