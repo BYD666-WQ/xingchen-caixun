@@ -1,10 +1,10 @@
 {
  "ok": true,
  "status": "success",
- "message": "数据已更新（实时彩种 2）",
- "updated": "2026-11-12 21:53:54",
- "updatedAt": "2026-11-12T21:53:54+08:00",
- "lastSuccess": "2026-11-12 21:53:54",
+ "message": "云端 Worker 已更新（实时 1 彩种）",
+ "updated": "2026-11-13 21:35:01",
+ "updatedAt": "2026-11-13T21:35:01.903+08:00",
+ "lastSuccess": "2026-11-13 21:35:01",
  "newest_seen_ts": "316",
  "newest_seen_ids": [
   "Macau:316",
@@ -20,7 +20,7 @@
   "HongKong"
  ],
  "latest_by_rule": {
-  "Macau": 316,
+  "Macau": 317,
   "HongKong": 120
  }
 }
