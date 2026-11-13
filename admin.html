@@ -81,9 +81,14 @@ body{padding-bottom:76px}
   <button id="btn-save-top" style="width:100%;min-height:48px;margin-bottom:10px;font-size:16px">保存并发布（改完点这里）</button>
   <label>彩种名称（tab 与标题）</label><input id="g-name">
   <div id="auto-issue-info" style="font-size:13px;background:#F3FBF6;border:1px solid #BFE8CF;color:#0b7a45;border-radius:6px;padding:8px;margin:4px 0 8px">自动：--</div>
-  <label>每天开奖时间（HH:mm，全站倒计时用；新港）</label>
-  <div class="row"><input id="g-time-newhk" inputmode="numeric" style="flex:1" placeholder="21:34"><button class="small" id="btn-save-times" type="button">保存开奖时间</button></div>
-  <div id="time-other" style="font-size:12px;color:#888;margin:2px 0 8px">新澳 21:30 · 香港 21:30（固定）</div>
+  <label>开奖时间 / 开奖日（勾选=开奖；香港默认二四六）</label>
+  <style>.trow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0}.trow b{width:34px;font-size:13px}.trow .tin{width:76px}.trow .days label{font-size:12px;margin-right:3px;white-space:nowrap}</style>
+  <div id="time-rows">
+    <div class="trow"><b>新港</b><input class="tin" id="g-time-newhk" inputmode="numeric" placeholder="21:34"><div class="days" id="g-days-newhk"></div></div>
+    <div class="trow"><b>新澳</b><input class="tin" id="g-time-newmo" inputmode="numeric" placeholder="21:30"><div class="days" id="g-days-newmo"></div></div>
+    <div class="trow"><b>香港</b><input class="tin" id="g-time-hk" inputmode="numeric" placeholder="21:30"><div class="days" id="g-days-hk"></div></div>
+  </div>
+  <div class="row"><button class="small" id="btn-save-times" type="button">保存开奖时间</button></div>
   <details><summary>高级：期号 / 公布时间（自动推算，可手改兜底）</summary>
     <label>期号（自动）</label><input id="g-issue" inputmode="numeric">
     <label>公布时间（自动）</label><input id="g-visiblefrom" type="datetime-local">
@@ -263,15 +268,35 @@ async function loadJSON(rel){var e0,e1,e2,e3;
 }
 
 var SITE_CFG={};
+var _ALLD=[0,1,2,3,4,5,6];
+function xcNormDT(v,defDays,defTime){
+  if(typeof v==='string')return {time:v,days:defDays.slice()};
+  if(v&&typeof v==='object'){
+    var t=String(v.time||defTime);
+    var ds=(v.days&&v.days.length)?v.days.filter(function(x){return x>=0&&x<=6}):defDays.slice();
+    if(!ds.length)ds=defDays.slice();
+    return {time:t,days:ds};
+  }
+  return {time:defTime,days:defDays.slice()};
+}
+function normDrawTimes(dt){
+  dt=dt||{};
+  return {newhk:xcNormDT(dt.newhk,_ALLD,'21:34'),newmo:xcNormDT(dt.newmo,_ALLD,'21:30'),hk:xcNormDT(dt.hk,[2,4,6],'21:30')};
+}
+function renderDayChecks(key,days){
+  var el=$('g-days-'+key);if(!el)return;
+  var names=['日','一','二','三','四','五','六'];
+  el.innerHTML=names.map(function(n,i){return '<label><input type="checkbox" data-day="'+i+'"'+(days.indexOf(i)>=0?' checked':'')+'>'+n+'</label>'}).join('');
+}
 function fillTimesUI(){
-  if($('g-time-newhk'))$('g-time-newhk').value=(SITE_CFG.drawTimes&&SITE_CFG.drawTimes.newhk)||'21:34';
-  var o=$('time-other');if(o)o.textContent='新澳 '+((SITE_CFG.drawTimes&&SITE_CFG.drawTimes.newmo)||'21:30')+' · 香港 '+((SITE_CFG.drawTimes&&SITE_CFG.drawTimes.hk)||'21:30')+'（固定，改配置可调）';
+  var dt=normDrawTimes(SITE_CFG.drawTimes);window.__dtNorm=dt;
+  ['newhk','newmo','hk'].forEach(function(k){var el=$('g-time-'+k);if(el)el.value=dt[k].time;renderDayChecks(k,dt[k].days)});
 }
 function autoIssueInfo(){
   var cur=draw&&draw.issue?parseInt(draw.issue,10):1;
   var published=!!(draw&&draw.publishedAt);
   var issue=published?cur+1:cur;
-  var hm=((SITE_CFG.drawTimes&&SITE_CFG.drawTimes.newhk)||'21:34');
+  var hm=(normDrawTimes(SITE_CFG.drawTimes).newhk.time||'21:34');
   var q=String(hm).split(':');var now=new Date();
   var t=new Date(now.getFullYear(),now.getMonth(),now.getDate(),parseInt(q[0],10)||21,parseInt(q[1],10)||34,0,0);
   var existing=(draw&&draw.visibleFrom)?new Date(draw.visibleFrom):null;
@@ -790,16 +815,22 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
   
 
 function saveDrawTimes(){
-  var hm=String(($('g-time-newhk')||{}).value||'').trim();
-  if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(hm)){topToast('开奖时间格式应为 HH:mm，如 21:34',false,true);return}
-  SITE_CFG.drawTimes=SITE_CFG.drawTimes||{newhk:'21:34',newmo:'21:30',hk:'21:30'};
-  SITE_CFG.drawTimes.newhk=hm;
+  var out={};
+  for(var i=0;i<3;i++){
+    var key=['newhk','newmo','hk'][i];
+    var hm=String(($('g-time-'+key)||{}).value||'').trim();
+    if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(hm)){topToast('开奖时间格式应为 HH:mm（新港/新澳/香港）',false,true);return}
+    var days=[].map.call(document.querySelectorAll('#g-days-'+key+' input:checked'),function(cb){return parseInt(cb.getAttribute('data-day'),10)});
+    if(!days.length){topToast('每个彩种至少选一个开奖日',false,true);return}
+    out[key]={time:hm,days:days};
+  }
+  SITE_CFG.drawTimes=out;
   if(!token()){topToast('请先在页面顶部保存密钥',false,true);return}
   setState('保存开奖时间…');
   saveFile('data/site-config.json',SITE_CFG,'CMS: update draw times').then(function(){
     try{pagesDispatch()}catch(e){}
     fillTimesUI();updateAutoInfo();
-    topToast('开奖时间已更新，立即生效',true,false);setState('开奖时间已更新');
+    topToast('开奖时间/开奖日已更新，立即生效',true,false);setState('开奖时间已更新');
   }).catch(function(e){topToast('保存失败：'+(e&&e.message||e),false,true);setState('保存失败')});
 }
 if(document.getElementById('btn-save-times'))document.getElementById('btn-save-times').addEventListener('click',saveDrawTimes);

@@ -575,7 +575,14 @@ details.mini>summary::-webkit-details-marker{display:none}
   Promise.all([get('data/manual-draw.json'),get('data/draw.json'),get('data/site-config.json')]).then(function(r){
     var md=r[0]||{},dr=r[1]||{},cfg=r[2]||null;var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
     VF_CFG=vfNormCfg(cfg);window.__vfConfig=function(){return JSON.parse(JSON.stringify(VF_CFG))};
-    try{var _dt=(cfg&&cfg.drawTimes)||{};if(_dt.newhk)TIME_TABLE['新港']=_dt.newhk;if(_dt.newmo)TIME_TABLE['新澳']=_dt.newmo;if(_dt.hk)TIME_TABLE['香港']=_dt.hk;window.__drawTimes=_dt}catch(e){}
+    try{
+      var _dt=(cfg&&cfg.drawTimes)||{};
+      var _all=[0,1,2,3,4,5,6],_def={'newhk':{t:'21:34',d:_all},'newmo':{t:'21:30',d:_all},'hk':{t:'21:30',d:[2,4,6]}};
+      var _cn={'newhk':'新港','newmo':'新澳','hk':'香港'};
+      function _nd(v,key){var d0=_def[key];if(typeof v==='string')return {time:v,days:d0.d.slice()};if(v&&typeof v==='object'){var time=String(v.time||d0.t);var days=(v.days&&v.days.length)?v.days.filter(function(x){return x>=0&&x<=6}):d0.d.slice();if(!days.length)days=d0.d.slice();return {time:time,days:days}}return {time:d0.t,days:d0.d.slice()}}
+      window.__drawTimes={};
+      Object.keys(_cn).forEach(function(key){var o=_nd(_dt[key],key);window.__drawTimes[key]=o;TIME_TABLE[_cn[key]]=o.time;DAYS[_cn[key]]=o.days;});
+    }catch(e){}
     D={newhk:md,newmo:by.Macau,hk:by.HongKong};
     buildCards();tick();setInterval(tick,1000);
     var vfActive=false;try{vfActive=vfApply(md)}catch(e){console.log('[vf]',e&&e.message)}
