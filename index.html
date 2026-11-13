@@ -381,6 +381,14 @@ details.mini>summary::-webkit-details-marker{display:none}
   function p2(x){return (x<10?'0':'')+x}
   function nextDate(hm,days){var n=new Date();var a=String(hm).split(':');var t=new Date(n.getFullYear(),n.getMonth(),n.getDate(),parseInt(a[0],10),parseInt(a[1],10),0);if(days&&days.length){for(var i=0;i<14;i++){if(days.indexOf(t.getDay())>=0&&t>n)return t;t=new Date(t.getTime()+864e5)}return t}if(t<=n)t=new Date(t.getTime()+864e5);return t}
   var DAYS={'新港':[0,1,2,3,4,5,6],'新澳':[0,1,2,3,4,5,6],'香港':[2,4,6]};
+  window.__setDrawTimes=function(out){
+    try{
+      if(out.newhk){TIME_TABLE['新港']=out.newhk.time;DAYS['新港']=out.newhk.days}
+      if(out.newmo){TIME_TABLE['新澳']=out.newmo.time;DAYS['新澳']=out.newmo.days}
+      if(out.hk){TIME_TABLE['香港']=out.hk.time;DAYS['香港']=out.hk.days}
+      window.__drawTimes=out;
+    }catch(e){}
+  };
   function hmOf(kind){return TIME_TABLE[kind]}
   function kindOf(k){return k==='hk'?'香港':(k==='newmo'?'新澳':'新港')}
   var R=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46];
@@ -822,12 +830,12 @@ details.mini>summary::-webkit-details-marker{display:none}
 </script><script src="assets/js/subnav.js"></script><script id="xc-realtime">
 (function(){
   if(window.__rtStarted)return;window.__rtStarted=1;
-  var files=['data/draw.json','data/manual-draw.json','data/manual-ziliao.json'];
+  var files=['data/draw.json','data/manual-draw.json','data/manual-ziliao.json','data/site-config.json'];
   var sig='',timer=null,delay=12000,fails=0,polls=0,updates=0,hiddenPolls=0,paused=false;
   window.__rtStats={polls:0,updates:0,lastDelay:12000,fails:0,hiddenPolls:0,lastErr:''};
   function stats(){var o=window.__rtStats||{};o.polls=polls;o.updates=updates;o.lastDelay=delay;o.fails=fails;o.hiddenPolls=hiddenPolls;o.lastErr=o.lastErr||'';window.__rtStats=o}
   function fetchJ(rel){var u=rel+(rel.indexOf('?')>=0?'&':'?')+'t='+Date.now();return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})}
-  function getSig(j){var by={};(j[0].games||[]).forEach(function(g){by[g.rule]=g});return [j[0].updated,j[1].updated,j[2].updated,by.Macau&&by.Macau.issue,by.HongKong&&by.HongKong.issue,j[1].issue].join('|')}
+  function getSig(j){var by={};(j[0].games||[]).forEach(function(g){by[g.rule]=g});var c=j[3]||{};return [j[0].updated,j[1].updated,j[2].updated,by.Macau&&by.Macau.issue,by.HongKong&&by.HongKong.issue,j[1].issue,JSON.stringify(c.drawTimes||{}),(c.maintenance&&c.maintenance.enabled)?1:0,(c.maintenance&&c.maintenance.code)||''].join('|')}
   function runStored(text){try{var s=document.createElement('script');s.textContent=text;document.body.appendChild(s);s.parentNode&&s.parentNode.removeChild(s)}catch(e){}}
   var stored=[];
   function capture(){
@@ -836,10 +844,27 @@ details.mini>summary::-webkit-details-marker{display:none}
       if(t.length>800&&t.indexOf('__rtStats')<0&&t.indexOf('xc-realtime')<0&&(t.indexOf('nm-final')>=0||t.indexOf('历史开奖记录')>=0||t.indexOf('xc-blocks2')>=0||t.indexOf('xc-blocks3')>=0||t.indexOf('wuxiao.json')>=0))stored.push(t);
     });
   }
+  function normCfgTime(v,defT,defD){if(typeof v==='string')return {time:v,days:defD.slice()};if(v&&typeof v==='object'){var t=String(v.time||defT);var ds=(v.days&&v.days.length)?v.days.filter(function(x){return x>=0&&x<=6}):defD.slice();if(!ds.length)ds=defD.slice();return {time:t,days:ds}}return {time:defT,days:defD.slice()}}
+  function applyRealtimeConfig(cfg){
+    try{
+      var all=[0,1,2,3,4,5,6],dt=(cfg&&cfg.drawTimes)||{},out={};
+      out.newhk=normCfgTime(dt.newhk,'21:34',all);out.newmo=normCfgTime(dt.newmo,'21:30',all);out.hk=normCfgTime(dt.hk,'21:30',[2,4,6]);
+      if(window.__setDrawTimes)window.__setDrawTimes(out);else window.__drawTimes=out;
+      var m=(cfg&&cfg.maintenance)||{},prev=window.__maintCfg;
+      window.__maintCfg={enabled:!!m.enabled,code:m.code||''};
+      if(prev&&!!prev.enabled!==!!m.enabled){
+        if(m.enabled){location.reload();return}
+        var o=document.getElementById('xc-maint');if(o)o.remove();document.body.style.overflow='';if(window.__maint)window.__maint.locked=false;
+        var meta=document.querySelector('meta[name=robots]');if(meta)meta.remove();
+        if(document.querySelectorAll('#nm-final .row.xc-nr').length===0){location.reload();return}
+      }
+    }catch(e){}
+  }
   function poll(){
     if(paused)return;
     polls++;
     Promise.all(files.map(fetchJ)).then(function(j){
+      applyRealtimeConfig(j[3]);
       var s=getSig(j);
       if(sig&&s!==sig){
         updates++;
