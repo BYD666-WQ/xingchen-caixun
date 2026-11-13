@@ -604,12 +604,15 @@ details.mini>summary::-webkit-details-marker{display:none}
     var g=D[k];if(!g||!g.nums||!g.nums.length)return;
     var nums=g.nums.slice(),st={issue:g.issue,nums:nums,start:start||Date.now(),phase:'revealing',revealed:mode==='incremental'?nums.length:0,mode:mode,timer:null};
     XR[k]=st;delete g._xrWaiting;xrSave(k,st);xrRender(k,st.revealed,-1);
+    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){st.revealed=nums.length;xrDone(k);return}
     if(mode!=='incremental')xrSchedule(k);
   }
   function xrResume(k,stored,nums){
+    try{delete D[k]._xrWaiting}catch(e){}
     if(stored.mode==='incremental'){var st={issue:stored.issue,nums:nums,start:stored.start,phase:nums.length>=7?'done':'revealing',revealed:nums.length,mode:'incremental',timer:null};XR[k]=st;xrSave(k,st);xrRender(k,st.revealed,-1,st.phase==='done'?'本期已开出':('开奖中… '+st.revealed+'/7'));return}
     var s2={issue:stored.issue,nums:(stored.nums&&stored.nums.length===7)?stored.nums:nums,start:stored.start,phase:'revealing',revealed:0,mode:'batch',timer:null};
-    XR[k]=s2;var tl=vfTimeline(s2.issue,VF_CFG),elapsed=Date.now()-s2.start,count=0;
+    XR[k]=s2;if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){s2.revealed=7;xrDone(k);return}
+    var tl=vfTimeline(s2.issue,VF_CFG),elapsed=Date.now()-s2.start,count=0;
     while(count<7&&tl[count]<=elapsed)count++;
     s2.revealed=count;
     if(count>=7&&elapsed>=tl[6]+SETTLE_MS){xrDone(k);return}
@@ -617,8 +620,8 @@ details.mini>summary::-webkit-details-marker{display:none}
   }
   function xrShow(k){
     var g=D[k]||{};
-    if(g._xrWaiting){xrRender(k,0,-1,'待开 · 等待开奖数据');return}
     var st=XR[k];if(st){xrRender(k,st.revealed||0,-1,st.phase==='done'?'本期已开出':('开奖中… '+(st.revealed||0)+'/7'));return}
+    if(g._xrWaiting){xrRender(k,0,-1,'待开 · 等待开奖数据');return}
     var stored=xrLS(k);
     if(stored&&String(stored.issue)===String(g.issue)&&g.nums&&g.nums.length===7){try{xrResume(k,stored,g.nums)}catch(e){}}
   }
@@ -633,7 +636,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     var gi=parseInt(g.issue,10),si=parseInt(stored.issue,10);
     if(gi>si){delete g._xrWaiting;xrStart(k,(g.nums.length<7)?'incremental':'batch',nowT);return}
     if(gi<si)return;
-    if(stored.phase==='done'){XR[k]={issue:stored.issue,nums:stored.nums,start:stored.start,phase:'done',revealed:7,mode:stored.mode};xrRender(k,7,-1,'本期已开出');return}
+    if(stored.phase==='done'){delete g._xrWaiting;XR[k]={issue:stored.issue,nums:stored.nums,start:stored.start,phase:'done',revealed:7,mode:stored.mode};xrRender(k,7,-1,'本期已开出');return}
     if(stored.mode==='incremental'){
       if(g.nums.length>stored.revealed){stored.revealed=g.nums.length;stored.nums=g.nums;stored.phase=g.nums.length>=7?'done':'revealing';XR[k]=stored;xrSave(k,stored);xrRender(k,stored.revealed,-1,stored.phase==='done'?'本期已开出':('开奖中… '+stored.revealed+'/7'))}
       return;
