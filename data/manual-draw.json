@@ -4,7 +4,50 @@
  "drawTime": "每天 21:34",
  "dailyTime": "21:34",
  "status": "sample",
- "nums": [],
+ "nums": [
+  {
+   "c": "12",
+   "z": "羊",
+   "color": "红",
+   "wuxing": "金"
+  },
+  {
+   "c": "40",
+   "z": "兔",
+   "color": "红",
+   "wuxing": "火"
+  },
+  {
+   "c": "42",
+   "z": "牛",
+   "color": "蓝",
+   "wuxing": "金"
+  },
+  {
+   "c": "38",
+   "z": "蛇",
+   "color": "绿",
+   "wuxing": "木"
+  },
+  {
+   "c": "33",
+   "z": "狗",
+   "color": "绿",
+   "wuxing": "火"
+  },
+  {
+   "c": "10",
+   "z": "鸡",
+   "color": "蓝",
+   "wuxing": "火"
+  },
+  {
+   "c": "46",
+   "z": "鸡",
+   "color": "红",
+   "wuxing": "木"
+  }
+ ],
  "history": [
   {
    "issue": 317,
@@ -712,8 +755,7 @@
    ]
   }
  ],
- "updated": "2026-11-13T15:55:04.073Z",
- "visibleFrom": "2026-11-13T15:58:00.000Z",
- "publishedAt": "",
- "numsEnc": "AxgbFWQIEgEGek8bDGQIEtW/w0EVVCVdXF1EelkbkfyQEh4ULxZBHyhVEggUvtONVDseSxBVelkbRncQHBBMelkbn++eEh4UOwxVGTQQChDR4sEbWmRFRUpfNgQbTGTUgIYUJU9CVCUQChAHYUEVVDwQChDf5MMbWmRRX15ZKkEDVKGIkhAaehRMDi9cVxAMeoS43WRPHEkUO0EDVHYAEh4UIkEDVK6ptxAaegBWGilAEggUv9mbVGoQR0dOMQ1eVHwQ17Odeh4VDWRREggUa1IbWmRIEggUsd+ZVGoQU11aNxEbTGTao68UdEFOAz5bXlUUYkHfxvIQTR5NegAbTGQDCBAaehkbTGTVuakUdEFaGSpdQhAMeoSD1GQeEkVDIApXEWQIEtW380FEWj0QUxAMelcLVGoQShAMeoSw7WQeElFZNAxLVHwQ2KGrek8bATNKWVxRelkbn8GjEk9r"
+ "updated": "2026-11-13T15:58:27.996Z",
+ "visibleFrom": "2026-11-13T15:58:28.112Z",
+ "publishedAt": ""
 }
