@@ -1,10 +1,10 @@
 {
  "ok": true,
  "status": "success",
- "message": "云端 Worker 已更新（实时 1 彩种）",
- "updated": "2026-11-13 21:35:01",
- "updatedAt": "2026-11-13T21:35:01.903+08:00",
- "lastSuccess": "2026-11-13 21:35:01",
+ "message": "狂暴模式：实时 1 彩种",
+ "updated": "2026-11-13 21:34:47",
+ "updatedAt": "2026-11-13T21:34:47+08:00",
+ "lastSuccess": "2026-11-13 21:34:47",
  "newest_seen_ts": "316",
  "newest_seen_ids": [
   "Macau:316",
