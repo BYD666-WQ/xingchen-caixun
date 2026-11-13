@@ -293,13 +293,16 @@ details.mini>summary::-webkit-details-marker{display:none}
 </style><script id="xc-maint-gate">
 (function(){
   if(window.__maintGateStarted)return;window.__maintGateStarted=1;
+  try{if(location.pathname.indexOf('admin')>=0)return}catch(e){}
   var orig=window.fetch.bind(window);
   var queued=[];
   window.__maint={enabled:false,locked:true};
   window.fetch=function(input,init){
+    var method=String((init&&init.method)||'GET').toUpperCase();
+    if(method!=='GET')return orig(input,init);
     var url=typeof input==='string'?input:((input&&input.url)||'');
     var isData=/(^|\/)data\/[^?]*\.json/.test(url)&&url.indexOf('site-config.json')<0;
-    if(isData&&window.__maint.locked){return new Promise(function(res,rej){queued.push({input:input,init:init,res:res,rej:rej})})}
+    if(isData&&window.__maint.locked){try{console.warn('[maintenance] blocked GET '+url+' — 需要访问代号')}catch(e){}return new Promise(function(res,rej){queued.push({input:input,init:init,res:res,rej:rej})})}
     return orig(input,init);
   };
   function settle(allow){

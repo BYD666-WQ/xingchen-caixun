@@ -622,7 +622,7 @@ async function saveImpl(){
     zlRowsEarly=zlAuto.rows;
   }
   showWarn(warns);
-  var btn=$('btn-save');btn.disabled=true;btn.textContent='提交中…';
+  var btn=$('btn-save');if(btn){btn.disabled=true;btn.textContent='提交中…'}
   $('btn-save-bar').disabled=true;if($('btn-save-top'))$('btn-save-top').disabled=true;setState('提交中…（号码顺序：'+orderTxt+'）');
   try{
     var copy={brand:$('c-brand').value.trim(),brandNumber:(($('c-banner')||{}).value||'').trim(),bannerNumber:(($('c-banner')||{}).value||'').trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
