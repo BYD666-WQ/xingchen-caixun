@@ -169,7 +169,8 @@ body{padding-bottom:76px}
   <div class="row" style="margin-top:8px"><button id="btn-save-reveal">保存节奏</button><span id="reveal-state" style="font-size:12px;color:#888"></span></div>
 </div></details></div>
 <div class="panel" id="panel-maint"><details><summary>⑨ 测试模式（维护遮罩）</summary><div class="body">
-  <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="maint-enabled" style="width:20px;height:20px"> 开启测试模式（访客需输入访问代号）</label>
+  <button id="maint-toggle" type="button" style="width:100%;min-height:48px;font-size:16px;font-weight:800;border-radius:8px;border:0;background:#0b7a45;color:#fff;margin:2px 0 10px">开启测试模式</button>
+  <p id="maint-status" style="font-size:12px;color:#888;margin:0 0 10px">当前：关闭</p>
   <label>访问代号（6 位）</label>
   <div class="row"><input id="maint-code" readonly style="flex:1;letter-spacing:2px;font-weight:700"><button id="maint-regen" type="button" class="small">重新生成</button></div>
   <label>提示文案（可选）</label><input id="maint-hint" placeholder="例如：测试中，请输入访问代号">
@@ -493,12 +494,17 @@ function calcAutoVf(newIssue){
 
 var __vfTouched=false;
 function genMaintCode(){var ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<6;i++){var r=(window.crypto&&crypto.getRandomValues)?crypto.getRandomValues(new Uint8Array(1))[0]:Math.floor(Math.random()*256);s+=ch[r%ch.length]}return s}
-function collectMaintUI(){var el=$('maint-enabled'),codeEl=$('maint-code'),hintEl=$('maint-hint');return {enabled:!!(el&&el.checked),code:String(codeEl&&codeEl.value||'').trim(),hint:String(hintEl&&hintEl.value||'').trim()}}
+function collectMaintUI(){var codeEl=$('maint-code'),hintEl=$('maint-hint'),base=(SITE_CFG&&SITE_CFG.maintenance)||{};return {enabled:!!base.enabled,code:String((codeEl&&codeEl.value)||base.code||'').trim(),hint:String((hintEl&&hintEl.value)||base.hint||'').trim()}}
+function updateMaintToggle(){
+  var m=(SITE_CFG&&SITE_CFG.maintenance)||{},on=!!m.enabled;
+  var b=$('maint-toggle');if(b){b.textContent=on?'关闭测试模式':'开启测试模式';b.style.background=on?'#a33':'#0b7a45'}
+  var st=$('maint-status');if(st)st.textContent='当前：'+(on?'已开启（首页显示维护遮罩）':'关闭');
+}
 function fillMaintUI(){
   var m=(SITE_CFG&&SITE_CFG.maintenance)||{};if(!m.code)m.code=genMaintCode();
-  if($('maint-enabled'))$('maint-enabled').checked=!!m.enabled;
   if($('maint-code'))$('maint-code').value=m.code;
   if($('maint-hint'))$('maint-hint').value=m.hint||'';
+  updateMaintToggle();
 }
 function collectDrawTimesUI(){
   var out={};
@@ -911,9 +917,32 @@ async function saveDrawTimesImpl(){
     topToast('开奖时间/开奖日已更新，立即生效',true,false);setState('开奖时间已更新');
   }).catch(function(e){topToast('保存失败：'+(e&&e.message||e),false,true);setState('保存失败')});
 }
-if($('maint-regen'))$('maint-regen').addEventListener('click',function(){$('maint-code').value=genMaintCode()});
+if($('maint-regen'))$('maint-regen').addEventListener('click',async function(){
+  var b=$('maint-regen');if(b._busy)return;b._busy=1;b.disabled=true;b.textContent='处理中…';
+  try{var code=genMaintCode();$('maint-code').value=code;var m=(SITE_CFG.maintenance||{});await saveMaintenanceNow(!!m.enabled,code);}
+  finally{b._busy=0;b.disabled=false;b.textContent='重新生成'}
+});
+if($('maint-toggle'))$('maint-toggle').addEventListener('click',async function(){
+  var b=$('maint-toggle');if(b._busy)return;b._busy=1;var old=b.textContent;b.disabled=true;b.textContent='处理中…';
+  try{var m=(SITE_CFG&&SITE_CFG.maintenance)||{};await saveMaintenanceNow(!m.enabled,($('maint-code')&&$('maint-code').value)||m.code);}
+  finally{b._busy=0;b.disabled=false;b.textContent=old;updateMaintToggle()}
+});
 if(document.getElementById('btn-save-times'))document.getElementById('btn-save-times').addEventListener('click',function(){if(window.__timesBusy)return;window.__timesBusy=true;busySet(['btn-save-times'],true);Promise.resolve(saveDrawTimesImpl()).finally(function(){busySet(['btn-save-times'],false);window.__timesBusy=false})});
 
+async function saveMaintenanceNow(nextEnabled,nextCode){
+  if(!token()){topToast('请先在页面顶部保存密钥',false,true);return false}
+  var c=null;try{c=await loadJSON('data/site-config.json')}catch(e){}
+  var base=(c&&c.drawTimes)?c:SITE_CFG;
+  base.maintenance={enabled:!!nextEnabled,code:String(nextCode||($('maint-code')&&$('maint-code').value)||'').trim(),hint:String(($('maint-hint')&&$('maint-hint').value)||'').trim()};
+  SITE_CFG=base;
+  try{
+    await saveFile('data/site-config.json',base,nextEnabled?'CMS: enable maintenance':'CMS: disable maintenance');
+    try{pagesDispatch()}catch(e){}
+    updateMaintToggle();
+    topToast(nextEnabled?'已开启测试模式（约1-2分钟生效，首页显示遮罩）':'已关闭测试模式（约1-2分钟生效）',true,false);
+    return true;
+  }catch(e){topToast('保存测试模式失败：'+(e&&e.message||e),false,true);return false}
+}
 loadAll();
 })();
 
