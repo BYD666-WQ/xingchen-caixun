@@ -81,6 +81,7 @@ body{padding-bottom:76px}
   <button id="btn-save-top" style="width:100%;min-height:48px;margin-bottom:10px;font-size:16px">保存并发布（改完点这里）</button>
   <label>彩种名称（tab 与标题）</label><input id="g-name">
   <div id="auto-issue-info" style="font-size:13px;background:#F3FBF6;border:1px solid #BFE8CF;color:#0b7a45;border-radius:6px;padding:8px;margin:4px 0 8px">自动：--</div>
+  <div id="next-notice" style="display:none;font-size:13px;background:#FFF3D6;border:1px solid #E8C98A;color:#8a5a2a;border-radius:6px;padding:8px;margin:0 0 8px;font-weight:700"></div>
   <label>开奖时间 / 开奖日（勾选=开奖；香港默认二四六）</label>
   <style>.trow{display:flex;align-items:center;gap:5px;margin:5px 0;white-space:nowrap}.trow b{width:30px;font-size:13px;flex:none}.trow .tin{width:54px;flex:none;text-align:center;padding:6px 2px}.trow .days{display:flex;gap:2px;flex:none}.daybtn{width:30px;height:30px;min-width:30px;padding:0;border:1px solid #D8D8D8;border-radius:6px;background:#F6F6F6;color:#777;font:700 11px/1 "Microsoft YaHei",Arial;flex:none}.daybtn.on{background:#0b7a45;border-color:#0b7a45;color:#fff}</style>
   <div id="time-rows">
@@ -310,6 +311,7 @@ function fmtVfStr(d){return d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.ge
 function updateAutoInfo(){
   var el=$('auto-issue-info');if(!el)return;var ai=autoIssueInfo();
   el.innerHTML='自动：第 <b>'+ai.issue+'</b> 期 · 公布 '+fmtVfStr(ai.vf)+'（'+(ai.published?'当前期已公布，自动 +1':'号码存当前期')+'）';
+  var nn=$('next-notice');if(nn){if(ai.issue>ai.cur){nn.style.display='block';nn.textContent='当前期 '+ai.cur+' 已公布，下次保存将写入第 '+ai.issue+' 期'}else{nn.style.display='none';nn.textContent=''}}
 }
 async function loadAll(){
   var t=Date.now();
@@ -338,7 +340,9 @@ async function loadAll(){
   if($('g-visiblefrom'))$('g-visiblefrom').value=vfLocalStr(ai.vf);
   updateAutoInfo();
   var loadedNums=dr.nums||[];if((!loadedNums.length)&&dr.numsEnc){var dn=vfDec(dr.numsEnc);if(dn&&dn.length)loadedNums=dn}
-  $('g-nums').value=loadedNums.map(function(n){return n.c}).join(' ');
+  var _cur=dr.issue?parseInt(dr.issue,10):0,_tgt=ai.issue;
+  if(_tgt>_cur){$('g-nums').value='';$('g-nums').placeholder='输入 '+_tgt+' 期的 7 个号码'}
+  else{$('g-nums').value=loadedNums.map(function(n){return n.c}).join(' ');$('g-nums').placeholder='可整串粘贴，如 07 12 23 34 45 06 18'}
   try { var zl = BACKEND === 'worker' ? (cfg.files['ziliao']||{}) : await loadJSON('data/manual-ziliao.json'); window.__ZL=zl; renderZl(zl); } catch(e){}
   $('p-issue').value=pl.issue||''; $('p-oe').value=pl.oddEven||'单'; $('p-zs').value=(pl.threeZodiac||[]).join(' ');
   $('p-note').value=pl.note||'';
@@ -468,6 +472,8 @@ async function save(){
   if(!token()){Msg('请先保存密钥（页面顶部）',false);setState('缺少密钥');return}
   if(!LOADED){Msg('未载入成功，禁止保存（请刷新页面）',false);setState('载入失败');return}
   var nums=parseNums($('g-nums').value);
+  var _aiTarget=parseInt(($('g-issue')||{}).value,10)||autoIssueInfo().issue;
+  if(nums.length===0){return Msg('还没输入第 '+_aiTarget+' 期的号码（7 个，6+1）',false)}
   if(nums.length!==7)return Msg('这会导致页面显示错，请修正：开奖号码需要 7 个（6+1），当前 '+nums.length+' 个',false);
   if(!nums.every(function(c){var n=parseInt(c,10);return /^\d{2}$/.test(c)&&n>=1&&n<=49}))return Msg('这会导致页面显示错，请修正：开奖号码请填 01–49 的两位数字',false);
   var ZC_ALL='鼠牛虎兔龙蛇马羊猴鸡狗猪';
