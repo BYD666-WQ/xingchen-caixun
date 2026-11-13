@@ -136,6 +136,7 @@ body{padding-bottom:76px}
 <div class="panel"><details><summary>⑥ 发布与历史版本</summary><div class="body">
   <div class="row">
     <button class="gray" id="btn-refresh">重新载入线上数据</button>
+    <button class="gray" id="btn-refresh-pages">刷新线上（触发 Pages 构建）</button>
   </div>
   <p style="font-size:12px;color:#888;margin:8px 0 0">保存后约 1–2 分钟生效；页面会自动轮询确认。token 仅存本机浏览器。</p>
   <label style="margin-top:12px">最近提交（点「回滚」把该版本数据恢复到线上）</label>
@@ -451,12 +452,35 @@ function validateZlText(txt){
 }
 window.__validateZlText=validateZlText;
 async function pagesDispatch(){
+  var t0=Date.now(),attempts=0,lastErr='';
+  function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+  async function latestRunStart(){
+    try{
+      var r=await fetch('https://api.github.com/repos/'+REPO+'/actions/runs?event=workflow_dispatch&per_page=5&t='+Date.now(),{headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json'}});
+      if(!r.ok)return null;var j=await r.json();var runs=(j&&j.workflow_runs)||[];
+      return runs.map(function(x){return {id:x.id,created:Date.parse(x.created_at),url:x.html_url,status:x.status}});
+    }catch(e){return null}
+  }
   try{
-    if(!token())return;
-    var r=await fetch('https://api.github.com/repos/'+REPO+'/actions/workflows/pages.yml/dispatches',{method:'POST',headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({ref:BRANCH})});
-    if(r.status>=400){console.log('[pages-dispatch] skip HTTP '+r.status)}else{console.log('[pages-dispatch] ok')}
-  }catch(e){console.log('[pages-dispatch] ignored '+(e&&e.message))}
+    if(!token())return {ok:false,error:'缺少 PAT'};
+    for(attempts=1;attempts<=3;attempts++){
+      var before=await latestRunStart();
+      var prevIds={};if(before)before.forEach(function(x){prevIds[x.id]=1});
+      var r=await fetch('https://api.github.com/repos/'+REPO+'/actions/workflows/pages.yml/dispatches',{method:'POST',headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({ref:BRANCH})});
+      console.log('[pages-dispatch] attempt='+attempts+' HTTP '+r.status);
+      if(r.status>=400){lastErr='dispatch HTTP '+r.status;await sleep(1200);continue}
+      for(var i=0;i<6;i++){
+        await sleep(1200);
+        var runs=await latestRunStart();
+        if(runs){var nr=runs.filter(function(x){return !prevIds[x.id]&&x.created>=t0-5000});if(nr.length){var run=nr[0];console.log('[pages-dispatch] created run '+run.id+' '+run.url);return {ok:true,run:run,attempts:attempts}}}
+      }
+      lastErr='dispatch 成功但未看到新 run';
+    }
+    console.log('[pages-dispatch] FAILED '+lastErr);
+    return {ok:false,error:lastErr||'未知错误',attempts:attempts-1};
+  }catch(e){console.log('[pages-dispatch] exception '+(e&&e.message));return {ok:false,error:String(e&&e.message||e)}}
 }
+
 function buildHistory(prevIssue,prevNums,newIssue,history){
   var hist=(history||[]).map(function(h){return {issue:h.issue,nums:(h.nums||[]).slice()}});
   var pushed=false;
@@ -659,7 +683,8 @@ async function saveImpl(){
       await saveFile('data/manual-ziliao.json',newZl,'cms: update ziliao');
     }
     if(_timesChanged||_maintChanged){SITE_CFG.drawTimes=_newTimes;SITE_CFG.maintenance=_newMaint;await saveFile('data/site-config.json',SITE_CFG,'CMS: update config')}
-    pagesDispatch(); // 保存成功后触发 Pages 构建；无 workflow 权限时内部忽略、不阻塞
+    var _disp=await pagesDispatch();
+    if(!_disp.ok){topToast('已保存，但 Pages 构建未触发：'+_disp.error+'（可点「刷新线上」重试）',false,true)}else{try{console.log('[pages-dispatch] final run '+_disp.run.id)}catch(e){}}
     setState('已提交，校验中…');
     try { await verifySaved(newPlay, newDraw); }
     catch (ve) { Msg('已提交（数据已写入）；读回校验未通过：' + ve.message + '（不影响保存，可稍后刷新核对）', false); setState('已提交（读回未通过）'); try{poll(newDraw.updated);draw=newDraw;play=newPlay;renderPreview();try{updateAutoInfo()}catch(e){}}catch(e2){} finallyRestore(); return; }
@@ -766,6 +791,7 @@ if($('g-visiblefrom'))$('g-visiblefrom').addEventListener('input',function(){win
 document.addEventListener('change',function(e){var t=e.target;if(t&&/^g-(hh|mm)-/.test(t.id||''))window.__timesTouched=true},true);
 if($('btn-save'))$('btn-save').addEventListener('click',save);
 $('btn-save-bar').addEventListener('click',save);
+if($('btn-refresh-pages'))$('btn-refresh-pages').addEventListener('click',async function(){var b=$('btn-refresh-pages');if(b._busy)return;b._busy=1;b.disabled=true;var old=b.textContent;b.textContent='触发中…';try{var res=await pagesDispatch();if(res.ok){topToast('已触发 Pages 构建（run '+res.run.id+'），约1-2分钟生效',true,false)}else{topToast('触发 Pages 构建失败：'+res.error,false,true)}}finally{b._busy=0;b.disabled=false;b.textContent=old}});
 if($('btn-save-top'))$('btn-save-top').addEventListener('click',save);
 function busySet(ids,on){ids.forEach(function(id){var b=document.getElementById(id);if(!b)return;if(on){b._origTxt=b._origTxt||b.textContent;b.disabled=true;b.textContent='保存中…';b.style.opacity='.65';b.style.cursor='not-allowed'}else{b.disabled=false;if(b._origTxt)b.textContent=b._origTxt;b.style.opacity='';b.style.cursor=''}})}
 function setState(t){var el=$('save-state');if(el)el.textContent=t}
