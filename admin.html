@@ -839,6 +839,21 @@ loadAll().then(function(){LOADED=true;setSaveEnabled(true);commitList()}).catch(
   var LOAD={},SAVE={};
   LOAD.ziliao=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})};
   SAVE.ziliao=function(rows,base){base=base||{};base.name=base.name||'新香港';base.rows=rows.map(function(x){var n=parseInt(x.num,10);var ok=n>=1&&n<=49;return {issue:parseInt(x.issue,10)||0,oddEven:(x.oe==='单'||x.oe==='双')?x.oe:'',threeZodiac:zsOf(x.zs,3),result:ok?{c:pad2(n),z:zOf(n)}:{c:'',z:''},text:'内幕【提前公开】',status:ok?'live':'upcoming',updated:new Date().toISOString()}});base.updated=new Date().toISOString();return base};
+  LOAD.pick=function(j){return (j.rows||[]).map(function(r){
+    var f=function(o){return {z:((o&&o.zodiac)||[]).join(''),n:((o&&o.nums)||[]).join(' ')}}
+    var s=f(r.seven),w=f(r.five),t=f(r.three);
+    return {issue:String(r.issue||''),sevenZ:s.z,sevenN:s.n,fiveZ:w.z,fiveN:w.n,threeZ:t.z,threeN:t.n,pickZ:(r.pick&&r.pick.zodiac)||'',pickN:(r.pick&&r.pick.num)||'',slogan:r.slogan||''};
+  })};
+  SAVE.pick=function(rows,base){
+    base=base||{};base.updated=new Date().toISOString();
+    base.rows=rows.map(function(x){
+      function zs(v){return String(v||'').split('').filter(function(c){return ZC.indexOf(c)>=0})}
+      function ns(v){return String(v||'').replace(/[，,、]/g,' ').split(/\s+/).filter(Boolean).map(function(n){var k=parseInt(n,10);return isFinite(k)?pad2(k):''}).filter(Boolean)}
+      var z7=zs(x.sevenZ),n7=ns(x.sevenN);
+      return {issue:String(parseInt(x.issue,10)||''),seven:{zodiac:z7.slice(0,7),nums:n7.slice(0,7)},five:{zodiac:zs(x.fiveZ).slice(0,5),nums:ns(x.fiveN).slice(0,5)},three:{zodiac:zs(x.threeZ).slice(0,3),nums:ns(x.threeN).slice(0,3)},pick:{zodiac:zs(x.pickZ)[0]||'',num:ns(x.pickN)[0]||''},slogan:String(x.slogan||'今晚中大奖')};
+    });
+    return base;
+  };
   LOAD.wuxiao=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):'',list:pairStr(r.list)}})};
   SAVE.wuxiao=function(rows,base){base=base||{name:'五肖五码'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,special:pair(x.sp)||{z:'',c:''},list:pairs(x.list,5)}});return base};
   LOAD.santou=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),heads:(r.heads||[]).join(' '),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
@@ -858,7 +873,7 @@ loadAll().then(function(){LOADED=true;setSaveEnabled(true);commitList()}).catch(
   LOAD.ds4=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),dan:(r.dan||[]).join(''),shuang:(r.shuang||[]).join(''),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
   SAVE.ds4=function(rows,base){base=base||{name:'单双四肖'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,dan:zsOf(x.dan,4),shuang:zsOf(x.shuang,4),special:pair(x.sp)||{z:'',c:''}}});return base};
   var BOARDS=[
-    {id:'ziliao',name:'内幕·单双③肖',file:'data/manual-ziliao.json',note:'单双 + 主三肖 + 开奖结果；新一期可只填期号/单双/三肖，开奖号留空=待开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'oe',t:'单/双',w:'56px',p:'单/双'},{k:'zs',t:'主三肖',w:'84px',p:'兔蛇羊'},{k:'num',t:'开奖号',w:'70px',p:'留空'}]},
+    {id:'pick',name:'本期内幕精选',file:'data/pick.json',note:'每期：七肖/⑦码、五肖/⑤码、三肖/③码、精选肖+码、标语；最多保留 3 期，超了先删旧期。',cols:[{k:'issue',t:'期号',w:'56px',p:'316'},{k:'sevenZ',t:'七肖（7）',p:'龙猴牛狗马猪兔'},{k:'sevenN',t:'⑦码（7）',p:'03 35 18 45 01 20 40'},{k:'fiveZ',t:'五肖（5）',p:'龙猴牛狗马'},{k:'fiveN',t:'⑤码（5）',p:'03 35 18 45 01'},{k:'threeZ',t:'三肖（3）',p:'龙猴牛'},{k:'threeN',t:'③码（3）',p:'03 35 18'},{k:'pickZ',t:'精选肖',w:'64px',p:'龙'},{k:'pickN',t:'精选码',w:'64px',p:'03'},{k:'slogan',t:'标语',p:'今晚中大奖'}]},
     {id:'wuxiao',name:'五肖五码',file:'data/wuxiao.json',note:'5 组「生肖+号码」+ 特开；新一期特开留空显示 ?。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'list',t:'五肖五码（5组）',p:'鼠07 牛18 龙39 鸡10 猪20'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
     {id:'santou',name:'三头中特',file:'data/santou.json',note:'3 个头（0-4）+ 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'heads',t:'三头',w:'90px',p:'1 2 3'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
     {id:'shuangbo',name:'必赢双波',file:'data/shuangbo.json',note:'两个波（红/蓝/绿，用 + 分隔）+ 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'waves',t:'双波',w:'90px',p:'红+绿'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
@@ -870,6 +885,8 @@ loadAll().then(function(){LOADED=true;setSaveEnabled(true);commitList()}).catch(
     {id:'ds4',name:'单双四肖',file:'data/danshuangsixiao.json',note:'单组四肖 + 双组四肖 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'dan',t:'单组四肖',w:'96px',p:'狗鼠龙虎'},{k:'shuang',t:'双组四肖',w:'96px',p:'猪鸡羊兔'},{k:'sp',t:'特开',w:'76px',p:'留空'}]}
   ];
   var state={cur:0,data:{},raw:{},deleted:{}};
+  function boardLimit(b){return b&&b.id==='pick'?3:10}
+  function limitMsg(b){return '最多保留 '+boardLimit(b)+' 期，请先删除旧期'}
   window.__daGetZiliao=function(){return JSON.parse(JSON.stringify(state.data['ziliao']||[]))};
 window.__daGetDeleted=function(){return JSON.parse(JSON.stringify(state.deleted||{}))};
 window.__daClearDeleted=function(b){if(!b){state.deleted={}}else{delete state.deleted[b]}};
@@ -913,10 +930,11 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
   function sortBoard(silent){var b=BOARDS[state.cur];var rows=state.data[b.id]||[];rows.sort(function(x,y){return (parseInt(y.issue,10)||0)-(parseInt(x.issue,10)||0)});daRender();if(!silent)topToast('已按期号排序',true)}
   function rowsNow(){return state.data[BOARDS[state.cur].id]||[]}
   function blankRow(){var b=BOARDS[state.cur];var r={};b.cols.forEach(function(c){r[c.k]=''});return r}
-  function addRow(){var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}var max=0;rows.forEach(function(x){var n=parseInt(x.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender();highlightTop()}
-  function copyPrev(){var b=BOARDS[state.cur];var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}if(!rows.length)return;var last=rows[rows.length-1];var r={};b.cols.forEach(function(c){r[c.k]=last[c.k]||''});var max=0;rows.forEach(function(x){var n=parseInt(x.issue,10);if(n>max)max=n});r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(b.id,r.issue);daRender();highlightTop()}
-  function newIssueRow(){var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}var max=0;rows.forEach(function(r){var n=parseInt(r.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender()}
-  function saveBoard(){if(window.__boardBusy)return;sortBoard(true);var b=BOARDS[state.cur];if(rowsNow().length>10){setState('da-state','已满 10 条，请先删除一条再加','da-warn');topToast('已满 10 条，请先删除一条再加',false,true);return}if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}window.__boardBusy=true;busySet(['da-save'],true);
+  function addRow(){var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}
+    if(rows.length>=boardLimit(BOARDS[state.cur])){topToast(limitMsg(BOARDS[state.cur]),false,true);return}var max=0;rows.forEach(function(x){var n=parseInt(x.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender();highlightTop()}
+  function copyPrev(){var b=BOARDS[state.cur];var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}if(rows.length>=boardLimit(b)){topToast(limitMsg(b),false,true);return}if(!rows.length)return;var last=rows[rows.length-1];var r={};b.cols.forEach(function(c){r[c.k]=last[c.k]||''});var max=0;rows.forEach(function(x){var n=parseInt(x.issue,10);if(n>max)max=n});r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(b.id,r.issue);daRender();highlightTop()}
+  function newIssueRow(){var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}if(rows.length>=boardLimit(BOARDS[state.cur])){topToast(limitMsg(BOARDS[state.cur]),false,true);return}var max=0;rows.forEach(function(r){var n=parseInt(r.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender()}
+  function saveBoard(){if(window.__boardBusy)return;sortBoard(true);var b=BOARDS[state.cur];if(rowsNow().length>boardLimit(b)){var lm=limitMsg(b);setState('da-state',lm,'da-warn');topToast(lm,false,true);return}if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}window.__boardBusy=true;busySet(['da-save'],true);
     var badRows=rowsNow().filter(function(x){return !parseInt(x.issue,10)}).length;
     var obj=SAVE[b.id](rowsNow(),state.raw[b.id]||{});var bfile=b.file;
     setState('da-state','提交中…（'+b.name+'）','da-ok');
@@ -924,7 +942,7 @@ function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&
       try{
         delete SHA_CACHE[bfile];
         await saveFile(bfile,obj,'资料录入：'+b.name+'（自助后台）');
-        try{ await fetch('https://api.github.com/repos/'+REPO+'/actions/workflows/pages.yml/dispatches',{method:'POST',headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({ref:BRANCH})}); }catch(e){}
+        var _bd=await pagesDispatch();if(!_bd.ok){topToast('已保存，但 Pages 构建未触发：'+_bd.error,false,true)}
         state.raw[b.id]=obj;state.status=state.status||{};state.status[b.id]={ok:true};if(window.__daClearDeleted)window.__daClearDeleted(b.id);
         setState('da-state','✅ 已提交「'+b.name+'」；约 90 秒生效（已自动触发 Pages 构建）','da-ok');
         daRender();

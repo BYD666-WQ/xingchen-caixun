@@ -667,35 +667,42 @@ details.mini>summary::-webkit-details-marker{display:none}
 </script><script>
 (function(){
   var SRC=['','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/'];
-  function get(p){var i=0,NAMES=['raw','jsdelivr','local'];function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var k=i;var u=SRC[i++]+p+'?t='+Date.now();var AC=(typeof AbortController!=='undefined')?new AbortController():null;var TO=AC?setTimeout(function(){try{AC.abort()}catch(e){}},2500):null;try{window.__dataOrder=window.__dataOrder||[];window.__dataOrder.push({try:NAMES[k]||String(k),path:p});console.log('[data-order] try '+(NAMES[k]||k)+' '+p)}catch(e){}return fetch(u,{cache:'no-store',signal:AC?AC.signal:undefined}).then(function(r){if(TO)clearTimeout(TO);if(!r.ok)throw 0;return r.json().then(function(j){try{window.__dataOrder.push({hit:NAMES[k]||String(k),path:p});console.log('[data-order] hit '+(NAMES[k]||k)+' '+p)}catch(e){}return j})}).catch(function(){if(TO)clearTimeout(TO);try{window.__dataOrder.push({fail:NAMES[k]||String(k),path:p})}catch(e){}return go()})}return go()}
-  get('data/manual-ziliao.json').then(function(zl){
-    var rows=(zl&&zl.rows||[]).slice(0,10).sort(function(a,b){return (parseInt(a.issue,10)||0)-(parseInt(b.issue,10)||0)});if(!rows.length)return;
-    var ZOD='鼠牛虎兔龙蛇马羊猴鸡狗猪';
-    function zOk(v){v=String(v||'');return v.length===1&&ZOD.indexOf(v)>=0?v:''}
-    var oHit=0,zHit=0;
-    var html=rows.map(function(d){
-      var c=String(d.result&&d.result.c||'');
-      var ok=/^\d{1,2}$/.test(c)&&d.status!=='upcoming';
-      var oddTxt=(d.oddEven==='双'?'双数':(d.oddEven==='单'?'单数':'—'));
-      var zs=(d.threeZodiac||[]).map(zOk).filter(Boolean);
-      if(!ok)return '<div class="row xc-nr upcoming"><i>'+d.issue+'期</i><b>【'+oddTxt+'】</b><span>主'+(zs.length?zs.join(''):'—')+'</span><b class="wait">【待开】</b></div>';
-      var oddHit=(d.oddEven===((parseInt(c,10)%2===0)?'双':'单'));
-      if(oddHit)oHit++;
-      var zNow=zOk(d.result&&d.result.z);
-      var zHitNow=zs.length===3&&zNow&&zs.indexOf(zNow)>=0;
-      if(zHitNow)zHit++;
-      return '<div class="row xc-nr"><i>'+d.issue+'期</i><b>【'+(d.oddEven==='双'?'双数':'单数')+'】</b><span>主'+(zs.length?zs.join(''):'—')+'</span><em>开'+(d.result.z||'')+c+'</em><u class="'+(oddHit?'hit':'miss')+'">'+(oddHit?'准':'未中')+'</u><span class="xz '+(zHitNow?'hit':'miss')+'">'+(zHitNow?'肖中':'肖未')+'</span></div>';
-    }).join('');
-    var stat='<div class="row xc-stat"><i>统计</i><span>近'+rows.length+'期：单双中 '+oHit+' ｜ 三肖中 '+zHit+'</span><em>历史统计</em></div>'+'<div class="row xc-note"><span>历史数据统计，非预测</span></div>';
-    // 删除所有旧「内幕」块
-    document.querySelectorAll('section.mini').forEach(function(m){if((m.innerText||'').indexOf('内幕')>=0)m.remove()});
-    var sec=document.createElement('section');sec.className='mini';sec.id='nm-final';
-    sec.innerHTML='<h5>内幕 · 单双③肖</h5>'+html+stat;
-    var host=document.getElementById('xc-extra')||document.querySelector('.nav');
-    host.parentNode.insertBefore(sec,host);
-    // 数据更新时间
-    var t=document.querySelector('.card .hd .t');if(t)t.textContent='数据更新 '+('0'+new Date().getHours()).slice(-2)+':'+('0'+new Date().getMinutes()).slice(-2);
-  }).catch(function(e){});
+  function get(p){var i=0,NAMES=['raw','jsdelivr','local'];function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var k=i;var u=SRC[i++]+p+'?t='+Date.now();var AC=(typeof AbortController!=='undefined')?new AbortController():null;var TO=AC?setTimeout(function(){try{AC.abort()}catch(e){}},2500):null;try{window.__dataOrder=window.__dataOrder||[];window.__dataOrder.push({try:NAMES[k]||String(k),path:p})}catch(e){}return fetch(u,{cache:'no-store',signal:AC?AC.signal:undefined}).then(function(r){if(TO)clearTimeout(TO);if(!r.ok)throw 0;return r.json()}).catch(function(){if(TO)clearTimeout(TO);return go()})}return go()}
+  var RED=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46],BLUE=[3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
+  function cw(n){n=parseInt(n,10);return RED.indexOf(n)>=0?'r':(BLUE.indexOf(n)>=0?'b':'g')}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  if(!document.getElementById('pick-style')){var st=document.createElement('style');st.id='pick-style';st.textContent='#nm-final.mini{padding:0;background:transparent;border:0;box-shadow:none}#nm-final .pk-block{background:#FFFDF6;border:1px solid #E3C98E;border-radius:8px;overflow:hidden;margin:0 0 10px}#nm-final .pk-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #E3C98E}#nm-final .pk-grid:first-child{border-top:0}#nm-final .pk-cell{padding:8px 7px;display:flex;align-items:baseline;gap:2px;min-width:0;white-space:nowrap;overflow:hidden;font-size:14px;font-weight:900;line-height:1.35}#nm-final .pk-cell.r{justify-content:flex-end;border-left:1px solid #E3C98E;text-align:right}#nm-final .pk-lab{font-size:11px;color:#8a6a33;font-weight:700;flex:none}#nm-final .pk-z,#nm-final .pk-n{display:inline-flex;align-items:baseline;gap:2px;min-width:0}#nm-final .r{color:#C00012}#nm-final .b{color:#0B4EA2}#nm-final .g{color:#0B7A3A}#nm-final .pk-pick{border-top:1px dashed #E3C98E;padding:9px 4px;text-align:center;font-size:14px;line-height:1.45;white-space:nowrap;overflow:hidden}#nm-final .pk-pick .iss{color:#C00012;font-weight:900;font-size:15px}#nm-final .pk-pick .one{color:#C00012;font-weight:900}#nm-final .pk-pick .tail{color:#6b4a10;font-weight:700}#nm-final .pk-ad{margin:0 0 10px;border-top:1px solid #E8C98A;border-bottom:1px solid #E8C98A;background:#FFF3D6;text-align:center;padding:9px 6px;font-size:15px;font-weight:900;color:#8a2b00;letter-spacing:2px}';document.head.appendChild(st)}
+  function pair(zodiacs,nums){
+    var z='',n='';
+    for(var i=0;i<zodiacs.length;i++){var c=cw(nums[i]);z+='<span class="'+c+'">'+esc(zodiacs[i])+'</span>';n+='<span class="'+c+'">'+esc(nums[i])+'</span>'}
+    return {z:z,n:n};
+  }
+  function issueHtml(p){
+    var seven=pair(p.seven.zodiac||[],p.seven.nums||[]);
+    var five=pair(p.five.zodiac||[],p.five.nums||[]);
+    var three=pair(p.three.zodiac||[],p.three.nums||[]);
+    var pick=p.pick||{};
+    return '<div class="pk-block" data-issue="'+esc(p.issue)+'">'+
+      '<div class="pk-grid"><div class="pk-cell"><span class="pk-lab">七肖：</span><span class="pk-z">'+seven.z+'</span></div><div class="pk-cell r"><span class="pk-lab">⑦码：</span><span class="pk-n">'+seven.n+'</span></div></div>'+
+      '<div class="pk-grid"><div class="pk-cell"><span class="pk-lab">五肖：</span><span class="pk-z">'+five.z+'</span></div><div class="pk-cell r"><span class="pk-lab">⑤码：</span><span class="pk-n">'+five.n+'</span></div></div>'+
+      '<div class="pk-grid"><div class="pk-cell"><span class="pk-lab">三肖：</span><span class="pk-z">'+three.z+'</span></div><div class="pk-cell r"><span class="pk-lab">③码：</span><span class="pk-n">'+three.n+'</span></div></div>'+
+      '<div class="pk-pick"><span class="iss">'+esc(p.issue)+'期：</span>精选一肖一码 <span class="one">【'+esc(pick.zodiac||'')+'-'+esc(pick.num||'')+'】</span> <span class="tail">'+esc(p.slogan||'今晚中大奖')+'</span></div>'+
+    '</div>';
+  }
+  function mount(){
+    var sec=document.getElementById('nm-final');
+    if(!sec){sec=document.createElement('section');sec.className='mini';sec.id='nm-final';var w=document.getElementById('wuxiao');if(w&&w.parentNode)w.parentNode.insertBefore(sec,w);else{var nav=document.querySelector('.nav');if(nav&&nav.parentNode)nav.parentNode.insertBefore(sec,nav)}}
+    return sec;
+  }
+  function render(rows){
+    var sec=mount();if(!sec)return;
+    var list=(rows||[]).slice().sort(function(a,b){return (parseInt(a.issue,10)||0)-(parseInt(b.issue,10)||0)}).slice(-2);
+    if(!list.length){sec.innerHTML='';return}
+    var html='';
+    for(var i=0;i<list.length;i++){html+=issueHtml(list[i]);if(i<list.length-1)html+='<div class="pk-ad">新港摇钱树</div>'}
+    sec.innerHTML=html;
+  }
+  get('data/pick.json').then(function(p){render(p&&p.rows||[])}).catch(function(){});
 })();
 </script><script>
 (function(){
@@ -830,12 +837,12 @@ details.mini>summary::-webkit-details-marker{display:none}
 </script><script src="assets/js/subnav.js"></script><script id="xc-realtime">
 (function(){
   if(window.__rtStarted)return;window.__rtStarted=1;
-  var files=['data/draw.json','data/manual-draw.json','data/manual-ziliao.json','data/site-config.json'];
+  var files=['data/draw.json','data/manual-draw.json','data/manual-ziliao.json','data/site-config.json','data/pick.json'];
   var sig='',timer=null,delay=12000,fails=0,polls=0,updates=0,hiddenPolls=0,paused=false;
   window.__rtStats={polls:0,updates:0,lastDelay:12000,fails:0,hiddenPolls:0,lastErr:''};
   function stats(){var o=window.__rtStats||{};o.polls=polls;o.updates=updates;o.lastDelay=delay;o.fails=fails;o.hiddenPolls=hiddenPolls;o.lastErr=o.lastErr||'';window.__rtStats=o}
   function fetchJ(rel){var u=rel+(rel.indexOf('?')>=0?'&':'?')+'t='+Date.now();return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})}
-  function getSig(j){var by={};(j[0].games||[]).forEach(function(g){by[g.rule]=g});var c=j[3]||{};return [j[0].updated,j[1].updated,j[2].updated,by.Macau&&by.Macau.issue,by.HongKong&&by.HongKong.issue,j[1].issue,JSON.stringify(c.drawTimes||{}),(c.maintenance&&c.maintenance.enabled)?1:0,(c.maintenance&&c.maintenance.code)||''].join('|')}
+  function getSig(j){var by={};(j[0].games||[]).forEach(function(g){by[g.rule]=g});var c=j[3]||{},pk=j[4]||{};return [j[0].updated,j[1].updated,j[2].updated,by.Macau&&by.Macau.issue,by.HongKong&&by.HongKong.issue,j[1].issue,JSON.stringify(c.drawTimes||{}),(c.maintenance&&c.maintenance.enabled)?1:0,(c.maintenance&&c.maintenance.code)||'',pk.updated||''].join('|')}
   function runStored(text){try{var s=document.createElement('script');s.textContent=text;document.body.appendChild(s);s.parentNode&&s.parentNode.removeChild(s)}catch(e){}}
   var stored=[];
   function capture(){
