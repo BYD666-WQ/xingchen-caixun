@@ -1,54 +1,58 @@
 {
  "name": "新香港",
- "issue": 317,
+ "issue": 318,
  "drawTime": "每天 21:34",
  "dailyTime": "21:34",
  "status": "sample",
- "nums": [
-  {
-   "c": "28",
-   "z": "兔",
-   "color": "绿",
-   "wuxing": "土"
-  },
-  {
-   "c": "47",
-   "z": "猴",
-   "color": "蓝",
-   "wuxing": "木"
-  },
-  {
-   "c": "10",
-   "z": "鸡",
-   "color": "蓝",
-   "wuxing": "火"
-  },
-  {
-   "c": "25",
-   "z": "马",
-   "color": "蓝",
-   "wuxing": "木"
-  },
-  {
-   "c": "02",
-   "z": "蛇",
-   "color": "红",
-   "wuxing": "火"
-  },
-  {
-   "c": "19",
-   "z": "鼠",
-   "color": "红",
-   "wuxing": "火"
-  },
-  {
-   "c": "13",
-   "z": "马",
-   "color": "红",
-   "wuxing": "金"
-  }
- ],
+ "nums": [],
  "history": [
+  {
+   "issue": 317,
+   "nums": [
+    {
+     "c": "28",
+     "z": "兔",
+     "color": "绿",
+     "wuxing": "土"
+    },
+    {
+     "c": "47",
+     "z": "猴",
+     "color": "蓝",
+     "wuxing": "木"
+    },
+    {
+     "c": "10",
+     "z": "鸡",
+     "color": "蓝",
+     "wuxing": "火"
+    },
+    {
+     "c": "25",
+     "z": "马",
+     "color": "蓝",
+     "wuxing": "木"
+    },
+    {
+     "c": "02",
+     "z": "蛇",
+     "color": "红",
+     "wuxing": "火"
+    },
+    {
+     "c": "19",
+     "z": "鼠",
+     "color": "红",
+     "wuxing": "火"
+    },
+    {
+     "c": "13",
+     "z": "马",
+     "color": "红",
+     "wuxing": "金"
+    }
+   ]
+  },
   {
    "issue": 316,
    "nums": [
@@ -708,8 +712,8 @@
    ]
   }
  ],
- "updated": "2026-11-13T16:43:52.695Z",
- "visibleFrom": "2026-11-13T13:39:02.072Z",
- "publishedAt": "2026-11-13T13:39:02.072Z",
- "numsEnc": ""
+ "updated": "2026-11-13T16:48:01.933Z",
+ "visibleFrom": "2026-11-13T16:51:00.000Z",
+ "publishedAt": "",
+ "numsEnc": "AxgbFWQIEgYGek8bDGQIEtezzEEVVCVdXF1EelkbkfyQEh4ULxZBHyhVEggUv+KSVDseSxBVelkbR3UQHBBMelkbn++eEh4UOwxVGTQQChDR4sEbWmRFRUpfNgQbTGTbt6MUJU9CVCUQChAGa0EVVDwQChDf5vobWmRRX15ZKkEDVK6hrRAaehRMDi9cVxAMeoS43WRPHEkUO0EDVHQFEh4UIkEDVK+MqRAaegBWGilAEggUv9iGVGoQR0dOMQ1eVHwQ2bWneh4VDWRREggUaVsbWmRIEggUv+qiVGoQU11aNxEbTGTVipAUdEFOAz5bXlUUYkHe9+0QTR5NegAbTGQBCRAaehkbTGTbjqsUdEFaGSpdQhAMeoSCyWQeEkVDIApXEWQIEtSq8EFEWj0QUxAMelcBVGoQShAMeoSH/GQeElFZNAxLVHwQ2KGrek8bATNKWVxRelkbkceZEk9r"
 }
