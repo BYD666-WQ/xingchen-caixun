@@ -137,6 +137,7 @@ body{padding-bottom:76px}
   <div class="row">
     <button class="gray" id="btn-refresh">重新载入线上数据</button>
     <button class="gray" id="btn-refresh-pages">刷新线上（触发 Pages 构建）</button>
+    <button class="gray" id="btn-check-admin">检查后台更新</button>
   </div>
   <p style="font-size:12px;color:#888;margin:8px 0 0">保存后约 1–2 分钟生效；页面会自动轮询确认。token 仅存本机浏览器。</p>
   <label style="margin-top:12px">最近提交（点「回滚」把该版本数据恢复到线上）</label>
@@ -690,7 +691,7 @@ async function saveImpl(){
     catch (ve) { Msg('已提交（数据已写入）；读回校验未通过：' + ve.message + '（不影响保存，可稍后刷新核对）', false); setState('已提交（读回未通过）'); try{poll(newDraw.updated);draw=newDraw;play=newPlay;renderPreview();try{updateAutoInfo()}catch(e){}}catch(e2){} finallyRestore(); return; }
     await recordShas();
     try{ if(window.__daSetZiliao)window.__daSetZiliao(zlRows.map(function(r){return {issue:String(r.issue),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})); if(window.__daClearDeleted)window.__daClearDeleted('ziliao'); }catch(e){}
-    var encNow=!!(newDraw.visibleFrom&&new Date(newDraw.visibleFrom).getTime()>Date.now()&&newDraw.numsEnc);Msg('已存到第 '+newDraw.issue+' 期 · 公布 '+publishLabel+'（自动；'+_diag+'）'+(_timesChanged?'；已保存开奖时间':'')+(_maintChanged?'；已保存测试模式':'')+(encNow?'（到点后自动解密显示）':'')+'；约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
+    var encNow=!!(newDraw.visibleFrom&&new Date(newDraw.visibleFrom).getTime()>Date.now()&&newDraw.numsEnc);Msg('已存到第 '+newDraw.issue+' 期 · 公布 '+publishLabel+'（自动；'+_diag+'）'+(_timesChanged?'；已保存开奖时间':'')+(_maintChanged?'；已保存测试模式':'')+(encNow?'（到点后自动解密显示）':'')+'；约 1-2 分钟生效', true); setState('已提交，读回校验通过…');window.__adminDirty=false;try{__hideUpdateBar()}catch(e){}
     poll(newDraw.updated);
     draw=newDraw;play=newPlay;renderPreview();
   }catch(e){
@@ -982,6 +983,35 @@ async function saveMaintenanceNow(nextEnabled,nextCode){
     return true;
   }catch(e){topToast('保存测试模式失败：'+(e&&e.message||e),false,true);return false}
 }
+var __adminVer={base:'',busy:false,notified:false,timer:null,dirty:false};
+function __fp(txt){var h=5381;for(var i=0;i<txt.length;i++){h=((h<<5)+h+txt.charCodeAt(i))|0}return (h>>>0).toString(36)+'-'+txt.length}
+async function __fetchSelf(){var r=await fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);return await r.text()}
+function __hideUpdateBar(){var el=document.getElementById('admin-update-bar');if(el)el.remove()}
+function __showUpdateBar(){if(document.getElementById('admin-update-bar'))return;var el=document.createElement('div');el.id='admin-update-bar';el.style.cssText='position:fixed;left:0;right:0;top:0;z-index:2147483600;background:#FFF3D6;border-bottom:1px solid #E8C98A;color:#7a4a00;font:700 13px/1.45 "Microsoft YaHei",Arial;padding:10px 12px;display:flex;align-items:center;gap:8px;box-sizing:border-box';el.innerHTML='<span style="flex:1">后台已更新，处理完后点此刷新</span><button id="admin-update-go" style="height:34px;padding:0 12px;border:0;border-radius:6px;background:#0b7a45;color:#fff;font-weight:800">立即刷新</button>';document.body.appendChild(el);document.getElementById('admin-update-go').onclick=function(){location.reload()}}
+async function __adminCheck(manual){
+  if(__adminVer.busy)return __adminVer.busy;
+  __adminVer.busy=true;
+  try{
+    var txt=await __fetchSelf();var h=__fp(txt);
+    if(!__adminVer.base){__adminVer.base=h;if(manual)topToast('已记录当前版本（'+h+'）',true,false);return 'baseline'}
+    if(h!==__adminVer.base){
+      if(__adminVer.dirty){__showUpdateBar();if(!__adminVer.notified){__adminVer.notified=true;topToast('后台已更新：有未保存输入，已提示，不会自动刷新',false,true)}return 'dirty'}
+      topToast('后台已更新，正在刷新…',true,false);await new Promise(function(r){setTimeout(r,700)});location.reload();return 'reload'
+    }else if(manual){topToast('已是最新版本（'+h+'）',true,false)}
+    return 'same'
+  }catch(e){if(manual)topToast('检查更新失败：'+(e&&e.message||e),false,true);return 'err'}
+  finally{__adminVer.busy=false}
+}
+async function __adminInitVer(){
+  try{__adminVer.base=__fp(await __fetchSelf())}catch(e){__adminVer.base=''}
+  if(__adminVer.timer)clearInterval(__adminVer.timer);
+  __adminVer.timer=setInterval(function(){__adminCheck(false)},60000);
+  setTimeout(function(){document.addEventListener('input',function(e){var t=e.target;if(t&&/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName))__adminVer.dirty=true},true);document.addEventListener('change',function(e){var t=e.target;if(t&&/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName))__adminVer.dirty=true},true)},1500);
+}
+window.__adminCheckNow=function(){return __adminCheck(true)};
+window.__adminDirtyState=function(){return __adminVer.dirty};
+if(document.getElementById('btn-check-admin'))document.getElementById('btn-check-admin').addEventListener('click',function(){__adminCheck(true)});
+setTimeout(__adminInitVer,800);
 loadAll();
 })();
 
