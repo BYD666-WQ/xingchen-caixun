@@ -633,7 +633,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     var ex=document.getElementById('xc-extra');if(!ex){ex=document.createElement('div');ex.id='xc-extra';host.parentNode.insertBefore(ex,host)}return ex;
   }
   get('data/manual-ziliao.json').then(function(zl){
-    var rows=(zl&&zl.rows||[]).slice(0,10);var ex=mount();if(!ex)return;
+    var rows=(zl&&zl.rows||[]).slice(0,10).sort(function(a,b){return (parseInt(a.issue,10)||0)-(parseInt(b.issue,10)||0)});var ex=mount();if(!ex)return;
     var hist=rows.map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');return '<div class="row"><i>'+d.issue+'期</i><span>'+(ok?((d.threeZodiac||[]).join('')+' 开'+(d.result.z||'')+c):'待开')+'</span></div>'}).join('');
     var zt=['鼠 07 19 31 43','牛 06 18 30 42','虎 05 17 29 41','兔 04 16 28 40','龙 03 15 27 39','蛇 02 14 26 38','马 01 13 25 37 49','羊 12 24 36 48','猴 11 23 35 47','鸡 10 22 34 46','狗 09 21 33 45','猪 08 20 32 44'];
     ex.innerHTML = ('<section class="mini"><h5>历史开奖记录</h5>'+hist+'</section>'+
