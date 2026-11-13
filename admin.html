@@ -168,6 +168,13 @@ body{padding-bottom:76px}
   <label>第 7 球（特码）前额外等待秒数（默认 5）</label><input id="reveal-special" inputmode="numeric" value="5">
   <div class="row" style="margin-top:8px"><button id="btn-save-reveal">保存节奏</button><span id="reveal-state" style="font-size:12px;color:#888"></span></div>
 </div></details></div>
+<div class="panel" id="panel-maint"><details><summary>⑨ 测试模式（维护遮罩）</summary><div class="body">
+  <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="maint-enabled" style="width:20px;height:20px"> 开启测试模式（访客需输入访问代号）</label>
+  <label>访问代号（6 位）</label>
+  <div class="row"><input id="maint-code" readonly style="flex:1;letter-spacing:2px;font-weight:700"><button id="maint-regen" type="button" class="small">重新生成</button></div>
+  <label>提示文案（可选）</label><input id="maint-hint" placeholder="例如：测试中，请输入访问代号">
+  <p style="font-size:12px;color:#888;margin:6px 0 0">改完点底部「保存并发布」生效；开启后页面会加 noindex。</p>
+</div></details></div>
 <div id="savebar">
   <span id="save-state">未保存</span>
   <button id="btn-save-bar" style="min-height:44px;padding:0 18px">保存并发布</button>
@@ -333,7 +340,7 @@ async function loadAll(){
   draw=dr;play=pl;LOADED=true;
   try{SITE_CFG=await loadJSON('data/site-config.json')||{}}catch(e){SITE_CFG={}}
   SITE_CFG.drawTimes=SITE_CFG.drawTimes||{newhk:'21:34',newmo:'21:30',hk:'21:30'};
-  fillTimesUI();
+  fillTimesUI();fillMaintUI();
   $('g-name').value=dr.name||'';
   var ai=autoIssueInfo();
   $('g-issue').value=ai.issue;
@@ -479,6 +486,14 @@ function calcAutoVf(newIssue){
 }
 
 var __vfTouched=false;
+function genMaintCode(){var ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<6;i++){var r=(window.crypto&&crypto.getRandomValues)?crypto.getRandomValues(new Uint8Array(1))[0]:Math.floor(Math.random()*256);s+=ch[r%ch.length]}return s}
+function collectMaintUI(){var el=$('maint-enabled'),codeEl=$('maint-code'),hintEl=$('maint-hint');return {enabled:!!(el&&el.checked),code:String(codeEl&&codeEl.value||'').trim(),hint:String(hintEl&&hintEl.value||'').trim()}}
+function fillMaintUI(){
+  var m=(SITE_CFG&&SITE_CFG.maintenance)||{};if(!m.code)m.code=genMaintCode();
+  if($('maint-enabled'))$('maint-enabled').checked=!!m.enabled;
+  if($('maint-code'))$('maint-code').value=m.code;
+  if($('maint-hint'))$('maint-hint').value=m.hint||'';
+}
 function collectDrawTimesUI(){
   var out={};
   for(var i=0;i<3;i++){var key=['newhk','newmo','hk'][i];var hm=String(($('g-time-'+key)||{}).value||'').trim();
@@ -502,16 +517,19 @@ async function saveImpl(){
   if(!LOADED){Msg('未载入成功，禁止保存（请刷新页面）',false);setState('载入失败');return}
   var _newTimes=null,_timesChanged=false;
   try{_newTimes=collectDrawTimesUI();_timesChanged=JSON.stringify(_newTimes)!==JSON.stringify(normDrawTimes(SITE_CFG.drawTimes))}catch(te){return Msg('保存失败（开奖时间/开奖日字段）：'+te.message,false)}
+  var _newMaint=collectMaintUI();
+  if(!_newMaint.code||_newMaint.code.length!==6)return Msg('保存失败（测试模式）：访问代号需为 6 位',false);
+  var _maintChanged=JSON.stringify(_newMaint)!==JSON.stringify((function(){var m=SITE_CFG.maintenance||{};return {enabled:!!m.enabled,code:String(m.code||''),hint:String(m.hint||'')}})());
   var nums=parseNums($('g-nums').value);
   var _aiTarget=parseInt(($('g-issue')||{}).value,10)||autoIssueInfo().issue;
   if(nums.length===0){
-    if(!_timesChanged){return Msg('还没输入第 '+_aiTarget+' 期的号码（7 个，6+1）；如只改开奖时间请直接点保存',false)}
+    if(!_timesChanged&&!_maintChanged){return Msg('还没输入第 '+_aiTarget+' 期的号码（7 个，6+1）；如只改开奖时间/测试模式请直接点保存',false)}
     try{
-      SITE_CFG.drawTimes=_newTimes;
-      await saveFile('data/site-config.json',SITE_CFG,'CMS: update draw times');
+      SITE_CFG.drawTimes=_newTimes;SITE_CFG.maintenance=_newMaint;
+      await saveFile('data/site-config.json',SITE_CFG,'CMS: update config');
       try{pagesDispatch()}catch(e){}
       fillTimesUI();updateAutoInfo();
-      Msg('已保存开奖时间（未填号码，开奖数据未改动）',true);setState('开奖时间已保存');
+      Msg((_timesChanged?'已保存开奖时间':'')+(_timesChanged&&_maintChanged?'、':'')+(_maintChanged?'已保存测试模式':'')+'（未填号码，开奖数据未改动）',true);setState('配置已保存');
       return;
     }catch(te2){return Msg('保存失败（开奖时间/开奖日字段）：'+(te2&&te2.message||te2),false)}
   }
@@ -616,14 +634,14 @@ async function saveImpl(){
       await saveFile('data/site-copy.json',copy,'CMS: update site copy');
       await saveFile('data/manual-ziliao.json',newZl,'cms: update ziliao');
     }
-    if(_timesChanged){SITE_CFG.drawTimes=_newTimes;await saveFile('data/site-config.json',SITE_CFG,'CMS: update draw times')}
+    if(_timesChanged||_maintChanged){SITE_CFG.drawTimes=_newTimes;SITE_CFG.maintenance=_newMaint;await saveFile('data/site-config.json',SITE_CFG,'CMS: update config')}
     pagesDispatch(); // 保存成功后触发 Pages 构建；无 workflow 权限时内部忽略、不阻塞
     setState('已提交，校验中…');
     try { await verifySaved(newPlay, newDraw); }
     catch (ve) { Msg('已提交（数据已写入）；读回校验未通过：' + ve.message + '（不影响保存，可稍后刷新核对）', false); setState('已提交（读回未通过）'); try{poll(newDraw.updated);draw=newDraw;play=newPlay;renderPreview();try{updateAutoInfo()}catch(e){}}catch(e2){} finallyRestore(); return; }
     await recordShas();
     try{ if(window.__daSetZiliao)window.__daSetZiliao(zlRows.map(function(r){return {issue:String(r.issue),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})); if(window.__daClearDeleted)window.__daClearDeleted('ziliao'); }catch(e){}
-    var encNow=!!(newDraw.visibleFrom&&new Date(newDraw.visibleFrom).getTime()>Date.now()&&newDraw.numsEnc);Msg('已存到第 '+newDraw.issue+' 期 · 公布 '+publishLabel+'（自动）'+(_timesChanged?'；已保存开奖时间':'')+(encNow?'（到点后自动解密显示）':'')+'；约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
+    var encNow=!!(newDraw.visibleFrom&&new Date(newDraw.visibleFrom).getTime()>Date.now()&&newDraw.numsEnc);Msg('已存到第 '+newDraw.issue+' 期 · 公布 '+publishLabel+'（自动）'+(_timesChanged?'；已保存开奖时间':'')+(_maintChanged?'；已保存测试模式':'')+(encNow?'（到点后自动解密显示）':'')+'；约 1-2 分钟生效', true); setState('已提交，读回校验通过…');
     poll(newDraw.updated);
     draw=newDraw;play=newPlay;renderPreview();
   }catch(e){
@@ -887,6 +905,7 @@ async function saveDrawTimesImpl(){
     topToast('开奖时间/开奖日已更新，立即生效',true,false);setState('开奖时间已更新');
   }).catch(function(e){topToast('保存失败：'+(e&&e.message||e),false,true);setState('保存失败')});
 }
+if($('maint-regen'))$('maint-regen').addEventListener('click',function(){$('maint-code').value=genMaintCode()});
 if(document.getElementById('btn-save-times'))document.getElementById('btn-save-times').addEventListener('click',function(){if(window.__timesBusy)return;window.__timesBusy=true;busySet(['btn-save-times'],true);Promise.resolve(saveDrawTimesImpl()).finally(function(){busySet(['btn-save-times'],false);window.__timesBusy=false})});
 
 loadAll();

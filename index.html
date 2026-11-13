@@ -290,7 +290,53 @@ details.mini>summary::-webkit-details-marker{display:none}
 #ds4 .ds4-grp{color:#0B7A3A;font-weight:900;font-size:14px;margin-right:8px}
 #ds4 .ds4-z{display:inline-block;padding:0 1px}
 #ds4 .ds4-z.hit{background:#FFE47A;color:#8A0000;border-radius:3px;box-shadow:0 0 0 1px #E0B400 inset}
-</style></head><body><div class="notice">本站数据仅供参考 · 开奖结果以官方公布为准</div>
+</style><script id="xc-maint-gate">
+(function(){
+  if(window.__maintGateStarted)return;window.__maintGateStarted=1;
+  var orig=window.fetch.bind(window);
+  var queued=[];
+  window.__maint={enabled:false,locked:true};
+  window.fetch=function(input,init){
+    var url=typeof input==='string'?input:((input&&input.url)||'');
+    var isData=/(^|\/)data\/[^?]*\.json/.test(url)&&url.indexOf('site-config.json')<0;
+    if(isData&&window.__maint.locked){return new Promise(function(res,rej){queued.push({input:input,init:init,res:res,rej:rej})})}
+    return orig(input,init);
+  };
+  function settle(allow){
+    var q=queued;queued=[];window.__maint.locked=!allow;
+    q.forEach(function(x){if(allow){orig(x.input,x.init).then(x.res,x.rej)}else{x.rej(new Error('maintenance'))}});
+  }
+  function unlock(){settle(true)}
+  function lock(m){settle(false);window.__maint.locked=true;showOverlay(m)}
+  function showOverlay(m){
+    var build=function(){
+      if(document.getElementById('xc-maint'))return;
+      var st=document.createElement('style');st.textContent='#xc-maint{position:fixed;inset:0;z-index:2147483000;background:linear-gradient(180deg,#7a0b0f,#4a0508);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}#xc-maint .box{width:100%;max-width:330px;background:#fffdf6;border:2px solid #e8c98a;border-radius:12px;padding:20px 16px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.35)}#xc-maint h3{margin:0 0 8px;color:#a3000a;font:900 22px/1.3 "Microsoft YaHei",Arial}#xc-maint p{margin:0 0 12px;font-size:13px;color:#6b4a10;line-height:1.5}#xc-maint input{width:100%;box-sizing:border-box;height:44px;border:1px solid #d8c08a;border-radius:8px;text-align:center;font-size:18px;letter-spacing:3px;text-transform:uppercase;margin:0 0 10px}#xc-maint button{width:100%;height:44px;border:0;border-radius:8px;background:#0b7a45;color:#fff;font:700 16px/1 "Microsoft YaHei",Arial}#xc-maint .err{color:#c00;font-size:13px;min-height:18px;margin:0 0 8px}';document.head.appendChild(st);
+      var o=document.createElement('div');o.id='xc-maint';
+      o.innerHTML='<div class="box"><h3>网站维护中</h3><p id="xc-maint-hint">'+((m.hint?String(m.hint).replace(/[<>&]/g,''):'测试中，请输入访问代号'))+'</p><input id="xc-maint-code" autocomplete="off" maxlength="8" inputmode="latin"><div class="err" id="xc-maint-err"></div><button id="xc-maint-go" type="button">进入</button></div>';
+      document.body.appendChild(o);document.body.style.overflow='hidden';
+      var inp=document.getElementById('xc-maint-code'),btn=document.getElementById('xc-maint-go'),err=document.getElementById('xc-maint-err');
+      function go(){
+        var v=String(inp.value||'').trim().toUpperCase();
+        if(v===String(m.code||'').toUpperCase()){try{localStorage.setItem('xc_pass',String(m.code))}catch(e){};location.reload();return}
+        err.textContent='代号错误，请重试';
+      }
+      btn.addEventListener('click',go);inp.addEventListener('keydown',function(e){if(e.key==='Enter')go()});setTimeout(function(){try{inp.focus()}catch(e){}},100);
+    };
+    if(document.body)build();else document.addEventListener('DOMContentLoaded',build);
+  }
+  orig('data/site-config.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json()}).then(function(cfg){
+    var m=(cfg&&cfg.maintenance)||{};
+    window.__maint.enabled=!!m.enabled;window.__maint.code=m.code||'';
+    if(!m.enabled){unlock();return}
+    var meta=document.createElement('meta');meta.name='robots';meta.content='noindex,nofollow';document.head.appendChild(meta);
+    var pass=null;try{pass=localStorage.getItem('xc_pass')}catch(e){}
+    if(pass&&String(pass)===String(m.code)){unlock();return}
+    lock(m);
+  }).catch(function(){unlock()});
+})();
+</script>
+</head><body><div class="notice">本站数据仅供参考 · 开奖结果以官方公布为准</div>
 <header><div class="logo">新港摇钱树</div><div class="seal">正版</div></header>
 <nav class="tabs"><a class="on">新港</a><a>新澳</a><a>香港</a></nav>
 <div class="openbar" id="xc-openbar" data-issue="313"><div class="ol"><b id="xc-ob-issue">313期开</b><span>开奖记录</span></div><div class="ob" id="xc-ob-balls"><div class="tile r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div></div></div>
