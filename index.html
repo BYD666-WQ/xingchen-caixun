@@ -370,11 +370,10 @@ details.mini>summary::-webkit-details-marker{display:none}
     });
   }
   function tick(){
-    try{if(window.__xcEnsureWaiting)window.__xcEnsureWaiting();if(VF&&VF.phase==='revealing')vfRestore();xrWaitingTick()}catch(e){}
+    try{if(window.__xcEnsureWaiting)window.__xcEnsureWaiting();if(VF&&VF.phase==='revealing')vfRestore()}catch(e){}
     KEYS.forEach(function(k){
       var e=document.getElementById('xc-cd-'+k);if(!e)return;
-      if(k==='newhk'&&((D.newhk&&D.newhk._xcWaiting)||window.__xcWaiting)){e.textContent='待开';return}
-      if(k!=='newhk'&&D[k]&&D[k]._xrWaiting){e.textContent='待开';return}var hm=TIME_TABLE[LABEL[k]==='新澳彩'?'新澳':(LABEL[k]==='香港彩'?'香港':'新港')];
+      if(k==='newhk'&&((D.newhk&&D.newhk._xcWaiting)||window.__xcWaiting)){e.textContent='待开';return}var hm=TIME_TABLE[LABEL[k]==='新澳彩'?'新澳':(LABEL[k]==='香港彩'?'香港':'新港')];
       var n=new Date();var t=nextDate(hm,DAYS[kindOf(k)]);var left=Math.floor((t-n)/1000);
       e.textContent='距开奖 '+p2(Math.floor(left/3600))+':'+p2(Math.floor(left%3600/60))+':'+p2(left%60);
     });
@@ -386,14 +385,13 @@ details.mini>summary::-webkit-details-marker{display:none}
     var ob=document.getElementById('xc-openbar');var obi=document.getElementById('xc-ob-issue');
     if(obi)obi.textContent=shortIssue(d.issue||'')+'期开';
     if(ob){ob.setAttribute('data-issue',shortIssue(d.issue||''));ob.setAttribute('data-nums',(d.nums||[]).map(function(x){return x.c}).join(','))}
-    var box=document.getElementById('xc-ob-balls')||document.querySelector('.openbar .ob');if(box&&d.nums)box.innerHTML=ballHtml(d.nums);try{if(k!=='newhk')xrShow(k)}catch(e){}
+    var box=document.getElementById('xc-ob-balls')||document.querySelector('.openbar .ob');if(box&&d.nums)box.innerHTML=ballHtml(d.nums);
     document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.classList.toggle('on',i===KEYS.indexOf(k))});
   }
   window.__xcShow=show;
   window.__applyDraw=function(dr,md){var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});D={newhk:md,newmo:by.Macau,hk:by.HongKong};buildCards();tick();var vfActive=false;try{vfActive=vfApply(md)}catch(e){}
     if(!vfActive&&window.__xcWaiting&&xcHasNums(md)){try{xcEnsureWaiting();vfActive=(window.__xcWaiting===false)}catch(e){}}
-    if(vfActive){try{vfRestore()}catch(e){}}else{fill();show(KEYS[window.__pendingTab||0])}try{xcEnsureWaiting()}catch(e){}
-    try{window.__drawUpdatedAt=dr.updatedAt;xrDetectAll();var ct2=KEYS[window.__pendingTab||0];if(ct2!=='newhk')xrShow(ct2)}catch(e){}};
+    if(vfActive){try{vfRestore()}catch(e){}}else{fill();show(KEYS[window.__pendingTab||0])}try{xcEnsureWaiting()}catch(e){}};
   window.__showTab=function(k){var M={newhk:0,newmo:1,hk:2,'新港':0,'新澳':1,'新澳彩':1,'香港':2,'香港彩':2};var i=(k in M)?M[k]:-1;if(i>=0){if(D[KEYS[i]])show(KEYS[i]);else{window.__pendingTab=i;document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,j){t.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}}return i>=0};
   document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.addEventListener('click',function(){window.__pendingTab=i;if(D[KEYS[i]])show(KEYS[i]);else{document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(x,j){x.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}})})
 
@@ -574,89 +572,6 @@ details.mini>summary::-webkit-details-marker{display:none}
   window.__xcEnsureWaiting=xcEnsureWaiting;
   window.__vfTimeline=function(){return VF&&VF.timeline?VF.timeline.slice():null};
   window.__vfState=function(){return VF?{issue:VF.issue,phase:VF.phase,revealed:VF.revealed,elapsed:Date.now()-VF.vf,played:VF.played}:null};
-  /* ===== 新澳/香港：到点灰球 + 到达/增量揭晓（与时间线共用 vfTimeline） ===== */
-  var XR={newmo:null,hk:null};
-  function xrLS(k){try{return JSON.parse(localStorage.getItem('xc-xr-'+k)||'null')}catch(e){return null}}
-  function xrSave(k,st){try{localStorage.setItem('xc-xr-'+k,JSON.stringify({issue:String(st.issue),start:st.start,phase:st.phase,nums:st.nums,mode:st.mode,revealed:st.revealed}))}catch(e){}}
-  function xrDue(k){var hm=TIME_TABLE[kindOf(k)],days=DAYS[kindOf(k)];if(!hm||!days||days.indexOf(new Date().getDay())<0)return null;var q=String(hm).split(':');var n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate(),parseInt(q[0],10)||0,parseInt(q[1],10)||0,0,0)}
-  function xrBalls(nums,count,hl){var h='';for(var i=0;i<6;i++)h+=vfTile(i,nums,count,hl);h+='<span class="plus">+</span>';return h+vfTile(6,nums,count,hl)}
-  function xrRender(k,count,hl,ptext){
-    var g=D[k]||{},nums=(XR[k]&&XR[k].nums)||[];
-    vfEnsureUI();
-    var html=xrBalls(nums,count,hl);
-    var card=document.getElementById('blk-'+k);if(card){var bb=card.querySelector('.balls');if(bb)bb.innerHTML=html;var b=card.querySelector('.hd b');if(b&&g.issue)b.textContent=LABEL[k]+'第'+shortIssue(g.issue)+'期'}
-    if(window.__curTab===k){
-      var ob=document.getElementById('xc-ob-balls');if(ob)ob.innerHTML=html;
-      var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent=shortIssue(g.issue||'')+'期开';
-      var p=document.getElementById('xc-vf-progress');if(p){p.textContent=ptext||('开奖中… '+count+'/7');p.style.display='block'}
-    }
-  }
-  function xrDone(k){var st=XR[k];if(!st)return;st.phase='done';st.revealed=7;xrSave(k,st);xrRender(k,7,-1,'本期已开出')}
-  function xrSchedule(k){
-    var st=XR[k];if(!st||st.phase!=='revealing')return;
-    var tl=vfTimeline(st.issue,VF_CFG),elapsed=Date.now()-st.start;
-    if(st.revealed>=7){var wait=Math.max(0,tl[6]+SETTLE_MS-elapsed);xrRender(k,7,-1,'开奖中… 7/7');st.timer=setTimeout(function(){xrDone(k)},wait);return}
-    var wait=Math.max(0,tl[st.revealed]-elapsed);
-    xrRender(k,st.revealed,-1);
-    st.timer=setTimeout(function(){if(!st||st.phase!=='revealing')return;st.revealed++;xrRender(k,st.revealed,st.revealed-1);xrSchedule(k)},wait);
-  }
-  function xrStart(k,mode,start){
-    var g=D[k];if(!g||!g.nums||!g.nums.length)return;
-    var nums=g.nums.slice(),st={issue:g.issue,nums:nums,start:start||Date.now(),phase:'revealing',revealed:mode==='incremental'?nums.length:0,mode:mode,timer:null};
-    XR[k]=st;delete g._xrWaiting;xrSave(k,st);xrRender(k,st.revealed,-1);
-    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){st.revealed=nums.length;xrDone(k);return}
-    if(mode!=='incremental')xrSchedule(k);
-  }
-  function xrResume(k,stored,nums){
-    try{delete D[k]._xrWaiting}catch(e){}
-    if(stored.mode==='incremental'){var st={issue:stored.issue,nums:nums,start:stored.start,phase:nums.length>=7?'done':'revealing',revealed:nums.length,mode:'incremental',timer:null};XR[k]=st;xrSave(k,st);xrRender(k,st.revealed,-1,st.phase==='done'?'本期已开出':('开奖中… '+st.revealed+'/7'));return}
-    var s2={issue:stored.issue,nums:(stored.nums&&stored.nums.length===7)?stored.nums:nums,start:stored.start,phase:'revealing',revealed:0,mode:'batch',timer:null};
-    XR[k]=s2;if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){s2.revealed=7;xrDone(k);return}
-    var tl=vfTimeline(s2.issue,VF_CFG),elapsed=Date.now()-s2.start,count=0;
-    while(count<7&&tl[count]<=elapsed)count++;
-    s2.revealed=count;
-    if(count>=7&&elapsed>=tl[6]+SETTLE_MS){xrDone(k);return}
-    xrRender(k,count,-1);xrSchedule(k);
-  }
-  function xrShow(k){
-    var g=D[k]||{};
-    var st=XR[k];if(st){xrRender(k,st.revealed||0,-1,st.phase==='done'?'本期已开出':('开奖中… '+(st.revealed||0)+'/7'));return}
-    if(g._xrWaiting){xrRender(k,0,-1,'待开 · 等待开奖数据');return}
-    var stored=xrLS(k);
-    if(stored&&String(stored.issue)===String(g.issue)&&g.nums&&g.nums.length===7){try{xrResume(k,stored,g.nums)}catch(e){}}
-  }
-  function xrDetect(k){
-    var g=D[k];if(!g||!g.issue||!g.nums||g.nums.length!==7)return;
-    var stored=xrLS(k),due=xrDue(k),up=window.__drawUpdatedAt?new Date(window.__drawUpdatedAt).getTime():0,nowT=Date.now();
-    if(!stored){
-      if(due&&nowT>=due.getTime()&&up>=due.getTime()&&(nowT-up)<2*3600*1000){xrStart(k,'batch',Math.min(up,nowT))}
-      else if(due&&nowT>=due.getTime()){g._xrWaiting=1}
-      return;
-    }
-    var gi=parseInt(g.issue,10),si=parseInt(stored.issue,10);
-    if(gi>si){delete g._xrWaiting;xrStart(k,(g.nums.length<7)?'incremental':'batch',nowT);return}
-    if(gi<si)return;
-    if(stored.phase==='done'){delete g._xrWaiting;XR[k]={issue:stored.issue,nums:stored.nums,start:stored.start,phase:'done',revealed:7,mode:stored.mode};xrRender(k,7,-1,'本期已开出');return}
-    if(stored.mode==='incremental'){
-      if(g.nums.length>stored.revealed){stored.revealed=g.nums.length;stored.nums=g.nums;stored.phase=g.nums.length>=7?'done':'revealing';XR[k]=stored;xrSave(k,stored);xrRender(k,stored.revealed,-1,stored.phase==='done'?'本期已开出':('开奖中… '+stored.revealed+'/7'))}
-      return;
-    }
-    if(due&&nowT>=due.getTime()&&stored.start<due.getTime()){g._xrWaiting=1;return}
-    xrResume(k,stored,g.nums);
-  }
-  function xrDetectAll(){['newmo','hk'].forEach(function(k){try{xrDetect(k)}catch(e){}})}
-  function xrWaitingTick(){['newmo','hk'].forEach(function(k){
-    var g=D[k];if(!g||!g.issue)return;var due=xrDue(k);if(!due||Date.now()<due.getTime())return;
-    var st=XR[k];if(st&&st.phase==='revealing')return;
-    var stored=xrLS(k);
-    if(stored&&String(stored.issue)===String(g.issue)){
-      if(stored.phase==='done'&&stored.start>=due.getTime())return;
-      if(stored.mode==='incremental'&&g.nums&&g.nums.length<7)return;
-    }
-    g._xrWaiting=1;xrRender(k,0,-1,'待开 · 等待开奖数据');
-  })}
-  window.__xrState=function(){var o={};['newmo','hk'].forEach(function(k){var s=XR[k];o[k]=s?{issue:s.issue,phase:s.phase,revealed:s.revealed,mode:s.mode,elapsed:Date.now()-s.start}:null});return o};
-
   Promise.all([get('data/manual-draw.json'),get('data/draw.json'),get('data/site-config.json')]).then(function(r){
     var md=r[0]||{},dr=r[1]||{},cfg=r[2]||null;var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
     VF_CFG=vfNormCfg(cfg);window.__vfConfig=function(){return JSON.parse(JSON.stringify(VF_CFG))};
@@ -673,7 +588,6 @@ details.mini>summary::-webkit-details-marker{display:none}
     var vfActive=false;try{vfActive=vfApply(md)}catch(e){console.log('[vf]',e&&e.message)}
     fill();show(KEYS[window.__pendingTab||0]);
     if(vfActive){try{vfRestore()}catch(e){}}try{xcEnsureWaiting()}catch(e){}
-    try{window.__drawUpdatedAt=dr.updatedAt;xrDetectAll();var ct=KEYS[window.__pendingTab||0];if(ct!=='newhk')xrShow(ct)}catch(e){}
   }).catch(function(e){console.log('[tt]',e&&e.message)});
 })();
 </script><script>
