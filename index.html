@@ -855,7 +855,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       var res=wait?'待开':(hit?'对':'错');
       var tag=wait?'<span class="wx-tag wait">待开</span>':'<span class="wx-tag '+(hit?'ok':'no')+'">'+res+'</span>';
       var l1='<b>'+r.issue+'期</b>：<span class="wx-title">五肖五码</span>'+(hit?' <span class="wx-hit">中</span>':'')+' 特开：<span class="wx-special">'+(wait?'?':(sp.z+sp.c))+'</span>'+tag;
-      var items=(r.list||[]).map(function(x){var on=!wait&&x.z===sp.z;return '<span class="wx-item'+(on?' hit':'')+'">'+x.z+x.c+'</span>'}).join('');
+      var items=(r.list||[]).map(function(x){var on=!wait&&(x.z===sp.z||('0'+x.c).slice(-2)===('0'+sp.c).slice(-2));return '<span class="wx-item'+(on?' hit':'')+'">'+x.z+x.c+'</span>'}).join('');
       return '<div class="wx-row" data-issue="'+r.issue+'" data-result="'+res+'"><div class="wx-l1">'+l1+'</div><div class="wx-l2">【'+items+'】</div></div>';
     }).join('');
     var sec=mount();sec.innerHTML='<h5>五肖五码</h5>'+html;
@@ -872,8 +872,10 @@ details.mini>summary::-webkit-details-marker{display:none}
   function wcls(w){return w==='红'?'w-red':(w==='蓝'?'w-blue':'w-green')}
   function place(){var box=document.getElementById('xc-blocks2');if(!box)return;var anchor=document.getElementById('wuxiao')||document.getElementById('nm-final');var nav=document.querySelector('.nav');if(anchor&&anchor.parentNode){if(anchor.nextSibling!==box)anchor.parentNode.insertBefore(box,anchor.nextSibling);return}if(nav&&nav.parentNode&&box.nextSibling!==nav)nav.parentNode.insertBefore(box,nav)}
   function mount(){var box=document.getElementById('xc-blocks2');if(box)return box;box=document.createElement('div');box.id='xc-blocks2';var w=document.getElementById('wuxiao')||document.getElementById('nm-final');if(w&&w.parentNode)w.parentNode.insertBefore(box,w.nextSibling);else{var nav=document.querySelector('.nav');if(nav)nav.parentNode.insertBefore(box,nav)}return box}
-  Promise.all([get('data/santou.json'),get('data/shuangbo.json'),get('data/danshuang.json'),get('data/liuxiao.json')]).then(function(rs){
-    var st=rs[0],sb=rs[1],ds=rs[2],lx=rs[3];
+  Promise.all([get('data/santou.json'),get('data/shuangbo.json'),get('data/danshuang.json'),get('data/liuxiao.json'),get('data/manual-draw.json').catch(function(){return {}})]).then(function(rs){
+    var st=rs[0],sb=rs[1],ds=rs[2],lx=rs[3],md=rs[4]||{};
+    function mdMap(md){var out={};function dec(enc){try{var b=atob(String(enc||'')),a=new Uint8Array(b.length),k='Xc9vF2026';for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i)^k.charCodeAt(i%k.length);return JSON.parse(new TextDecoder('utf-8').decode(a))}catch(e){return []}}function add(issue,nums){if(issue===undefined||issue===null)return;out[String(issue).slice(-3)]=nums||[]}if(md.current){add(md.current.issue,md.current.numsEnc?dec(md.current.numsEnc):md.current.nums)}else{add(md.issue,md.numsEnc?dec(md.numsEnc):md.nums)}(md.history||[]).forEach(function(h){add(h.issue,h.nums)});return out}
+    var MDR=mdMap(md);
     var stHtml=(st&&st.rows||[]).map(function(r){
       var sp=r.special||{};var wait=!sp.z;var num=wait?0:parseInt(sp.c,10);var head=wait?-1:Math.floor(num/10);
       var hit=!wait&&(r.heads||[]).indexOf(head)>=0;
@@ -883,7 +885,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       return '<div class="st-row" data-issue="'+r.issue+'" data-result="'+(wait?'?':res)+'"><b>'+r.issue+'期</b>：<span class="st-name">三头中特</span><span class="st-heads">【'+heads+'】</span> <span class="st-open">开：'+(wait?'?':(sp.z+sp.c))+'</span> '+tag+'</div>';
     }).join('');
     var sbHtml=(sb&&sb.rows||[]).map(function(r){
-      var sp=r.special||{};var wait=!sp.z;var num=wait?0:parseInt(sp.c,10);var color=wait?'':waveOf(num);
+      var sp=r.special||{};var wait=!sp.z;var num=wait?0:parseInt(sp.c,10);var _arr=MDR[String(r.issue).slice(-3)];var _col=_arr&&_arr[6]&&_arr[6].color;var color=wait?'':( _col || waveOf(num));
       var hit=!wait&&(r.waves||[]).indexOf(color)>=0;
       var waves=(r.waves||[]).map(function(x){return '<span class="sb-wave '+wcls(x)+(x===color?' hit':'')+'">'+x+'波</span>'}).join('<span style="color:#222;font-weight:900">+</span>');
       var res=wait?'':(hit?'准':'错');
@@ -903,7 +905,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     var lxHtml='<div class="lx-hd"><b>新港摇钱树【六肖六码】</b><span>作者：小小码神</span></div>'+(lx&&lx.rows||[]).map(function(r){
       var sp=r.special||{};var wait=!sp.z;var list=r.list||[];var exact=!wait&&list.some(function(x){return x.z===sp.z&&x.c===sp.c});
       var hit=!wait&&list.some(function(x){return x.z===sp.z});
-      var items=list.map(function(x){var on=!wait&&x.z===sp.z&&(exact?x.c===sp.c:true);return '<span class="lx-item'+(on?' hit':'')+'">'+x.z+x.c+'</span>'}).join('');
+      var items=list.map(function(x){var on=!wait&&(x.z===sp.z||('0'+x.c).slice(-2)===('0'+sp.c).slice(-2));return '<span class="lx-item'+(on?' hit':'')+'">'+x.z+x.c+'</span>'}).join('');
       var res=wait?'':(hit?'中':'错');var resHtml=wait?'':'<span class="lx-res '+(hit?'ok':'no')+'">'+res+'</span>';
       return '<div class="lx-row" data-issue="'+r.issue+'" data-result="'+(wait?'?':res)+'"><span class="lx-issue">'+r.issue+'期</span><span class="lx-list">'+items+'</span><span class="lx-open">开:'+(wait?'?':(sp.z+sp.c))+'</span>'+resHtml+'</div>';
     }).join('')+'<div class="lx-slogan">家人们：和我一起六合彩，赚到盆满钵满都在掌握之中，多期连升足以证明一切</div>';
@@ -935,9 +937,10 @@ details.mini>summary::-webkit-details-marker{display:none}
     }).join('');
     var ptHtml=(pt&&pt.rows||[]).map(function(r){
       var sp=r.special||{};var wait=!sp.z;var hit=!wait&&sp.z===r.zod;
+      /* 平特①肖：数据错位，待修数据后再启用自动标；当前完全不标（仅保留历史准/错文本） */
       var zodTxt=r.zod?(r.zod+r.zod+r.zod):'待定';
       var res=wait?'':(hit?'准':'错');var resHtml=wait?'':'<span class="pt-res '+(hit?'ok':'no')+'">'+res+'</span>';
-      return '<div class="pt-row" data-issue="'+r.issue+'" data-result="'+(wait?'?':res)+'"><b>'+r.issue+'期</b>：<span class="pt-name">平特①肖</span><span class="pt-zod'+(hit?' hit':'')+'">【'+zodTxt+'】</span> <span class="pt-open">开：'+(wait?'?':(sp.z+sp.c))+'</span> '+resHtml+'</div>';
+      return '<div class="pt-row" data-issue="'+r.issue+'" data-result="'+(wait?'?':res)+'"><b>'+r.issue+'期</b>：<span class="pt-name">平特①肖</span><span class="pt-zod">【'+zodTxt+'】</span> <span class="pt-open">开：'+(wait?'?':(sp.z+sp.c))+'</span> '+resHtml+'</div>';
     }).join('');
     var ds4Html='<div class="ds4-hd">单双四肖</div>'+(ds4&&ds4.rows||[]).map(function(r){
       var sp=r.special||{};var wait=!sp.z;var num=wait?0:parseInt(sp.c,10);var isDan=!wait&&num%2===1;
