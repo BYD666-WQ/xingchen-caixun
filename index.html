@@ -152,7 +152,7 @@ header{background-color:#B3000E!important}
 .mini .row span{margin-right:auto!important}
 .nav a[href="gallery.html"]{}
 </style><style id="xc-f10">
-.tabs .badge-img{width:28px!important;height:28px!important;display:block!important;flex:0 0 28px!important}
+.tabs .badge-img{width:20px!important;height:20px!important;display:block!important;flex:0 0 20px!important}
 .tabs svg.badge-svg{display:none!important}
 </style><style id="xc-cd-gold">
 #xc-cd{font-size:18px!important;font-weight:800!important;color:#FFD24D!important;-webkit-text-fill-color:#FFD24D!important;background:none!important;text-shadow:0 1px 0 rgba(120,0,0,.6)!important}
@@ -348,7 +348,7 @@ details.mini>summary::-webkit-details-marker{display:none}
 <div class="nav"><a class="on">首页</a><a>资料大全</a><a>规律走势</a><a>寻宝</a><a href="gallery.html">图库</a></div><script>
 (function(){
   var tabsImgs=['assets/theme/tabs/xianggang.webp','assets/theme/tabs/xin-aocai.webp','assets/theme/tabs/xianggang.webp'];
-  function addBadge(a,i){var old=a.querySelector('svg,img');if(old)old.remove();var im=document.createElement('img');im.className='badge-img';im.alt='';im.src=tabsImgs[i];im.style.cssText='width:28px;height:28px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid #F6C65B;margin-right:5px';a.insertBefore(im,a.firstChild)}
+  function addBadge(a,i){var old=a.querySelector('svg,img');if(old)old.remove();var im=document.createElement('img');im.className='badge-img';im.alt='';im.src=tabsImgs[i];im.style.cssText='width:20px;height:20px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid #F6C65B;margin-right:5px;vertical-align:middle';a.insertBefore(im,a.firstChild)}
   document.querySelectorAll('.tabs a, .tabs .tab').forEach(addBadge);
   document.querySelectorAll('body > div, body > section, main > *, .wrap > *').forEach(function(e){
     if(e.id==='xc-extra')return;var r=e.getBoundingClientRect();if(r.height>24&&r.height<400){var t=(e.innerText||'').trim();if(!t&&!e.querySelector('img,svg'))e.style.display='none'}
