@@ -1,14 +1,14 @@
 {
  "ok": true,
  "status": "ok",
- "source": "cf-worker",
- "updated": "2026-11-14 21:35:03",
- "updatedAt": "2026-11-14T21:35:03.313+08:00",
+ "source": "gh-actions",
+ "updated": "2026-11-14 21:55:14",
+ "updatedAt": "2026-11-14T21:55:14+08:00",
  "games": [
   {
    "rule": "Macau",
    "name": "新澳彩",
-   "widgetId": 41408,
+   "widgetId": 24186,
    "issue": 2026318,
    "shortIssue": 318,
    "nums": [
@@ -41,7 +41,7 @@
      "z": "蛇"
     }
    ],
-   "sourcePackage": "cf-worker",
+   "sourcePackage": "temps_result_1.json",
    "live": true,
    "history": [
     {
@@ -389,7 +389,7 @@
   {
    "rule": "HongKong",
    "name": "香港彩",
-   "widgetId": 41376,
+   "widgetId": 41362,
    "issue": 2026120,
    "shortIssue": 120,
    "nums": [

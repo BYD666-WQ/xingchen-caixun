@@ -1,19 +1,19 @@
 {
  "ok": true,
  "status": "success",
- "message": "云端 Worker 已更新（实时 1 彩种）",
- "updated": "2026-11-14 21:35:03",
- "updatedAt": "2026-11-14T21:35:03.313+08:00",
- "lastSuccess": "2026-11-14 21:35:03",
- "newest_seen_ts": "317",
+ "message": "数据已更新（实时彩种 2）",
+ "updated": "2026-11-14 21:55:14",
+ "updatedAt": "2026-11-14T21:55:14+08:00",
+ "lastSuccess": "2026-11-14 21:55:14",
+ "newest_seen_ts": "318",
  "newest_seen_ids": [
-  "Macau:317",
+  "Macau:318",
   "HongKong:120"
  ],
  "read_count": 2,
- "new_count": 0,
+ "new_count": 1,
  "probe_ok": true,
- "receipt_gap_alert": false,
+ "receipt_gap_alert": true,
  "digest_frozen_alert": false,
  "liveRules": [
   "Macau",
