@@ -1,19 +1,19 @@
 {
  "ok": true,
  "status": "success",
- "message": "狂暴模式：实时 1 彩种",
- "updated": "2026-11-13 21:34:47",
- "updatedAt": "2026-11-13T21:34:47+08:00",
- "lastSuccess": "2026-11-13 21:34:47",
- "newest_seen_ts": "316",
+ "message": "数据已更新（实时彩种 2）",
+ "updated": "2026-11-14 08:15:13",
+ "updatedAt": "2026-11-14T08:15:13+08:00",
+ "lastSuccess": "2026-11-14 08:15:13",
+ "newest_seen_ts": "317",
  "newest_seen_ids": [
-  "Macau:316",
+  "Macau:317",
   "HongKong:120"
  ],
  "read_count": 2,
  "new_count": 0,
  "probe_ok": true,
- "receipt_gap_alert": false,
+ "receipt_gap_alert": true,
  "digest_frozen_alert": false,
  "liveRules": [
   "Macau",
