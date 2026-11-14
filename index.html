@@ -422,7 +422,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       var b=c.querySelector('.hd b');if(b&&d.issue)b.textContent=LABEL[k]+'第'+String(d.issue).slice(-3)+'期';
       var bb=c.querySelector('.balls');if(bb&&d.nums)bb.innerHTML=ballHtml(d.nums);
       var t=c.querySelector('.hd .t');if(t)t.textContent='数据更新 '+p2(new Date().getHours())+':'+p2(new Date().getMinutes());
-      var nx=c.querySelector('.next span');if(nx){var nd=nextDate(hm,DAYS[kindOf(k)]);nx.textContent='第'+((parseInt(String(d.issue).slice(-3),10)||0)+1)+'期 · '+(nd.getMonth()+1)+'月'+nd.getDate()+'日 '+WD[nd.getDay()]+' '+hm}
+      var nx=c.querySelector('.next span');if(nx){var nd=nextDate(hm,DAYS[kindOf(k)]);var _nxt='第'+((parseInt(String(d.issue).slice(-3),10)||0)+1)+'期 · '+(nd.getMonth()+1)+'月'+nd.getDate()+'日 '+WD[nd.getDay()]+' '+hm;if(k==='newmo'){var _wx=newmoWaitInfo();if(_wx&&_wx.expired)_nxt='数据超时，已转下一期 · '+_nxt}nx.textContent=_nxt}
       var cd=c.querySelector('.xc-cd');if(!cd){cd=document.createElement('span');cd.className='xc-cd';c.querySelector('.hd').appendChild(cd)}
       cd.id='xc-cd-'+k;
       var hd=c.querySelector('.hd .h');
