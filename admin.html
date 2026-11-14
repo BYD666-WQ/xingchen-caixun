@@ -80,6 +80,7 @@ body{padding-bottom:76px}
   </div>
   <p id="token-state" style="font-size:12px;color:#888;margin:8px 0 0">未保存密钥</p>
   <p style="font-size:12px;color:#888;margin:4px 0 0">密钥只存本机浏览器，不会上传到网站。</p>
+  <p style="font-size:12px;color:#b26a00;background:#fff8e6;border:1px solid #f0d48a;border-radius:5px;padding:6px 8px;margin:6px 0 0;line-height:1.6">权限要求：Fine-grained PAT 仅选本仓库，勾 <b>Actions: Read and write</b> + <b>Contents: Read and write</b>；classic PAT 勾 <b>workflow</b> + <b>repo</b>。否则数据能存但不会自动构建。</p>
 </div></details></div>
 
 <div class="panel" id="login-panel" style="display:none"><details open><summary>🔐 登录</summary><div class="body">
@@ -466,25 +467,49 @@ window.__validateZlText=validateZlText;
 async function pagesDispatch(){
   var t0=Date.now(),attempts=0,lastErr='';
   function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
-  async function latestRunStart(){
+  async function latestRuns(ev){
     try{
-      var r=await fetch('https://api.github.com/repos/'+REPO+'/actions/runs?event=workflow_dispatch&per_page=5&t='+Date.now(),{headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json'}});
+      var r=await fetch('https://api.github.com/repos/'+REPO+'/actions/runs?event='+encodeURIComponent(ev)+'&per_page=5&t='+Date.now(),{headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json'}});
       if(!r.ok)return null;var j=await r.json();var runs=(j&&j.workflow_runs)||[];
-      return runs.map(function(x){return {id:x.id,created:Date.parse(x.created_at),url:x.html_url,status:x.status}});
+      return runs.map(function(x){return {id:x.id,created:Date.parse(x.created_at),url:x.html_url,status:x.status,event:x.event}});
     }catch(e){return null}
   }
+  async function tryRepoDispatch(){
+    var rd={ok:false,status:0,error:'',body:''};
+    try{
+      var rr=await fetch('https://api.github.com/repos/'+REPO+'/dispatches',{method:'POST',headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({event_type:'pages-build'})});
+      rd.status=rr.status;console.log('[pages-dispatch] repository_dispatch HTTP '+rr.status);
+      if(rr.status>=400){try{rd.body=await rr.text()}catch(e){};rd.error='repository_dispatch HTTP '+rr.status;return rd}
+      for(var i=0;i<7;i++){
+        await sleep(1200);
+        var runs=await latestRuns('repository_dispatch');
+        if(runs){var nr=runs.filter(function(x){return x.created>=t0-5000});if(nr.length){console.log('[pages-dispatch] repository run '+nr[0].id+' '+nr[0].url);return {ok:true,run:nr[0],via:'repository_dispatch'}}}
+      }
+      rd.error='repository_dispatch 成功但未看到新 run';return rd;
+    }catch(e){rd.error='repository_dispatch 异常：'+String(e&&e.message||e);return rd}
+  }
   try{
-    if(!token())return {ok:false,error:'缺少 PAT'};
+    if(!token())return {ok:false,status:0,error:'缺少 PAT'};
     for(attempts=1;attempts<=3;attempts++){
-      var before=await latestRunStart();
+      var before=await latestRuns('workflow_dispatch');
       var prevIds={};if(before)before.forEach(function(x){prevIds[x.id]=1});
       var r=await fetch('https://api.github.com/repos/'+REPO+'/actions/workflows/pages.yml/dispatches',{method:'POST',headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({ref:BRANCH})});
       console.log('[pages-dispatch] attempt='+attempts+' HTTP '+r.status);
-      if(r.status>=400){lastErr='dispatch HTTP '+r.status;await sleep(1200);continue}
+      if(r.status>=400){
+        var _body='';try{_body=await r.text()}catch(e2){}
+        var _acc='';try{_acc=r.headers.get('x-accepted-github-permissions')||''}catch(e3){}
+        console.log('[pages-dispatch] '+r.status+' body='+_body.slice(0,300)+' accepted='+_acc);
+        if(r.status===403||r.status===404){
+          var rd=await tryRepoDispatch();
+          if(rd.ok)return rd;
+          return {ok:false,status:r.status,error:'密钥缺少 Actions 权限',body:_body.slice(0,500),accepted:_acc,repoError:rd.error,attempts:attempts};
+        }
+        lastErr='dispatch HTTP '+r.status+' '+_body.slice(0,120);await sleep(1200);continue
+      }
       for(var i=0;i<6;i++){
         await sleep(1200);
-        var runs=await latestRunStart();
-        if(runs){var nr=runs.filter(function(x){return !prevIds[x.id]&&x.created>=t0-5000});if(nr.length){var run=nr[0];console.log('[pages-dispatch] created run '+run.id+' '+run.url);return {ok:true,run:run,attempts:attempts}}}
+        var runs=await latestRuns('workflow_dispatch');
+        if(runs){var nr=runs.filter(function(x){return !prevIds[x.id]&&x.created>=t0-5000});if(nr.length){var run=nr[0];console.log('[pages-dispatch] created run '+run.id+' '+run.url);return {ok:true,run:run,via:'workflow_dispatch',attempts:attempts}}}
       }
       lastErr='dispatch 成功但未看到新 run';
     }
@@ -492,7 +517,36 @@ async function pagesDispatch(){
     return {ok:false,error:lastErr||'未知错误',attempts:attempts-1};
   }catch(e){console.log('[pages-dispatch] exception '+(e&&e.message));return {ok:false,error:String(e&&e.message||e)}}
 }
-
+function pagesPermHint(){
+  return '密钥缺少 Actions/Workflow 权限。请重新生成密钥：GitHub → Settings → Developer settings → Fine-grained tokens → 仅选本仓库 → Actions: Read and write + Contents: Read and write；classic PAT 请勾选 workflow + repo。';
+}
+function handleDispatchFail(res,files){
+  var is403=!!(res&&(res.status===403||/403|Actions|权限/.test(String(res.error||''))));
+  var msg=is403
+    ? '数据已保存，但密钥缺少 Actions 权限，自动构建未触发。'+pagesPermHint()+' 后台将自动补构建并核对线上（约 90 秒）…'
+    : '数据已保存，但 Pages 构建未触发（'+((res&&res.error)||'未知')+'）。后台将自动补构建并核对线上（约 90 秒）…';
+  try{topToast(msg,false,true)}catch(e){}
+  try{console.log('[pages-dispatch] FAILED status='+((res&&res.status)||'')+' error='+((res&&res.error)||'')+' accepted='+((res&&res.accepted)||'')+' body='+String((res&&res.body)||'').slice(0,300))}catch(e){}
+  try{waitOnline(files,180000)}catch(e){}
+}
+function sameJson(a,b){try{return JSON.stringify(a)===JSON.stringify(b)}catch(e){return false}}
+async function waitOnline(files,timeoutMs){
+  var t0=Date.now(),last=0;
+  function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+  try{topToast('数据已保存，后台自动补构建中（约 90 秒）…',true,true)}catch(e){}
+  while(Date.now()-t0<timeoutMs){
+    var all=true;
+    for(var i=0;i<files.length;i++){
+      try{var r=await fetch(PAGES+files[i].path+'?t='+Date.now(),{cache:'no-store'});if(!r.ok){all=false;break}var j=await r.json();if(!sameJson(j,files[i].obj)){all=false;break}}catch(e){all=false;break}
+    }
+    if(all){try{topToast('数据已保存，线上已更新（约 '+Math.round((Date.now()-t0)/1000)+' 秒）',true,false)}catch(e){};return true}
+    var sec=Math.round((Date.now()-t0)/1000);
+    if(sec-last>=20){last=sec;try{topToast('数据已保存，后台自动补构建中…已等待 '+sec+' 秒（最长 180 秒）',true,true)}catch(e){}}
+    await sleep(8000);
+  }
+  try{topToast('数据已保存，但线上仍未更新；请点「刷新线上（触发 Pages 构建）」重试，或更换有 Actions 权限的密钥',false,true)}catch(e){}
+  return false;
+}
 function buildHistory(prevIssue,prevNums,newIssue,history){
   var hist=(history||[]).map(function(h){return {issue:h.issue,nums:(h.nums||[]).slice()}});
   var pushed=false;
@@ -696,7 +750,7 @@ async function saveImpl(){
     }
     if(_timesChanged||_maintChanged){SITE_CFG.drawTimes=_newTimes;SITE_CFG.maintenance=_newMaint;await saveFile('data/site-config.json',SITE_CFG,'CMS: update config')}
     var _disp=await pagesDispatch();
-    if(!_disp.ok){topToast('已保存，但 Pages 构建未触发：'+_disp.error+'（可点「刷新线上」重试）',false,true)}else{try{console.log('[pages-dispatch] final run '+_disp.run.id)}catch(e){}}
+    if(!_disp.ok){handleDispatchFail(_disp,[{path:'data/manual-draw.json',obj:newDraw}])}else{try{console.log('[pages-dispatch] final run '+_disp.run.id)}catch(e){}}
     setState('已提交，校验中…');
     try { await verifySaved(newPlay, newDraw); }
     catch (ve) { Msg('已提交（数据已写入）；读回校验未通过：' + ve.message + '（不影响保存，可稍后刷新核对）', false); setState('已提交（读回未通过）'); try{poll(newDraw.updated);draw=newDraw;play=newPlay;renderPreview();try{updateAutoInfo()}catch(e){}}catch(e2){} finallyRestore(); return; }
@@ -992,7 +1046,7 @@ function daRender(){renderTabs();var b=BOARDS[state.cur];$d('da-note').textConte
       try{
         delete SHA_CACHE[bfile];
         await saveFile(bfile,obj,'资料录入：'+b.name+'（自助后台）');
-        var _bd=await pagesDispatch();if(!_bd.ok){topToast('已保存，但 Pages 构建未触发：'+_bd.error,false,true)}
+        var _bd=await pagesDispatch();if(!_bd.ok){handleDispatchFail(_bd,[{path:bfile,obj:obj}])}else{try{console.log('[pages-dispatch] board run '+_bd.run.id)}catch(e){}}
         state.raw[b.id]=obj;state.status=state.status||{};state.status[b.id]={ok:true};if(window.__daClearDeleted)window.__daClearDeleted(b.id);
         setState('da-state','✅ 已提交「'+b.name+'」；约 90 秒生效（已自动触发 Pages 构建）','da-ok');
         daRender();
