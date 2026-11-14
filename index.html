@@ -759,22 +759,44 @@ details.mini>summary::-webkit-details-marker{display:none}
   var RED=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46],BLUE=[3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
   function cw(n){n=parseInt(n,10);return RED.indexOf(n)>=0?'pkr':(BLUE.indexOf(n)>=0?'pkb':'pkg')}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-  if(!document.getElementById('pick-style')){var st=document.createElement('style');st.id='pick-style';st.textContent='#nm-final.mini{padding:0;background:transparent;border:0;box-shadow:none}#nm-final .pk-block{background:#FFFDF6;border:1px solid #E3C98E;border-radius:8px;overflow:hidden;margin:0 0 10px}#nm-final .pk-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #E3C98E}#nm-final .pk-grid:first-child{border-top:0}#nm-final .pk-cell{padding:10px 3px;display:flex;flex-wrap:nowrap;align-items:flex-start;gap:2px;min-width:0;white-space:normal;overflow:hidden;font-size:16px;font-weight:900;line-height:1.5;box-sizing:border-box}#nm-final .pk-cell.pk-right{justify-content:flex-start;border-left:1px solid #E3C98E;text-align:left}#nm-final .pk-lab{font-size:12px;color:#8a6a33!important;-webkit-text-fill-color:#8a6a33!important;font-weight:700;flex:none;line-height:1.5}#nm-final .pk-z{display:inline-flex;flex-wrap:wrap;align-items:flex-start;gap:2px;min-width:0;flex:1 1 auto;line-height:1.5}#nm-final .pk-n{display:inline-flex;flex-wrap:wrap;align-items:flex-start;gap:2px;min-width:0;flex:1 1 auto;line-height:1.5}#nm-final .pkr{color:#C00012!important;-webkit-text-fill-color:#C00012!important}#nm-final .pkb{color:#0B4EA2!important;-webkit-text-fill-color:#0B4EA2!important}#nm-final .pkg{color:#0B7A3A!important;-webkit-text-fill-color:#0B7A3A!important}#nm-final .pk-pick{border-top:1px dashed #E3C98E;padding:10px 4px;text-align:center;font-size:16px;line-height:1.5;white-space:nowrap;overflow:hidden;color:#6b4a10!important;-webkit-text-fill-color:#6b4a10!important}#nm-final .pk-pick .iss{color:#C00012!important;-webkit-text-fill-color:#C00012!important;font-weight:900;font-size:17px}#nm-final .pk-pick .one{color:#C00012!important;-webkit-text-fill-color:#C00012!important;font-weight:900}#nm-final .pk-pick .tail{color:#6b4a10!important;-webkit-text-fill-color:#6b4a10!important;font-weight:700}#nm-final .pk-ad{margin:0 0 10px;border-top:1px solid #E8C98A;border-bottom:1px solid #E8C98A;background:#FFF3D6;text-align:center;padding:10px 6px;font-size:17px;font-weight:900;color:#8a2b00!important;-webkit-text-fill-color:#8a2b00!important;letter-spacing:3px}';document.head.appendChild(st)}
-  function pair(zodiacs,nums){
-    var z='',n='';
-    for(var i=0;i<zodiacs.length;i++){var c=cw(nums[i]);var col=c==='pkr'?'#C00012':(c==='pkb'?'#0B4EA2':'#0B7A3A');var attr=' class="'+c+'" style="color:'+col+'"';z+='<span'+attr+'>'+esc(zodiacs[i])+'</span>';n+='<span'+attr+'>'+esc(nums[i])+'</span>'}
+  if(!document.getElementById('pick-style')){var st=document.createElement('style');st.id='pick-style';st.textContent='#nm-final.mini{padding:0;background:transparent;border:0;box-shadow:none}#nm-final .pk-block{background:#FFFDF6;border:1px solid #E3C98E;border-radius:8px;overflow:hidden;margin:0 0 10px}#nm-final .pk-grid{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #E3C98E}#nm-final .pk-grid:first-child{border-top:0}#nm-final .pk-cell{padding:10px 3px;display:flex;flex-wrap:nowrap;align-items:flex-start;gap:2px;min-width:0;white-space:normal;overflow:hidden;font-size:16px;font-weight:900;line-height:1.5;box-sizing:border-box}#nm-final .pk-cell.pk-right{justify-content:flex-start;border-left:1px solid #E3C98E;text-align:left}#nm-final .pk-lab{font-size:12px;color:#8a6a33!important;-webkit-text-fill-color:#8a6a33!important;font-weight:700;flex:none;line-height:1.5}#nm-final .pk-z{display:inline-flex;flex-wrap:wrap;align-items:flex-start;gap:2px;min-width:0;flex:1 1 auto;line-height:1.5}#nm-final .pk-n{display:inline-flex;flex-wrap:wrap;align-items:flex-start;gap:2px;min-width:0;flex:1 1 auto;line-height:1.5}#nm-final .pkr{color:#C00012!important;-webkit-text-fill-color:#C00012!important}#nm-final .pkb{color:#0B4EA2!important;-webkit-text-fill-color:#0B4EA2!important}#nm-final .pkg{color:#0B7A3A!important;-webkit-text-fill-color:#0B7A3A!important}#nm-final .pk-pick{border-top:1px dashed #E3C98E;padding:10px 4px;text-align:center;font-size:16px;line-height:1.5;white-space:nowrap;overflow:hidden;color:#6b4a10!important;-webkit-text-fill-color:#6b4a10!important}#nm-final .pk-pick .iss{color:#C00012!important;-webkit-text-fill-color:#C00012!important;font-weight:900;font-size:17px}#nm-final .pk-pick .one{color:#C00012!important;-webkit-text-fill-color:#C00012!important;font-weight:900}#nm-final .pk-pick .tail{color:#6b4a10!important;-webkit-text-fill-color:#6b4a10!important;font-weight:700}#nm-final .pk-ad{margin:0 0 10px;border-top:1px solid #E8C98A;border-bottom:1px solid #E8C98A;background:#FFF3D6;text-align:center;padding:10px 6px;font-size:17px;font-weight:900;color:#8a2b00!important;-webkit-text-fill-color:#8a2b00!important;letter-spacing:3px}#nm-final .pk-hit{background:#FFE47A!important;color:#8A0000!important;-webkit-text-fill-color:#8A0000!important;border-radius:3px!important;padding:0 1px!important;box-shadow:0 0 0 1px #E0B400 inset!important}';document.head.appendChild(st)}
+  function padN(v){v=String(v==null?'':v).trim();return /^\d+$/.test(v)?('0'+v).slice(-2):v}
+  function decNums(enc){try{var bin=atob(String(enc||'')),arr=new Uint8Array(bin.length),k='Xc9vF2026';for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i)^k.charCodeAt(i%k.length);var j=JSON.parse(new TextDecoder('utf-8').decode(arr));return (j||[]).map(function(x){return {c:padN(x.c),z:x.z||''}})}catch(e){return []}}
+  function resultsOf(md){
+    var out={};if(!md)return out;
+    function add(issue,nums){if(issue===undefined||issue===null)return;out[String(issue).slice(-3)]=(nums||[]).map(function(x){return {c:padN(x.c),z:x.z||''}})}
+    if(md.current){add(md.current.issue,md.current.numsEnc?decNums(md.current.numsEnc):md.current.nums)}
+    else{add(md.issue,md.numsEnc?decNums(md.numsEnc):md.nums)}
+    (md.history||[]).forEach(function(h){add(h.issue,h.nums)});
+    return out;
+  }
+  function hitSets(res){
+    var ns={},zs={};if(!res)return {ns:ns,zs:zs};
+    res.forEach(function(x){if(x&&x.c)ns[padN(x.c)]=1;if(x&&x.z)zs[x.z]=1});return {ns:ns,zs:zs};
+  }
+  function pair(zodiacs,nums,res){
+    var hs=hitSets(res),z='',n='';
+    for(var i=0;i<zodiacs.length;i++){
+      var c=cw(nums[i]),col=c==='pkr'?'#C00012':(c==='pkb'?'#0B4EA2':'#0B7A3A');
+      var zHit=!!hs.zs[zodiacs[i]],nHit=!!hs.ns[padN(nums[i])];
+      z+='<span class="'+c+(zHit?' pk-hit':'')+'" style="color:'+col+'">'+esc(zodiacs[i])+'</span>';
+      n+='<span class="'+c+(nHit?' pk-hit':'')+'" style="color:'+col+'">'+esc(padN(nums[i]))+'</span>';
+    }
     return {z:z,n:n};
   }
-  function issueHtml(p){
-    var seven=pair(p.seven.zodiac||[],p.seven.nums||[]);
-    var five=pair(p.five.zodiac||[],p.five.nums||[]);
-    var three=pair(p.three.zodiac||[],p.three.nums||[]);
-    var pick=p.pick||{};
+  function issueHtml(p,res){
+    var seven=pair(p.seven.zodiac||[],p.seven.nums||[],res);
+    var five=pair(p.five.zodiac||[],p.five.nums||[],res);
+    var three=pair(p.three.zodiac||[],p.three.nums||[],res);
+    var pick=p.pick||{},hs=hitSets(res);
+    var pz=esc(pick.zodiac||''),pn=esc(padN(pick.num||''));
+    var pzHtml=hs.zs[pick.zodiac]?'<span class="pk-hit">'+pz+'</span>':pz;
+    var pnHtml=hs.ns[padN(pick.num||'')]?'<span class="pk-hit">'+pn+'</span>':pn;
     return '<div class="pk-block" data-issue="'+esc(p.issue)+'">'+
       '<div class="pk-grid"><div class="pk-cell"><span class="pk-lab">七肖：</span><span class="pk-z">'+seven.z+'</span></div><div class="pk-cell pk-right"><span class="pk-lab">⑦码：</span><span class="pk-n">'+seven.n+'</span></div></div>'+
       '<div class="pk-grid"><div class="pk-cell"><span class="pk-lab">五肖：</span><span class="pk-z">'+five.z+'</span></div><div class="pk-cell pk-right"><span class="pk-lab">⑤码：</span><span class="pk-n">'+five.n+'</span></div></div>'+
       '<div class="pk-grid"><div class="pk-cell"><span class="pk-lab">三肖：</span><span class="pk-z">'+three.z+'</span></div><div class="pk-cell pk-right"><span class="pk-lab">③码：</span><span class="pk-n">'+three.n+'</span></div></div>'+
-      '<div class="pk-pick"><span class="iss">'+esc(p.issue)+'期：</span>精选一肖一码 <span class="one">【'+esc(pick.zodiac||'')+'-'+esc(pick.num||'')+'】</span> <span class="tail">'+esc(p.slogan||'今晚中大奖')+'</span></div>'+
+      '<div class="pk-pick"><span class="iss">'+esc(p.issue)+'期：</span>精选一肖一码 <span class="one">【'+pzHtml+'-'+pnHtml+'】</span> <span class="tail">'+esc(p.slogan||'今晚中大奖')+'</span></div>'+
     '</div>';
   }
   function mount(){
@@ -783,15 +805,15 @@ details.mini>summary::-webkit-details-marker{display:none}
     if(!sec){sec=document.createElement('section');sec.className='mini';sec.id='nm-final';var w=document.getElementById('wuxiao');if(w&&w.parentNode)w.parentNode.insertBefore(sec,w);else{var nav=document.querySelector('.nav');if(nav&&nav.parentNode)nav.parentNode.insertBefore(sec,nav)}}
     return sec;
   }
-  function render(rows){
+  function render(rows,resMap){
     var sec=mount();if(!sec)return;
     var list=(rows||[]).slice().sort(function(a,b){return (parseInt(a.issue,10)||0)-(parseInt(b.issue,10)||0)}).slice(-2);
     if(!list.length){sec.innerHTML='';return}
     var html='';
-    for(var i=0;i<list.length;i++){html+=issueHtml(list[i]);if(i<list.length-1)html+='<div class="pk-ad">新港摇钱树</div>'}
+    for(var i=0;i<list.length;i++){var _is=String(list[i].issue).slice(-3);html+=issueHtml(list[i],(resMap||{})[_is]);if(i<list.length-1)html+='<div class="pk-ad">新港摇钱树</div>'}
     sec.innerHTML=html;
   }
-  get('data/pick.json').then(function(p){render(p&&p.rows||[])}).catch(function(){});
+  Promise.all([get('data/pick.json'),get('data/manual-draw.json')]).then(function(r){var p=r[0]||{},md=r[1]||{};render(p.rows||[],resultsOf(md))}).catch(function(){});
 })();
 </script><script>
 (function(){
