@@ -918,4 +918,22 @@ details.mini>summary::-webkit-details-marker{display:none}
   apply();setTimeout(apply,800);setTimeout(apply,2000);setInterval(apply,3000);
 })();
 </script>
+<script id="xc-block-order">
+(function(){
+  var IDS=['nm-final','wuxiao','xc-blocks2','xc-blocks3','xc-extra'];
+  var scheduled=false;
+  function order(){
+    scheduled=false;
+    var nav=document.querySelector('.nav');if(!nav||!nav.parentNode)return;
+    for(var i=0;i<IDS.length;i++){
+      var el=document.getElementById(IDS[i]);
+      if(el&&el.parentNode===nav.parentNode&&el.nextSibling!==nav){nav.parentNode.insertBefore(el,nav)}
+    }
+  }
+  function schedule(){if(scheduled)return;scheduled=true;setTimeout(order,0)}
+  window.__xcOrderBlocks=order;
+  try{new MutationObserver(schedule).observe(document.body,{childList:true});}catch(e){}
+  [0,200,800,1800,3500].forEach(function(t){setTimeout(order,t)});
+})();
+</script>
 </body></html>

@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://cdn.jsdelivr.net; font-src 'self' data:; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>新港摇钱树 · 内容管理</title>
+<meta property="og:title" content="新港摇钱树 · 内容管理">
+<style>
+:root{--g:#07a35a;--ink:#222;--line:#e5e5e5;--bg:#f2f4f3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font:15px/1.6 "Microsoft YaHei",Arial,sans-serif;color:var(--ink)}
+header{position:sticky;top:0;z-index:10;background:var(--g);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+header b{font-size:17px}
+.wrap{max-width:640px;margin:0 auto;padding:12px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;overflow:hidden}
+.panel>summary{padding:12px 14px;min-height:44px;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.panel>summary::-webkit-details-marker{display:none}
+.panel>summary::after{content:"▾";color:#888}
+.panel[open]>summary{background:#eef8f2;border-bottom:1px solid var(--line)}
+.panel[open]>summary::after{content:"▴"}
+.body{padding:12px 14px}
+label{display:block;margin:8px 0 4px;font-weight:700;font-size:13px;color:#444}
+input,select,textarea{width:100%;min-height:42px;padding:8px 10px;border:1px solid #cfd6d2;border-radius:6px;font-size:15px;background:#fff}
+textarea{min-height:110px;font-family:Consolas,monospace;font-size:13px}
+button{min-height:44px;border:0;border-radius:6px;background:var(--g);color:#fff;font-size:15px;font-weight:700;padding:0 16px}
+button.gray{background:#6b7a72}
+button.small{min-height:40px;font-size:13px;padding:0 12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.balls{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ball{width:40px;height:40px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
+.ball i{font-style:normal;font-size:9px;font-weight:400}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{border-bottom:1px solid #eee;padding:6px;text-align:left}
+#savebar{position:fixed;left:0;right:0;bottom:0;z-index:9999;min-height:56px;display:flex;align-items:center;gap:10px;padding:0 12px;padding-bottom:env(safe-area-inset-bottom);background:#fff;border-top:1px solid #e5e5e5;box-shadow:0 -2px 8px rgba(0,0,0,.08);box-sizing:content-box}
+#savebar #save-state{flex:1;font-size:12px;color:#666;line-height:1.3}
+body{padding-bottom:76px}
+#msg{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);max-width:92vw;padding:10px 14px;border-radius:8px;color:#fff;background:#333;display:none;z-index:30;white-space:pre-wrap;font-size:13px}
+.commit{font-size:12px;color:#666;border-top:1px solid #eee;padding:6px 0;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.da-tabs{display:flex;gap:6px;overflow-x:auto;padding:6px 0;white-space:nowrap;margin:6px 0}
+.da-tabs button{background:#fff;color:#333;border:1px solid #d8d8d8;border-radius:5px;padding:6px 10px;font-size:12px;font-weight:600;min-height:32px}
+.da-tabs button.on{background:#07a35a;color:#fff;border-color:#07a35a}
+.da-tabs button.bad{color:#b00020;border-color:#e3a6ad;background:#fff5f6}
+#da-table{width:100%;border-collapse:collapse;font-size:12px}
+#da-table th,#da-table td{border:1px solid #e6e6e6;padding:3px 4px;text-align:left;vertical-align:middle}
+#da-table th{background:#f5f7f5;font-size:11px;color:#555;white-space:nowrap}
+#da-table td input{min-height:28px;font-size:12px;padding:2px 4px;width:100%}
+.da-warn{font-size:12px;color:#8a3a00;background:#FFF6D6;border:1px solid #E8C86A;border-radius:5px;padding:6px 8px;margin:6px 0;line-height:1.6}
+.da-ok{font-size:12px;color:#0b7a45}
+#xc-toast{position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:2147483000;display:none;border-radius:8px;padding:10px 34px 10px 12px;font-size:13px;line-height:1.5;box-shadow:0 6px 18px rgba(0,0,0,.18);color:#fff;background:#0b7a45}
+#xc-toast.err{background:#a33}
+#xc-toast .x{position:absolute;right:6px;top:4px;width:26px;height:26px;border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:50%;font-size:16px;line-height:1}
+@keyframes daFlash{0%{background:#FFF3C4}70%{background:#FFF3C4}100%{background:transparent}}
+#da-tbody tr.da-new td{animation:daFlash 2s ease}
+</style></head><body>
+<div id="xc-toast"><span id="xc-toast-t"></span><button class="x" id="xc-toast-x">×</button></div>
+<header><b>新港摇钱树 · 内容管理</b><span id="who" style="font-size:12px;opacity:.9"></span></header>
+<div class="wrap">
+<div id="guide" style="background:#e8f7ef;border:1px solid #b9e3cd;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;line-height:1.75;color:#0b6b3d">
+  <b>3 步完成修改：</b><br>① 在下面粘贴密钥（只需一次） → ② 填号码/资料 → ③ 点底部「保存并发布」
+</div>
+
+<div class="panel" id="token-panel"><details open><summary>🔑 密钥（只需保存一次）</summary><div class="body">
+  <input id="token" type="password" autocomplete="off" placeholder="粘贴 github_pat… 开头的密钥（粘贴后自动保存）" style="font-size:14px">
+  <div class="row">
+    <button id="btn-token-save" style="min-height:44px">保存密钥</button>
+    <button class="gray" id="btn-clear" style="min-height:44px">清除本机密钥</button>
+  </div>
+  <p id="token-state" style="font-size:12px;color:#888;margin:8px 0 0">未保存密钥</p>
+  <p style="font-size:12px;color:#888;margin:4px 0 0">密钥只存本机浏览器，不会上传到网站。</p>
+</div></details></div>
+
+<div class="panel" id="login-panel" style="display:none"><details open><summary>🔐 登录</summary><div class="body">
+  <label>后台密码</label><input id="pw" type="password" autocomplete="off" placeholder="输入密码">
+  <div class="row"><button id="btn-login">登录</button><button class="gray" id="btn-logout" style="display:none">退出登录</button></div>
+  <p style="font-size:12px;color:#888;margin:8px 0 0">登录态保存在 HttpOnly cookie，12 小时有效；密码不会出现在浏览器里。</p>
+</div></details></div>
+
+<div class="panel"><details open><summary>① 彩种配置</summary><div class="body">
+  <label>彩种名称（tab 与标题）</label><input id="g-name">
+  <div id="auto-issue-info" style="font-size:13px;background:#F3FBF6;border:1px solid #BFE8CF;color:#0b7a45;border-radius:6px;padding:8px;margin:4px 0 8px">自动：--</div>
+  <div id="next-notice" style="display:none;font-size:13px;background:#FFF3D6;border:1px solid #E8C98A;color:#8a5a2a;border-radius:6px;padding:8px;margin:0 0 8px;font-weight:700"></div>
+  <label>开奖时间 / 开奖日（勾选=开奖；香港默认二四六）</label>
+  <style>.trow{display:flex;align-items:center;gap:4px;margin:5px 0;white-space:nowrap;max-width:100%;box-sizing:border-box}.trow b{width:36px;font-size:13px;flex:none}.tsel{display:flex;align-items:center;gap:1px;flex:none}.tsel select{height:42px;width:42px;min-width:0;font-size:14px;padding:0;box-sizing:border-box;text-align:center;border:1px solid #D8D8D8;border-radius:6px;background:#fff}.tsel b{width:4px;font-weight:800;color:#333;text-align:center;flex:none}.trow .days{display:flex;gap:3px;flex:none;min-width:0}.trow .days label{font-size:11px}.daybtn{width:25px;height:25px;min-width:25px;padding:0;border:1px solid #D8D8D8;border-radius:6px;background:#F6F6F6;color:#777;font:700 11px/1 "Microsoft YaHei",Arial;flex:none}.daybtn.on{background:#0b7a45;border-color:#0b7a45;color:#fff}</style>
+  <div id="time-rows">
+    <div class="trow"><b>新港</b><span class="tsel"><select id="g-hh-newhk" aria-label="小时"></select><b>:</b><select id="g-mm-newhk" aria-label="分钟"></select></span><div class="days" id="g-days-newhk"></div></div>
+    <div class="trow"><b>新澳</b><span class="tsel"><select id="g-hh-newmo" aria-label="小时"></select><b>:</b><select id="g-mm-newmo" aria-label="分钟"></select></span><div class="days" id="g-days-newmo"></div></div>
+    <div class="trow"><b>香港</b><span class="tsel"><select id="g-hh-hk" aria-label="小时"></select><b>:</b><select id="g-mm-hk" aria-label="分钟"></select></span><div class="days" id="g-days-hk"></div></div>
+  </div>
+  <details><summary>高级：期号 / 公布时间（自动推算，可手改兜底）</summary>
+    <label>期号（自动）</label><input id="g-issue" inputmode="numeric">
+    <label>公布时间（自动）</label><input id="g-visiblefrom" type="datetime-local">
+    <details><summary>开发用兼容字段（不用管）</summary>
+      <label>开奖时间文案（兼容）</label><input id="g-drawtime">
+      <label>倒计时时间（兼容）</label><input id="g-dailytime" inputmode="numeric">
+    </details>
+  </details>
+  <label>开奖号码（6 个正码 + 1 个特别号）</label><input id="g-nums" placeholder="可整串粘贴，如 07 12 23 34 45 06 18">
+  <div id="nums-hint" style="font-size:12px;color:#888;margin-top:4px">支持整串粘贴自动拆分（空格/逗号/14 位连写均可）</div>
+  <p style="font-size:12px;color:#888;margin:4px 0 0">号码按你输入的顺序保存，不做排序；顺序即正码顺序。</p>
+  <div class="row"><button class="small gray" id="btn-rand">随机一键开</button><button class="small gray" id="btn-calc">重新计算生肖/波色</button></div>
+  <div class="balls" id="preview"></div>
+</div></details></div>
+
+<div class="panel"><details><summary>② 历史开奖</summary><div class="body">
+  <div style="overflow:auto"><table id="hist-tbl"><thead><tr><th>期号</th><th>7 个号码</th><th></th></tr></thead><tbody></tbody></table></div>
+  <div class="row"><button class="small gray" id="btn-addhist">＋ 新增一期</button></div>
+  <label>批量导入（每行：期号 号1 号2 … 号7）</label>
+  <textarea id="hist-bulk" placeholder="313 28 26 12 11 30 07 13"></textarea>
+  <div class="row"><button class="small" id="btn-bulk">导入（覆盖同期号）</button></div>
+</div></details></div>
+
+<div class="panel"><details><summary>③ 单双三肖玩法</summary><div class="body">
+  <label>期号</label><input id="p-issue" inputmode="numeric">
+  <label>单双</label><select id="p-oe"><option>单</option><option>双</option></select>
+  <label>三肖（空格分隔 3 个）</label><input id="p-zs">
+  <label>玩法文案</label><input id="p-note">
+</div></details></div>
+
+<div class="panel"><details><summary>④ 系统文案</summary><div class="body">
+  <label>站名</label><input id="c-brand" placeholder="香港摇钱树">
+  <label>站名数字（显示在站名后，如 7798）</label><input id="c-banner" inputmode="numeric" placeholder="7798">
+  <label>标语</label><input id="c-slogan" placeholder="官方开奖信息">
+  <label>公告条（留空不显示）</label><input id="c-notice" placeholder="如：本站数据仅供参考">
+  <label>页脚免责声明</label><textarea id="c-disclaimer" style="min-height:80px"></textarea>
+</div></details></div>
+
+<div class="panel"><details><summary>⑤ 资料区（单双③肖）</summary><div class="body">
+  <label>每行一条：期号 单双 三肖 开奖号（例：313 单 狗马猴 43）</label>
+  <textarea id="zl-bulk" style="min-height:140px" placeholder="313 单 狗马猴 43"></textarea>
+  <div id="zl-warn" style="display:none;margin:6px 0;padding:6px 8px;background:#FFF3C4;border:1px solid #E8C86A;border-radius:4px;color:#8a3a00;font-size:12px;line-height:1.6"></div>
+  <p style="font-size:12px;color:#888;margin:6px 0 0">保存后资料区会整体替换成这里的内容（期号会显示为「新香港X期:内幕」）。</p>
+</div></details></div>
+
+<div class="panel"><details><summary>⑥ 发布与历史版本</summary><div class="body">
+  <div class="row">
+    <button class="gray" id="btn-refresh">重新载入线上数据</button>
+    <button class="gray" id="btn-refresh-pages">刷新线上（触发 Pages 构建）</button>
+    <button class="gray" id="btn-check-admin">检查后台更新</button>
+  </div>
+  <p style="font-size:12px;color:#888;margin:8px 0 0">保存后约 1–2 分钟生效；页面会自动轮询确认。token 仅存本机浏览器。</p>
+  <label style="margin-top:12px">最近提交（点「回滚」把该版本数据恢复到线上）</label>
+  <div id="commits" style="max-height:220px;overflow:auto"></div>
+</div></details></div>
+
+</div>
+<div class="panel" id="panel-data"><details><summary>⑦ 资料自助录入（多板块）</summary><div class="body">
+  <div class="row"><button class="gray" id="da-reload">重新载入线上资料</button><span id="da-src" style="font-size:12px;color:#888">未载入</span></div>
+  <div class="da-tabs" id="da-tabs"></div>
+  <div class="row" style="margin:6px 0">
+    <button id="da-add">＋ 加行</button>
+    <button class="gray" id="da-copy">复制上一期</button>
+    <button class="gray" id="da-empty">生成本期空行</button>
+    <button id="da-save">保存本板块</button>
+    <span id="da-count" style="font-size:12px;color:#888"></span>
+  </div>
+  <div class="da-warn" id="da-warn" style="display:none"></div>
+  <div style="overflow:auto"><table id="da-table"><thead id="da-thead"></thead><tbody id="da-tbody"></tbody></table></div>
+  <p id="da-note" style="font-size:12px;color:#888;margin:6px 0 0"></p>
+  <div id="da-state" class="da-ok" style="margin-top:4px">保存后约 90 秒生效（自动触发 Pages 构建）</div>
+</div></details></div>
+<div class="panel" id="panel-reveal"><details><summary>⑧ 开奖揭晓节奏</summary><div class="body">
+  <p style="font-size:12px;color:#888;margin:0 0 6px">控制新港到点后每球揭晓间隔；保存后下一期开奖生效。</p>
+  <label>模式</label>
+  <select id="reveal-mode"><option value="fixed">固定秒数</option><option value="random">随机区间</option></select>
+  <label>固定秒数（1–120，默认 10）</label><input id="reveal-seconds" inputmode="numeric" value="10">
+  <label>随机区间（min / max，秒，1–120，min≤max）</label>
+  <div class="row"><input id="reveal-min" inputmode="numeric" value="8" style="flex:1"><input id="reveal-max" inputmode="numeric" value="15" style="flex:1"></div>
+  <label>第 7 球（特码）前额外等待秒数（默认 5）</label><input id="reveal-special" inputmode="numeric" value="5">
+  <div class="row" style="margin-top:8px"><button id="btn-save-reveal">保存节奏</button><span id="reveal-state" style="font-size:12px;color:#888"></span></div>
+</div></details></div>
+<div class="panel" id="panel-maint"><details><summary>⑨ 测试模式（维护遮罩）</summary><div class="body">
+  <button id="maint-toggle" type="button" style="width:100%;min-height:48px;font-size:16px;font-weight:800;border-radius:8px;border:0;background:#0b7a45;color:#fff;margin:2px 0 10px">开启测试模式</button>
+  <p id="maint-status" style="font-size:12px;color:#888;margin:0 0 10px">当前：关闭</p>
+  <label>访问代号（6 位）</label>
+  <div class="row"><input id="maint-code" readonly style="flex:1;letter-spacing:2px;font-weight:700"><button id="maint-regen" type="button" class="small">重新生成</button></div>
+  <label>提示文案（可选）</label><input id="maint-hint" placeholder="例如：测试中，请输入访问代号">
+  <p style="font-size:12px;color:#888;margin:6px 0 0">改完点底部「保存并发布」生效；开启后页面会加 noindex。</p>
+</div></details></div>
+<div id="savebar">
+  <span id="save-state">未保存</span>
+  <button id="btn-save-bar" style="min-height:44px;padding:0 18px">保存并发布</button>
+</div>
+<div id="msg"></div>
+<script>
+var WORKER_BASE = ''; // 例：https://xingchen-cms.xxx.workers.dev（部署 Worker 后填这里）
+var BACKEND = WORKER_BASE ? 'worker' : 'contents';
+var ATTRS = {"10":{"z":"鸡","c":"蓝","w":"火"},"11":{"z":"猴","c":"绿","w":"火"},"12":{"z":"羊","c":"红","w":"金"},"13":{"z":"马","c":"红","w":"金"},"14":{"z":"蛇","c":"蓝","w":"水"},"15":{"z":"龙","c":"蓝","w":"水"},"16":{"z":"兔","c":"绿","w":"木"},"17":{"z":"虎","c":"绿","w":"木"},"18":{"z":"牛","c":"红","w":"火"},"19":{"z":"鼠","c":"红","w":"火"},"20":{"z":"猪","c":"蓝","w":"土"},"21":{"z":"狗","c":"绿","w":"土"},"22":{"z":"鸡","c":"绿","w":"水"},"23":{"z":"猴","c":"红","w":"水"},"24":{"z":"羊","c":"红","w":"木"},"25":{"z":"马","c":"蓝","w":"木"},"26":{"z":"蛇","c":"蓝","w":"金"},"27":{"z":"龙","c":"绿","w":"金"},"28":{"z":"兔","c":"绿","w":"土"},"29":{"z":"虎","c":"红","w":"土"},"30":{"z":"牛","c":"红","w":"水"},"31":{"z":"鼠","c":"蓝","w":"水"},"32":{"z":"猪","c":"绿","w":"火"},"33":{"z":"狗","c":"绿","w":"火"},"34":{"z":"鸡","c":"红","w":"金"},"35":{"z":"猴","c":"红","w":"金"},"36":{"z":"羊","c":"蓝","w":"土"},"37":{"z":"马","c":"蓝","w":"土"},"38":{"z":"蛇","c":"绿","w":"木"},"39":{"z":"龙","c":"绿","w":"木"},"40":{"z":"兔","c":"红","w":"火"},"41":{"z":"虎","c":"蓝","w":"火"},"42":{"z":"牛","c":"蓝","w":"金"},"43":{"z":"鼠","c":"绿","w":"金"},"44":{"z":"猪","c":"绿","w":"水"},"45":{"z":"狗","c":"红","w":"水"},"46":{"z":"鸡","c":"红","w":"木"},"47":{"z":"猴","c":"蓝","w":"木"},"48":{"z":"羊","c":"蓝","w":"火"},"49":{"z":"马","c":"绿","w":"火"},"01":{"z":"马","c":"红","w":"水"},"02":{"z":"蛇","c":"红","w":"火"},"03":{"z":"龙","c":"蓝","w":"火"},"04":{"z":"兔","c":"蓝","w":"金"},"05":{"z":"虎","c":"绿","w":"金"},"06":{"z":"牛","c":"绿","w":"土"},"07":{"z":"鼠","c":"红","w":"土"},"08":{"z":"猪","c":"红","w":"木"},"09":{"z":"狗","c":"蓝","w":"木"}};
+var REPO='BYD666-WQ/xingchen-caixun', BRANCH='main', KEY='xc-gh-pat';
+var CMS_BACKEND='contents'; // contents | gh-actions（B 方案留口，未实现时走 contents）
+var BANNED_FILES=['data/ziliao-list.json','data/ziliao-list-macau.json','data/ziliao-list-macauold.json','data/ziliao-list-hk.json','data/ziliao-list-happy8.json','data/hub.json','data/tuku.json','data/guilv.json','data/num-attrs.json'];
+function guardFile(path){ if(BANNED_FILES.indexOf(path)>=0) throw new Error('该文件过大（>1MB），禁止走 Contents API：'+path); }
+async function saveFile(path,obj,msg){
+  if(CMS_BACKEND==='gh-actions'){ throw new Error('gh-actions 后端尚未接入（B 方案留口）'); }
+  guardFile(path);
+  for(var attempt=0;attempt<2;attempt++){
+    try{ return await putFile(path,obj,msg); }
+    catch(e){
+      var m=String(e.message||'');
+      if(attempt===0 && (e.status===409 || e.status===422)){
+        await new Promise(function(r){setTimeout(r,800)});
+        continue;
+      }
+      throw e;
+    }
+  }
+}
+var PAGES='https://byd666-wq.github.io/xingchen-caixun/';
+var RAW='https://raw.githubusercontent.com/'+REPO+'/'+BRANCH+'/';
+var draw=null, play=null, LOADED=false;
+var SHA_CACHE = {};
+var DATA_PATHS = ['data/manual-draw.json','data/manual-play.json','data/site-copy.json','data/manual-ziliao.json'];
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function $(id){return document.getElementById(id)}
+function topToast(t,ok,sticky){
+  try{var el=$('xc-toast');if(!el)return;var tx=$('xc-toast-t');if(tx)tx.innerHTML=t;el.className=ok?'':'err';el.style.display='block';el._sticky=!!sticky;
+    if(el._timer)clearTimeout(el._timer);if(!sticky)el._timer=setTimeout(function(){el.style.display='none'},4000);
+  }catch(e){}
+}
+if(document.getElementById('xc-toast-x'))document.getElementById('xc-toast-x').addEventListener('click',function(){var el=document.getElementById('xc-toast');if(el)el.style.display='none'});
+function Msg(t,ok){try{topToast(t,!!ok,!ok)}catch(e){}var m=$('msg');m.style.display='block';m.style.background=ok?'#0b7a45':'#a33';m.textContent=t;clearTimeout(m._t);m._t=setTimeout(function(){m.style.display='none'},6000)}
+
+function showWarn(list){try{if(list&&list.length)topToast('⚠ '+esc(list[0])+(list.length>1?(' 等 '+list.length+' 条'):''),false,true)}catch(e){}var el=$('zl-warn');if(!el)return;if(!list||!list.length){el.style.display='none';el.innerHTML='';return}el.style.display='block';el.innerHTML='⚠ 保存提示（不会阻止保存）：<br>'+list.map(function(x){return '· '+x}).join('<br>')}
+function clearWarn(){showWarn([])}function pad(n){return (n<10?'0':'')+n}
+function ballColor(c){return c==='红'?'#e71607':(c==='蓝'?'#2873e6':'#1fb61d')}
+function attrsOf(num){var k=pad(parseInt(num,10));return ATTRS[k]||{}}
+function parseNums(s){return String(s||'').trim().replace(/,/g,' ').split(/\s+/).filter(Boolean).map(function(x){return pad(parseInt(x,10))})}
+function numsWithAttrs(list){return list.map(function(c){var a=attrsOf(c);return {c:c,z:a.z||'',color:a.c||'',wuxing:a.w||''}})}
+function token(){return localStorage.getItem(KEY)||''}
+var VF_KEY='Xc9vF2026';
+function vfEnc(obj){try{var s=JSON.stringify(obj),b=new TextEncoder().encode(s),out=new Uint8Array(b.length);for(var i=0;i<b.length;i++)out[i]=b[i]^VF_KEY.charCodeAt(i%VF_KEY.length);var bin='';out.forEach(function(x){bin+=String.fromCharCode(x)});return btoa(bin)}catch(e){return ''}}
+function vfDec(enc){try{var bin=atob(String(enc||'')),arr=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i)^VF_KEY.charCodeAt(i%VF_KEY.length);return JSON.parse(new TextDecoder('utf-8').decode(arr))}catch(e){return null}}
+function vfLocal(iso){if(!iso)return '';var d=new Date(iso);if(isNaN(d.getTime()))return '';return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
+function vfDefaultLocal(){var d=new Date();d.setHours(21,34,0,0);if(d.getTime()>Date.now())d.setDate(d.getDate()-1);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T21:34'}
+async function api(url,opt){opt=opt||{};opt.headers=Object.assign({'Authorization':'Bearer '+token(),'Accept':'application/vnd.github+json'},opt.headers||{});var r=await fetch(url,opt);var j=null;try{j=await r.json()}catch(e){}if(!r.ok){var err=new Error((j&&j.message)||('HTTP '+r.status));err.status=r.status;throw err}return j}
+async function shaOf(path){
+  var u = 'https://api.github.com/repos/' + REPO + '/contents/' + path + '?ref=' + BRANCH + '&t=' + Date.now();
+  try {
+    if (token()) { var j = await api(u); return j.sha; }
+    var r = await fetch(u, { cache: 'no-store', headers: { Accept: 'application/vnd.github+json' } });
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error('sha HTTP ' + r.status);
+    return (await r.json()).sha;
+  } catch (e) { if (e.status === 404) return null; throw e; }
+}
+async function recordShas(){
+  for (var i = 0; i < DATA_PATHS.length; i++) { try { SHA_CACHE[DATA_PATHS[i]] = await shaOf(DATA_PATHS[i]); } catch (e) { SHA_CACHE[DATA_PATHS[i]] = null; } }
+}
+async function getFileSha(path){try{var j=await api('https://api.github.com/repos/'+REPO+'/contents/'+path+'?ref='+BRANCH);return j.sha}catch(e){if(e.status===404)return null;throw e}}
+async function putFile(path,obj,msg){"use strict";
+  var content=btoa(unescape(encodeURIComponent(JSON.stringify(obj,null,1))));
+  var cur=await getFileSha(path);
+  var want=SHA_CACHE[path];
+  if (want && cur && want !== cur) { var ce = new Error('CONFLICT ' + path); ce.code = 'CONFLICT'; throw ce; }
+  var sha = want || cur;
+  var payload={message:msg,content:content,branch:BRANCH};if(sha)payload.sha=sha;
+  await api('https://api.github.com/repos/'+REPO+'/contents/'+path,{method:'PUT',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'}});
+}
+async function wfetch(path, opt) {
+  opt = opt || {}; opt.credentials = 'include';
+  opt.headers = Object.assign({ 'content-type': 'application/json' }, opt.headers || {});
+  var r = await fetch(WORKER_BASE + path, opt);
+  var j = null; try { j = await r.json(); } catch (e) {}
+  if (!r.ok) throw new Error((j && j.error) || ('HTTP ' + r.status));
+  return j;
+}
+var JSD_URL='https://cdn.jsdelivr.net/gh/'+REPO+'@'+BRANCH+'/';
+var SRC_TO=4000, SRC_API_TO=8000;
+function srcErr(e,ms){var s=String((e&&e.message)||e);if((e&&e.name==='AbortError')||/abort/i.test(s))return 'timeout('+(ms||SRC_TO)+'ms)';if(e&&e.status)return 'HTTP '+e.status;return s}
+function srcFetchJson(url,opt,ms){var AC=(typeof AbortController!=='undefined')?new AbortController():null;var timer=AC?setTimeout(function(){try{AC.abort()}catch(e){}},ms):null;return fetch(url,Object.assign({cache:'no-store',signal:AC?AC.signal:undefined},opt||{})).then(function(r){if(!r.ok){var er=new Error('HTTP '+r.status);er.status=r.status;throw er}return r.text()}).then(function(t){return JSON.parse(t)}).then(function(j){return j},function(e){throw e}).finally(function(){if(timer)clearTimeout(timer)})}
+async function loadJSON(rel){var e0,e1,e2,e3;
+  try{return await srcFetchJson(rel+'?t='+Date.now(),null,SRC_TO)}catch(e){e0=e}
+  try{return await srcFetchJson(JSD_URL+rel+'?t='+Date.now(),null,SRC_TO)}catch(e){e1=e}
+  try{return await srcFetchJson(RAW+rel+'?t='+Date.now(),null,SRC_TO)}catch(e){e2=e}
+  try{if(!token())throw Object.assign(new Error('未填 token'),{status:0});var j=await srcFetchJson('https://api.github.com/repos/'+REPO+'/contents/'+rel+'?ref='+BRANCH+'&t='+Date.now(),{headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}},SRC_API_TO);var b64=String(j.content||'').replace(/\n/g,'');var txt=decodeURIComponent(escape(atob(b64)));return JSON.parse(txt)}catch(e){e3=e}
+  throw new Error(rel+' 载入失败 → jsDelivr: '+srcErr(e1)+' | raw: '+srcErr(e2)+' | API: '+srcErr(e3,SRC_API_TO));
+}
+
+var SITE_CFG={};
+var _ALLD=[0,1,2,3,4,5,6];
+function xcNormDT(v,defDays,defTime){
+  if(typeof v==='string')return {time:v,days:defDays.slice()};
+  if(v&&typeof v==='object'){
+    var t=String(v.time||defTime);
+    var ds=(v.days&&v.days.length)?v.days.filter(function(x){return x>=0&&x<=6}):defDays.slice();
+    if(!ds.length)ds=defDays.slice();
+    return {time:t,days:ds};
+  }
+  return {time:defTime,days:defDays.slice()};
+}
+function normDrawTimes(dt){
+  dt=dt||{};
+  return {newhk:xcNormDT(dt.newhk,_ALLD,'21:34'),newmo:xcNormDT(dt.newmo,_ALLD,'21:30'),hk:xcNormDT(dt.hk,[2,4,6],'21:30')};
+}
+function renderDayChecks(key,days){
+  var el=$('g-days-'+key);if(!el)return;
+  var names=['日','一','二','三','四','五','六'];
+  el.innerHTML=names.map(function(n,i){return '<button type="button" class="daybtn'+(days.indexOf(i)>=0?' on':'')+'" data-day="'+i+'" aria-pressed="'+(days.indexOf(i)>=0?'true':'false')+'">'+n+'</button>'}).join('');
+  if(!el._bound){el._bound=1;el.addEventListener('click',function(ev){var b=ev.target.closest('.daybtn');if(!b)return;b.classList.toggle('on');b.setAttribute('aria-pressed',b.classList.contains('on')?'true':'false')})}
+}
+function fillTimesUI(){
+  var dt=normDrawTimes(SITE_CFG.drawTimes);window.__dtNorm=dt;
+  ['newhk','newmo','hk'].forEach(function(k){
+    var hhEl=$('g-hh-'+k),mmEl=$('g-mm-'+k),t=String(dt[k].time||'00:00').split(':');
+    if(hhEl&&!hhEl.options.length){for(var h=0;h<24;h++)hhEl.add(new Option(('0'+h).slice(-2),('0'+h).slice(-2)))}
+    if(mmEl&&!mmEl.options.length){for(var m=0;m<60;m++)mmEl.add(new Option(('0'+m).slice(-2),('0'+m).slice(-2)))}
+    if(hhEl)hhEl.value=String(t[0]||'00').padStart(2,'0');if(mmEl)mmEl.value=String(t[1]||'00').padStart(2,'0');
+    renderDayChecks(k,dt[k].days);
+  });
+}
+function autoIssueInfo(){
+  var cur=draw&&draw.issue?parseInt(draw.issue,10):1;
+  var published=!!(draw&&draw.publishedAt);
+  var issue=published?cur+1:cur;
+  var _dt=normDrawTimes(SITE_CFG.drawTimes).newhk;var hm=_dt.time,days=_dt.days;
+  var q=String(hm).split(':');var now=new Date();
+  var t=new Date(now.getFullYear(),now.getMonth(),now.getDate(),parseInt(q[0],10)||21,parseInt(q[1],10)||34,0,0);
+  for(var _i=0;_i<14;_i++){if(t.getTime()>now.getTime()&&days.indexOf(t.getDay())>=0)break;t.setDate(t.getDate()+1)}
+  return {issue:issue,vf:t,cur:cur,published:published,hm:hm};
+}
+function vfLocalStr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
+function fmtVfStr(d){return d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
+function updateAutoInfo(){
+  var el=$('auto-issue-info');if(!el)return;var ai=autoIssueInfo();
+  el.innerHTML='自动：第 <b>'+ai.issue+'</b> 期 · 公布 '+fmtVfStr(ai.vf)+'（'+(ai.published?'当前期已公布，自动 +1':'号码存当前期')+'）';
+  var nn=$('next-notice');if(nn){if(ai.issue>ai.cur){nn.style.display='block';nn.textContent='当前期 '+ai.cur+' 已公布，下次保存将写入第 '+ai.issue+' 期'}else{nn.style.display='none';nn.textContent=''}}
+}
+function mdCompatAdmin(md){
+  if(md&&md.current&&md.current.issue!==undefined){var c=md.current;return {name:md.name,issue:c.issue,nums:c.nums||[],numsEnc:c.numsEnc,visibleFrom:c.visibleFrom,publishedAt:c.publishedAt||'',history:md.history||[],updated:md.updated,drawTime:md.drawTime,dailyTime:(typeof md.dailyTime==='string'?md.dailyTime:'21:34')}}
+  return md;
+}
+async function loadAll(){
+  var t=Date.now();
+  var dr, pl, cp = {};
+  if (BACKEND === 'worker') {
+    var cfg = await wfetch('/api/config');
+    dr = cfg.files['hongkong-draw']; pl = cfg.files['play'] || {}; cp = cfg.files['site-copy'] || {};
+  } else {
+    dr = await loadJSON('data/manual-draw.json');
+  }
+  if (BACKEND !== 'worker') {
+    try { pl = await loadJSON('data/manual-play.json'); } catch (e) { pl = {}; }
+    try { cp = await loadJSON('data/site-copy.json'); } catch (e) { cp = {}; }
+  }
+  $('c-brand').value=cp.brand||'香港摇钱树'; var _cb=$('c-banner'); if(_cb) _cb.value=cp.brandNumber||cp.bannerNumber||'7798'; $('c-slogan').value=cp.slogan||'官方开奖信息';
+  $('c-notice').value=cp.notice||''; $('c-disclaimer').value=cp.disclaimer||'数据来自官方公开信息，仅供参考。';
+  dr=mdCompatAdmin(dr);
+  draw=dr;play=pl;LOADED=true;
+  try{SITE_CFG=await loadJSON('data/site-config.json')||{}}catch(e){SITE_CFG={}}
+  SITE_CFG.drawTimes=SITE_CFG.drawTimes||{newhk:'21:34',newmo:'21:30',hk:'21:30'};
+  fillTimesUI();fillMaintUI();
+  $('g-name').value=dr.name||'';
+  var ai=autoIssueInfo();
+  $('g-issue').value=ai.issue;
+  $('g-drawtime').value=dr.drawTime||('每天 '+SITE_CFG.drawTimes.newhk);
+  $('g-dailytime').value=normDrawTimes(SITE_CFG.drawTimes).newhk.time;
+  if($('g-visiblefrom'))$('g-visiblefrom').value=vfLocalStr(ai.vf);
+  updateAutoInfo();
+  var loadedNums=dr.nums||[];if((!loadedNums.length)&&dr.numsEnc){var dn=vfDec(dr.numsEnc);if(dn&&dn.length)loadedNums=dn}
+  var _cur=dr.issue?parseInt(dr.issue,10):0,_tgt=ai.issue;
+  if(_tgt>_cur){$('g-nums').value='';$('g-nums').placeholder='输入 '+_tgt+' 期的 7 个号码'}
+  else{$('g-nums').value=loadedNums.map(function(n){return n.c}).join(' ');$('g-nums').placeholder='可整串粘贴，如 07 12 23 34 45 06 18'}
+  try { var zl = BACKEND === 'worker' ? (cfg.files['ziliao']||{}) : await loadJSON('data/manual-ziliao.json'); window.__ZL=zl; renderZl(zl); } catch(e){}
+  $('p-issue').value=pl.issue||''; $('p-oe').value=pl.oddEven||'单'; $('p-zs').value=(pl.threeZodiac||[]).join(' ');
+  $('p-note').value=pl.note||'';
+  renderPreview(); renderHistory();
+  await recordShas();
+}
+function renderPreview(){
+  if (typeof updateNumsHint === 'function') updateNumsHint();
+  var list=parseNums($('g-nums').value);
+  $('preview').innerHTML=list.map(function(c){var a=attrsOf(c);return '<span class="ball" style="background:'+ballColor(a.c)+'">'+c+'<i>'+(a.w||'')+'/'+(a.z||'')+'</i></span>'}).join('');
+}
+function renderZl(zl){
+  var rows=(zl&&zl.rows)||[]; window.__ZL=zl||{rows:[]};
+  $('zl-bulk').value=rows.map(function(r){
+    var zs=(r.threeZodiac||[]).join('');
+    return r.issue+' '+r.oddEven+' '+zs+' '+((r.result&&r.result.c)||'');
+  }).join('\n');
+}
+function renderHistory(){
+  var tb=$('hist-tbl').querySelector('tbody');var h=(draw&&draw.history)||[];
+  tb.innerHTML=h.map(function(row,i){
+    return '<tr><td><input data-hi="'+i+'" data-k="issue" value="'+esc(row.issue)+'" style="min-height:40px;width:80px"></td>'+
+      '<td><input data-hi="'+i+'" data-k="nums" value="'+esc(row.nums.map(function(n){return n.c}).join(' '))+'" style="min-height:40px;font-size:13px"></td>'+
+      '<td><button class="small gray" data-del="'+i+'" style="min-width:40px">删</button></td></tr>';
+  }).join('');
+  tb.querySelectorAll('input').forEach(function(inp){inp.addEventListener('change',function(){
+    var i=+inp.getAttribute('data-hi'),k=inp.getAttribute('data-k');
+    if(k==='issue')h[i].issue=parseInt(inp.value,10)||h[i].issue;
+    else h[i].nums=numsWithAttrs(parseNums(inp.value));
+  })});
+  tb.querySelectorAll('button[data-del]').forEach(function(b){b.addEventListener('click',function(){h.splice(+b.getAttribute('data-del'),1);renderHistory()})});
+}
+function commitList(){
+  if(!token())return;
+  api('https://api.github.com/repos/'+REPO+'/commits?per_page=10').then(function(list){
+    $('commits').innerHTML=list.map(function(c){return '<div class="commit"><span>'+esc(c.sha.slice(0,7))+' '+esc(c.commit.message.split('\n')[0].slice(0,26))+'</span><button class="small gray" data-rb="'+c.sha+'">回滚</button></div>'}).join('');
+    $('commits').querySelectorAll('button[data-rb]').forEach(function(b){b.addEventListener('click',function(){rollback(b.getAttribute('data-rb'))})});
+  }).catch(function(){});
+}
+async function rollback(sha){
+  if(!confirm('把 data 文件恢复到 '+sha.slice(0,7)+' 这一版并提交？'))return;
+  try{
+    for(var f of ['data/manual-draw.json','data/manual-play.json']){
+      var j=await api('https://api.github.com/repos/'+REPO+'/contents/'+f+'?ref='+sha);
+      var txt=decodeURIComponent(escape(atob(j.content.replace(/\n/g,''))));
+      var obj=JSON.parse(txt);var cur=await getFileSha(f);
+      var payload={message:'rollback to '+sha.slice(0,7),content:btoa(unescape(encodeURIComponent(JSON.stringify(obj,null,1)))),branch:BRANCH};if(cur)payload.sha=cur;
+      await api('https://api.github.com/repos/'+REPO+'/contents/'+f,{method:'PUT',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'}});
+    }
+    Msg('已提交回滚，约 1-2 分钟生效',true);poll();
+  }catch(e){Msg('回滚失败：'+e.message,false)}
+}
+function finallyRestore(){
+  var b1=$('btn-save'), b2=$('btn-save-bar'), b3=$('btn-save-top');
+  if(b1){b1.disabled=false;b1.textContent='保存并发布';}
+  if(b2)b2.disabled=false;
+  if(b3)b3.disabled=false;
+}
+function validateZlText(txt){
+  var lines=String(txt||'').split('\n').map(function(s){return s.trim()}).filter(Boolean);
+  var out=[],warns=[],unparsed=[];
+  var ZC='鼠牛虎兔龙蛇马羊猴鸡狗猪';
+  var ZRE=new RegExp('^['+ZC+']{3}$');
+  var ZONLY=new RegExp('^['+ZC+']+$');
+  var missZs=0,missOe=0;
+  function hard(m){throw new Error(m)}
+  for(var i=0;i<lines.length;i++){
+    var ln=i+1;var p=lines[i].replace(/,/g,' ').split(/\s+/).filter(Boolean);
+    if(!p.length)continue;
+    if(/NaN/i.test(lines[i]))hard('资料区第'+ln+'行出现 NaN——这会导致页面显示错，请修正后再保存');
+    var itok=p[0],issue=parseInt(itok,10);
+    if(!/^\d{3,4}$/.test(itok)){unparsed.push({line:ln,text:lines[i]});warns.push('第'+ln+'行未识别（原文已保留 unparsed）：'+lines[i]);continue}
+    var oe='',zsArr=[],res='';
+    for(var j=1;j<p.length;j++){
+      var tok=p[j];
+      if(tok==='单'||tok==='双'){ if(oe)warns.push('第'+ln+'行单双出现多个，已取「'+oe+'」'); else oe=tok; continue; }
+      if(/^\d+$/.test(tok)){var n=parseInt(tok,10);if(n<1||n>49)hard('资料区第'+ln+'行号码「'+tok+'」不在 1–49——这会导致页面显示错，请修正后再保存');if(res)warns.push('第'+ln+'行出现多个号码，已取「'+res+'」');else res=('0'+n).slice(-2);continue}
+      if(ZONLY.test(tok)){var cs=tok.split('');if(zsArr.length)warns.push('第'+ln+'行三肖出现多组，已取「'+zsArr.join('')+'」');else{zsArr=cs.slice(0,3);if(cs.length!==3)warns.push('第'+ln+'行三肖「'+tok+'」建议填 3 个（本次存「'+zsArr.join('')+'」）');if(new Set(zsArr).size!==zsArr.length)warns.push('第'+ln+'行三肖「'+zsArr.join('')+'」建议不重复（不阻止保存）')}continue}
+      warns.push('第'+ln+'行忽略无法识别内容「'+tok+'」（三肖=3个生肖，号码=1-49，单双=单/双；都可留空）');
+    }
+    if(!zsArr.length)missZs++;
+    if(!oe)missOe++;
+    var resObj={c:'',z:''};
+    if(res){var at=attrsOf(parseInt(res,10));resObj={c:res,z:at.z||''}}
+    out.push({issue:issue,oddEven:oe,threeZodiac:zsArr,result:resObj,text:'内幕【提前公开】',status:res?'live':'upcoming',updated:new Date().toISOString()});
+  }
+  if(missZs)warns.push('有 '+missZs+' 行三肖留空（页面显示「—」，不影响保存）');
+  if(missOe)warns.push('有 '+missOe+' 行单双留空（不影响保存）');
+  return {rows:out,warnings:warns,unparsed:unparsed};
+}
+window.__validateZlText=validateZlText;
+async function pagesDispatch(){
+  var t0=Date.now(),attempts=0,lastErr='';
+  function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+  async function latestRunStart(){
+    try{
+      var r=await fetch('https://api.github.com/repos/'+REPO+'/actions/runs?event=workflow_dispatch&per_page=5&t='+Date.now(),{headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json'}});
+      if(!r.ok)return null;var j=await r.json();var runs=(j&&j.workflow_runs)||[];
+      return runs.map(function(x){return {id:x.id,created:Date.parse(x.created_at),url:x.html_url,status:x.status}});
+    }catch(e){return null}
+  }
+  try{
+    if(!token())return {ok:false,error:'缺少 PAT'};
+    for(attempts=1;attempts<=3;attempts++){
+      var before=await latestRunStart();
+      var prevIds={};if(before)before.forEach(function(x){prevIds[x.id]=1});
+      var r=await fetch('https://api.github.com/repos/'+REPO+'/actions/workflows/pages.yml/dispatches',{method:'POST',headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify({ref:BRANCH})});
+      console.log('[pages-dispatch] attempt='+attempts+' HTTP '+r.status);
+      if(r.status>=400){lastErr='dispatch HTTP '+r.status;await sleep(1200);continue}
+      for(var i=0;i<6;i++){
+        await sleep(1200);
+        var runs=await latestRunStart();
+        if(runs){var nr=runs.filter(function(x){return !prevIds[x.id]&&x.created>=t0-5000});if(nr.length){var run=nr[0];console.log('[pages-dispatch] created run '+run.id+' '+run.url);return {ok:true,run:run,attempts:attempts}}}
+      }
+      lastErr='dispatch 成功但未看到新 run';
+    }
+    console.log('[pages-dispatch] FAILED '+lastErr);
+    return {ok:false,error:lastErr||'未知错误',attempts:attempts-1};
+  }catch(e){console.log('[pages-dispatch] exception '+(e&&e.message));return {ok:false,error:String(e&&e.message||e)}}
+}
+
+function buildHistory(prevIssue,prevNums,newIssue,history){
+  var hist=(history||[]).map(function(h){return {issue:h.issue,nums:(h.nums||[]).slice()}});
+  var pushed=false;
+  if(prevIssue&&prevNums&&prevNums.length&&String(prevIssue)!==String(newIssue)){
+    hist=hist.filter(function(h){return String(h.issue)!==String(prevIssue)});
+    hist.unshift({issue:prevIssue,nums:prevNums.map(function(n){return {c:n.c,z:n.z||'',color:n.color||'',wuxing:n.wuxing||''}})});
+    pushed=true;
+  }
+  hist=hist.filter(function(h){return String(h.issue)!==String(newIssue)});
+  var _seen={};hist=hist.filter(function(h){var k=String(h.issue);if(_seen[k])return false;_seen[k]=1;return true});
+  hist.sort(function(a,b){return parseInt(b.issue,10)-parseInt(a.issue,10)});
+  return {history:hist,pushed:pushed};
+}
+window.__buildHistory=buildHistory;
+function buildZlRows(rows,newIssue){
+  var out=(rows||[]).map(function(r){return r});
+  var pushed=false;
+  if(out.length){
+    var fi=parseInt(out[0].issue,10)||0;
+    if(fi<newIssue){
+      out.unshift({issue:newIssue,oddEven:'',threeZodiac:[],result:{c:'',z:''},text:'内幕【提前公开】',status:'upcoming',updated:new Date().toISOString()});
+      pushed=true;
+    }
+  }
+  return {rows:out,pushed:pushed};
+}
+window.__buildZlRows=buildZlRows;
+function nextDrawAfter(base,hm,days){var q=String(hm||'21:34').split(':');var t=new Date(base.getFullYear(),base.getMonth(),base.getDate(),parseInt(q[0],10)||21,parseInt(q[1],10)||34,0,0);for(var i=0;i<14;i++){if(t.getTime()>base.getTime()&&days.indexOf(t.getDay())>=0)return t;t.setDate(t.getDate()+1)}return t}
+function calcAutoVf(newIssue,times){
+  var dt=(times&&times.newhk)||{};
+  var hm=String(dt.time||'').trim(),days=Array.isArray(dt.days)?dt.days:[];
+  if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(hm))throw new Error('drawTimes.newhk.time 非法：'+hm);
+  if(!days.length)throw new Error('drawTimes.newhk.days 为空');
+  var q=hm.split(':'),nowD=new Date();
+  var t=new Date(nowD.getFullYear(),nowD.getMonth(),nowD.getDate(),parseInt(q[0],10),parseInt(q[1],10),0,0);
+  return (t.getTime()>nowD.getTime())?t:new Date(nowD.getTime());
+}
+
+
+var __vfTouched=false;
+function genMaintCode(){var ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<6;i++){var r=(window.crypto&&crypto.getRandomValues)?crypto.getRandomValues(new Uint8Array(1))[0]:Math.floor(Math.random()*256);s+=ch[r%ch.length]}return s}
+function collectMaintUI(){var codeEl=$('maint-code'),hintEl=$('maint-hint'),base=(SITE_CFG&&SITE_CFG.maintenance)||{};return {enabled:!!base.enabled,code:String((codeEl&&codeEl.value)||base.code||'').trim(),hint:String((hintEl&&hintEl.value)||base.hint||'').trim()}}
+function updateMaintToggle(){
+  var m=(SITE_CFG&&SITE_CFG.maintenance)||{},on=!!m.enabled;
+  var b=$('maint-toggle');if(b){b.textContent=on?'关闭测试模式':'开启测试模式';b.style.background=on?'#a33':'#0b7a45'}
+  var st=$('maint-status');if(st)st.textContent='当前：'+(on?'已开启（首页显示维护遮罩）':'关闭');
+}
+function fillMaintUI(){
+  var m=(SITE_CFG&&SITE_CFG.maintenance)||{};if(!m.code)m.code=genMaintCode();
+  if($('maint-code'))$('maint-code').value=m.code;
+  if($('maint-hint'))$('maint-hint').value=m.hint||'';
+  updateMaintToggle();
+}
+function collectDrawTimesUI(){
+  var out={};
+  for(var i=0;i<3;i++){var key=['newhk','newmo','hk'][i];var hh=String(($('g-hh-'+key)||{}).value||'00'),mm=String(($('g-mm-'+key)||{}).value||'00');var hm=hh+':'+mm;
+    if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(hm))throw new Error('开奖时间格式应为 HH:mm（'+(key==='newhk'?'新港':key==='newmo'?'新澳':'香港')+'）');
+    var days=[].map.call(document.querySelectorAll('#g-days-'+key+' .daybtn.on'),function(b){return parseInt(b.getAttribute('data-day'),10)});
+    if(!days.length)throw new Error('每个彩种至少选一个开奖日');
+    out[key]={time:hm,days:days};
+  }
+  return out;
+}
+var __saveBusy=false;
+async function save(){
+  if(__saveBusy)return __saveBusy;
+  var ids=['btn-save','btn-save-bar','btn-save-top'];
+  __saveBusy=true;busySet(ids,true);
+  try{return await saveImpl()}
+  finally{busySet(ids,false);__saveBusy=false}
+}
+async function saveImpl(){
+  if(!token()){Msg('请先保存密钥（页面顶部）',false);setState('缺少密钥');return}
+  if(!LOADED){Msg('未载入成功，禁止保存（请刷新页面）',false);setState('载入失败');return}
+  var _newTimes=null,_timesChanged=false;
+  try{_newTimes=collectDrawTimesUI();_timesChanged=JSON.stringify(_newTimes)!==JSON.stringify(normDrawTimes(SITE_CFG.drawTimes))}catch(te){return Msg('保存失败（开奖时间/开奖日字段）：'+te.message,false)}
+  var _newMaint=collectMaintUI();
+  if(!_newMaint.code||_newMaint.code.length!==6)return Msg('保存失败（测试模式）：访问代号需为 6 位',false);
+  var _maintChanged=JSON.stringify(_newMaint)!==JSON.stringify((function(){var m=SITE_CFG.maintenance||{};return {enabled:!!m.enabled,code:String(m.code||''),hint:String(m.hint||'')}})());
+  var nums=parseNums($('g-nums').value);
+  var _aiTarget=parseInt(($('g-issue')||{}).value,10)||autoIssueInfo().issue;
+  if(nums.length===0){
+    if(!_timesChanged&&!_maintChanged){return Msg('还没输入第 '+_aiTarget+' 期的号码（7 个，6+1）；如只改开奖时间/测试模式请直接点保存',false)}
+    try{
+      SITE_CFG.drawTimes=_newTimes;SITE_CFG.maintenance=_newMaint;
+      await saveFile('data/site-config.json',SITE_CFG,'CMS: update config');
+      try{pagesDispatch()}catch(e){}
+      fillTimesUI();updateAutoInfo();
+      Msg((_timesChanged?'已保存开奖时间':'')+(_timesChanged&&_maintChanged?'、':'')+(_maintChanged?'已保存测试模式':'')+'（未填号码，开奖数据未改动）',true);setState('配置已保存');
+      return;
+    }catch(te2){return Msg('保存失败（开奖时间/开奖日字段）：'+(te2&&te2.message||te2),false)}
+  }
+  if(nums.length!==7)return Msg('这会导致页面显示错，请修正：开奖号码需要 7 个（6+1），当前 '+nums.length+' 个',false);
+  if(!nums.every(function(c){var n=parseInt(c,10);return /^\d{2}$/.test(c)&&n>=1&&n<=49}))return Msg('这会导致页面显示错，请修正：开奖号码请填 01–49 的两位数字',false);
+  var ZC_ALL='鼠牛虎兔龙蛇马羊猴鸡狗猪';
+  var zsRaw = String($('p-zs').value || '').replace(/[\s,，、]+/g, '');
+  var warns=[];
+  var zs = zsRaw.split('').filter(function(c){return ZC_ALL.indexOf(c)>=0}).slice(0,3);
+  if (!(/^[鼠牛虎兔龙蛇马羊猴鸡狗猪]{3}$/.test(zsRaw) && new Set(zsRaw.split('')).size === 3)) warns.push('内幕三肖建议填 3 个不重复生肖（例：狗马猴；留空也可以，不影响保存）');
+  // 校验通过后再存 token
+  localStorage.setItem(KEY,token());
+  if ((draw&&draw.history||[]).length>0 && String($('zl-bulk').value||'').trim()===''){warns.push('资料区为空，保存后会清空历史记录——可先备份再保存')}
+  var _ai=autoIssueInfo();
+  var newIssueVal=parseInt($('g-issue').value,10)||_ai.issue;
+  var prevIssueRaw=(draw&&draw.issue)?parseInt(draw.issue,10):0;
+  var hb=buildHistory(prevIssueRaw,(draw&&draw.nums)||[],newIssueVal,(draw&&draw.history)||[]);
+  if(hb.pushed)warns.push('已自动把上一期 '+prevIssueRaw+' 压入历史记录');
+  var orderTxt=nums.join(' ');
+  try{console.log('[save] 号码顺序（按输入原序）= '+orderTxt)}catch(e){}
+  var newDraw={
+    name:$('g-name').value.trim()||'新香港',
+    issue:newIssueVal,
+    drawTime:$('g-drawtime').value.trim()||'每天 21:34',
+    dailyTime:$('g-dailytime').value.trim()||'21:34',
+    status:'sample',
+    nums:numsWithAttrs(nums),
+    history:hb.history,
+    updated:new Date().toISOString()
+  };
+  var _freshTimes=null;
+  try{var _c2=await loadJSON('data/site-config.json');if(_c2&&_c2.drawTimes){_freshTimes=normDrawTimes(_c2.drawTimes)}}catch(e){}
+  var _useTimes,_timeSrc;
+  if(window.__timesTouched){_useTimes=_newTimes;_timeSrc='ui'}
+  else if(_freshTimes){_useTimes=_freshTimes;_newTimes=_freshTimes;SITE_CFG.drawTimes=_freshTimes;fillTimesUI();_timesChanged=false;_timeSrc='server'}
+  else{_useTimes=_newTimes;_timeSrc='ui-fallback'}
+  SITE_CFG.drawTimes=_useTimes;
+  var _autoVf;
+  try{_autoVf=calcAutoVf(newIssueVal,_useTimes)}catch(ve){return Msg('保存失败（drawTimes 非法/缺失）：'+ve.message+'；未写入',false)}
+  var vfMs=_autoVf.getTime();
+  var _diag='src='+_timeSrc+' drawTimes.newhk='+_useTimes.newhk.time+' days=['+_useTimes.newhk.days.join(',')+'] now='+fmtVfStr(new Date())+' → vf='+fmtVfStr(new Date(vfMs));
+  try{console.log('[vf-diag] '+_diag)}catch(e){}
+  try{topToast('诊断：'+_diag,true,false)}catch(e){}
+  if($('g-visiblefrom'))$('g-visiblefrom').value=vfLocalStr(new Date(vfMs));
+  newDraw.visibleFrom=new Date(vfMs).toISOString();
+  newDraw.publishedAt='';
+  var dl=new Date(vfMs);var publishLabel=fmtVfStr(dl);
+  if(vfMs>Date.now()){newDraw.numsEnc=vfEnc(newDraw.nums);newDraw.nums=[]}
+  var newPlay={name:newDraw.name,issue:newDraw.issue,oddEven:$('p-oe').value,threeZodiac:zs,note:$('p-note').value.trim(),status:'live',updated:new Date().toISOString()};
+  var zlParsed;
+  try{ zlParsed=validateZlText($('zl-bulk').value); }catch(ve){ return Msg('这会导致页面显示错，请修正：'+ve.message,false); }
+  var zlRowsEarly=zlParsed.rows;
+  warns=warns.concat(zlParsed.warnings);
+  var delSet={};
+  try{var _dd=window.__daGetDeleted?window.__daGetDeleted():{};delSet=(_dd&&_dd['ziliao'])||{};}catch(e){}
+  if(Object.keys(delSet).length){
+    var beforeN=zlRowsEarly.length;
+    zlRowsEarly=zlRowsEarly.filter(function(r){return !delSet[String(r.issue)]});
+    warns.push('已排除表格中删除的期号：'+Object.keys(delSet).join('、')+'（'+beforeN+'→'+zlRowsEarly.length+' 行）');
+  }
+  try{
+    var daZ=(window.__daGetZiliao?window.__daGetZiliao():[])||[];if(Object.keys(delSet).length)daZ=daZ.filter(function(x){return !delSet[String(parseInt(x.issue,10))]});try{console.log('[zl-merge] daZ='+daZ.length+' has317='+daZ.some(function(x){return String(x.issue)==='317'}))}catch(e){}
+    if(daZ.length){
+      var ZC0='鼠牛虎兔龙蛇马羊猴鸡狗猪';
+      var ZOF=function(n){return ['马','蛇','龙','兔','虎','牛','鼠','猪','狗','鸡','猴','羊'][(parseInt(n,10)-1+12)%12]};
+      var ZS0=function(v){return String(v||'').split('').filter(function(c){return ZC0.indexOf(c)>=0}).slice(0,3)};
+      var mm={};zlRowsEarly.forEach(function(r){mm[String(r.issue)]=r});
+      var mergedCnt=0;
+      daZ.forEach(function(x){var n=parseInt(x.issue,10)||0;if(!n)return;mergedCnt++;
+        var num=parseInt(x.num,10);var ok=num>=1&&num<=49;
+        mm[String(n)]={issue:n,oddEven:(x.oe==='单'||x.oe==='双')?x.oe:'',threeZodiac:ZS0(x.zs),result:ok?{c:('0'+num).slice(-2),z:ZOF(num)}:{c:'',z:''},text:'内幕【提前公开】',status:ok?'live':'upcoming',updated:new Date().toISOString()};
+      });
+      zlRowsEarly=Object.keys(mm).map(function(k){return mm[k]}).sort(function(a,b){return b.issue-a.issue});
+      warns.push('已合并「资料自助录入」表格中的 '+mergedCnt+' 行（保存两者并集，避免丢行）');
+    }
+    if(zlParsed.unparsed&&zlParsed.unparsed.length)warns.push('有 '+zlParsed.unparsed.length+' 行无法识别，原文已保留（unparsed 字段），保存后请修正');
+  }catch(e){warns.push('合并资料表格失败：'+(e&&e.message||e))}
+  try{console.log('[zl-save] parsed='+zlParsed.rows.length+' merged='+zlRowsEarly.length+' issues='+zlRowsEarly.map(function(r){return r.issue}).join(','))}catch(e){}
+  try{
+    var inSet={};String($('zl-bulk').value||'').split('\n').forEach(function(line){var m=line.trim().match(/^(\d{3,4})/);if(m)inSet[m[1]]=1});
+    (window.__daGetZiliao?window.__daGetZiliao():[]).forEach(function(x){var n=parseInt(x.issue,10);if(n)inSet[String(n)]=1});
+    var outSet={};zlRowsEarly.forEach(function(r){outSet[String(r.issue)]=1});
+    var miss=Object.keys(inSet).filter(function(k){return !outSet[k]});
+    if(miss.length)warns.push('⚠ 期号未写入：'+miss.join('、')+'（请检查原文后重试）');
+  }catch(e){}
+  var zlAuto=buildZlRows(zlRowsEarly,newIssueVal);
+  if(zlAuto.pushed && delSet[String(newIssueVal)]){
+    zlRowsEarly=zlAuto.rows.filter(function(r){return String(r.issue)!==String(newIssueVal)});
+    warns.push('本期 '+newIssueVal+' 已在表格中删除，未自动补行');
+  } else {
+    if(zlAuto.pushed)warns.push('已自动补 '+newIssueVal+' 期资料行（三肖/单双/开奖号留空），请到资料区补齐');
+    zlRowsEarly=zlAuto.rows;
+  }
+  showWarn(warns);
+  var btn=$('btn-save');if(btn){btn.disabled=true;btn.textContent='提交中…'}
+  $('btn-save-bar').disabled=true;if($('btn-save-top'))$('btn-save-top').disabled=true;setState('提交中…（号码顺序：'+orderTxt+'）');
+  try{
+    var copy={brand:$('c-brand').value.trim(),brandNumber:(($('c-banner')||{}).value||'').trim(),bannerNumber:(($('c-banner')||{}).value||'').trim(),slogan:$('c-slogan').value.trim(),notice:$('c-notice').value.trim(),disclaimer:$('c-disclaimer').value.trim(),updated:new Date().toISOString()};
+    var zlRows = zlRowsEarly;try{console.log('[zl-save] final='+zlRows.length+' issues='+zlRows.map(function(r){return r.issue}).join(','))}catch(e){}
+    var newZl={name:newDraw.name,rows:zlRows,updated:new Date().toISOString()};
+    if(zlParsed.unparsed&&zlParsed.unparsed.length)newZl.unparsed=zlParsed.unparsed;
+    try{ window.__ZL=newZl; renderZl(newZl); }catch(e){}
+    if (BACKEND === 'worker') {
+      await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'ziliao',data:newZl})});
+      await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'play',data:newPlay})});
+      await wfetch('/api/save',{method:'POST',body:JSON.stringify({game:'site-copy',data:copy})});
+    } else {
+      await saveFile('data/manual-draw.json',newDraw,'CMS: update draw');
+      await saveFile('data/manual-play.json',newPlay,'CMS: update play');
+      await saveFile('data/site-copy.json',copy,'CMS: update site copy');
+      await saveFile('data/manual-ziliao.json',newZl,'cms: update ziliao');
+    }
+    if(_timesChanged||_maintChanged){SITE_CFG.drawTimes=_newTimes;SITE_CFG.maintenance=_newMaint;await saveFile('data/site-config.json',SITE_CFG,'CMS: update config')}
+    var _disp=await pagesDispatch();
+    if(!_disp.ok){topToast('已保存，但 Pages 构建未触发：'+_disp.error+'（可点「刷新线上」重试）',false,true)}else{try{console.log('[pages-dispatch] final run '+_disp.run.id)}catch(e){}}
+    setState('已提交，校验中…');
+    try { await verifySaved(newPlay, newDraw); }
+    catch (ve) { Msg('已提交（数据已写入）；读回校验未通过：' + ve.message + '（不影响保存，可稍后刷新核对）', false); setState('已提交（读回未通过）'); try{poll(newDraw.updated);draw=newDraw;play=newPlay;renderPreview();try{updateAutoInfo()}catch(e){}}catch(e2){} finallyRestore(); return; }
+    await recordShas();
+    try{ if(window.__daSetZiliao)window.__daSetZiliao(zlRows.map(function(r){return {issue:String(r.issue),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})); if(window.__daClearDeleted)window.__daClearDeleted('ziliao'); }catch(e){}
+    var encNow=!!(newDraw.visibleFrom&&new Date(newDraw.visibleFrom).getTime()>Date.now()&&newDraw.numsEnc);Msg('已存到第 '+newDraw.issue+' 期 · 公布 '+publishLabel+'（自动；'+_diag+'）'+(_timesChanged?'；已保存开奖时间':'')+(_maintChanged?'；已保存测试模式':'')+(encNow?'（到点后自动解密显示）':'')+'；约 1-2 分钟生效', true); setState('已提交，读回校验通过…');window.__adminDirty=false;try{__hideUpdateBar()}catch(e){}
+    poll(newDraw.updated);
+    draw=newDraw;play=newPlay;renderPreview();
+  }catch(e){
+    if (e.code === 'CONFLICT') { Msg('数据已被别处更新（sha 不一致），请刷新页面后重试', false); setState('冲突：请刷新'); }
+    else { Msg('保存失败（开奖号码/期号/公布时间等字段）：' + e.message, false); setState('保存失败（开奖字段）：' + e.message); }
+  }
+  finallyRestore();
+  commitList();
+}
+async function readJsonViaApi(path){
+  var u = 'https://api.github.com/repos/' + REPO + '/contents/' + path + '?ref=' + BRANCH + '&t=' + Date.now();
+  var j = await api(u);
+  var txt = decodeURIComponent(escape(atob(String(j.content).replace(/\n/g,''))));
+  return JSON.parse(txt);
+}
+async function verifySaved(expectedPlay, expectedDraw){
+  var p = null, d = null, lastErr = null;
+  for (var i = 0; i < 3; i++) {
+    try { p = await readJsonViaApi('data/manual-play.json'); d = await readJsonViaApi('data/manual-draw.json'); break; }
+    catch (e) { lastErr = e; await new Promise(function (r) { setTimeout(r, 2000); }); }
+  }
+  if (!p || !d) throw new Error('读回失败：' + (lastErr && lastErr.message));
+  var Z = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+  var zs = p.threeZodiac;
+  if (!Array.isArray(zs) || zs.length !== 3 || zs.some(function (z) { return Z.indexOf(z) < 0; })) throw new Error('threeZodiac 非法：' + JSON.stringify(zs));
+  if (zs.join('') !== (expectedPlay.threeZodiac || []).join('')) throw new Error('threeZodiac 与提交不一致：' + zs.join('') + ' != ' + (expectedPlay.threeZodiac || []).join(''));
+  if (String(p.issue) !== String(expectedPlay.issue)) throw new Error('play.issue 不一致');
+  var futureVf=d&&d.visibleFrom&&new Date(d.visibleFrom).getTime()>Date.now();
+  var encState=futureVf&&(!Array.isArray(d.nums)||d.nums.length===0)&&!!d.numsEnc;
+  if(encState){
+    var dec=vfDec(d.numsEnc);
+    if(!dec||dec.length!==7)throw new Error('draw.numsEnc 解码结构非法');
+    var bad=dec.some(function(n){var v=parseInt(n&&n.c,10);return !/^\d{2}$/.test(String(n&&n.c))||v<1||v>49});
+    if(bad)throw new Error('draw.numsEnc 解码号码非法');
+  } else {
+    if (!d || !Array.isArray(d.nums) || d.nums.length !== 7) throw new Error('draw.nums 结构非法');
+    if (d.nums.map(function (n) { return n.c; }).join(',') !== (expectedDraw.nums || []).map(function (n) { return n.c; }).join(',')) throw new Error('draw.nums 内容与提交不一致');
+  }
+  if (String(d.issue) !== String(expectedDraw.issue)) throw new Error('draw.issue 不一致');
+  return true;
+}
+function poll(expectedUpdated){
+  var tries=0;
+  var timer=setInterval(async function(){
+    tries++;
+    try{
+      var d=await fetch(RAW+'data/manual-draw.json?t='+Date.now()).then(function(r){return r.json()});
+      if (expectedUpdated && d.updated === expectedUpdated) {
+        clearInterval(timer);Msg('已生效 ✓ 打开站点查看：'+PAGES,true);setState('已生效 ✓');
+      }else if(tries>=8){clearInterval(timer);Msg('仍在构建中，稍后刷新页面即可',false)}
+    }catch(e){}
+    if(tries>=8)clearInterval(timer);
+  },15000);
+}
+// 事件
+$('btn-rand').addEventListener('click',function(){
+  var pool=[];for(var i=1;i<=49;i++)pool.push(i);var pick=[];
+  while(pick.length<7){pick.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0])}
+  $('g-nums').value=pick.map(function(n){return pad(n)}).join(' ');renderPreview();
+});
+$('btn-calc').addEventListener('click',renderPreview);
+$('g-nums').addEventListener('input',function(){
+  var raw=$('g-nums').value.replace(/[^0-9]/g,'');
+  if(raw.length===14 && $('g-nums').value.replace(/[0-9]/g,'').replace(/\s/g,'').length===0){
+    $('g-nums').value=(raw.match(/.{1,2}/g)||[]).join(' ');
+  }
+  updateNumsHint(); renderPreview();
+});
+$('g-nums').addEventListener('paste',function(e){
+  var t=(e.clipboardData||window.clipboardData).getData('text')||'';
+  var s=t.replace(/[^0-9]/g,'');
+  if(s.length>=14 && t.replace(/\s/g,'').length<=14){
+    e.preventDefault();
+    $('g-nums').value=(s.match(/.{1,2}/g)||[]).slice(0,7).join(' ');
+    updateNumsHint(); renderPreview();
+  }
+});
+function updateNumsHint(){
+  var h=$('nums-hint'); if(!h) return;
+  var n=parseNums($('g-nums').value).length;
+  h.style.color = n===7 ? '#0b7a45' : '#a33';
+  h.textContent = n===7 ? ('已识别 7 个号码：'+$('g-nums').value.trim()) : ('已识别 '+n+'/7 个，还差 '+(7-n)+' 个');
+}
+updateNumsHint();
+$('btn-addhist').addEventListener('click',function(){draw.history=draw.history||[];draw.history.unshift({issue:(parseInt($('g-issue').value,10)||1)-1,nums:numsWithAttrs(parseNums($('g-nums').value))});renderHistory()});
+$('btn-bulk').addEventListener('click',function(){
+  var lines=$('hist-bulk').value.split('\n').map(function(l){return l.trim()}).filter(Boolean);
+  var added=0;draw.history=draw.history||[];
+  lines.forEach(function(l){
+    var parts=l.replace(/,/g,' ').split(/\s+/).filter(Boolean);var issue=parseInt(parts.shift(),10);if(!issue)return;
+    var nums=numsWithAttrs(parts.slice(0,7));if(nums.length!==7)return;
+    var idx=-1;draw.history.forEach(function(r,i){if(String(r.issue)===String(issue))idx=i});
+    var row={issue:issue,nums:nums};if(idx>=0)draw.history[idx]=row;else draw.history.push(row);added++;
+  });
+  draw.history.sort(function(a,b){return b.issue-a.issue});renderHistory();Msg('导入 '+added+' 期，记得点「保存并发布」',true);
+});
+if($('g-visiblefrom'))$('g-visiblefrom').addEventListener('input',function(){window.__vfTouched=true});
+document.addEventListener('change',function(e){var t=e.target;if(t&&/^g-(hh|mm)-/.test(t.id||''))window.__timesTouched=true},true);
+if($('btn-save'))$('btn-save').addEventListener('click',save);
+$('btn-save-bar').addEventListener('click',save);
+if($('btn-refresh-pages'))$('btn-refresh-pages').addEventListener('click',async function(){var b=$('btn-refresh-pages');if(b._busy)return;b._busy=1;b.disabled=true;var old=b.textContent;b.textContent='触发中…';try{var res=await pagesDispatch();if(res.ok){topToast('已触发 Pages 构建（run '+res.run.id+'），约1-2分钟生效',true,false)}else{topToast('触发 Pages 构建失败：'+res.error,false,true)}}finally{b._busy=0;b.disabled=false;b.textContent=old}});
+if($('btn-save-top'))$('btn-save-top').addEventListener('click',save);
+function busySet(ids,on){ids.forEach(function(id){var b=document.getElementById(id);if(!b)return;if(on){b._origTxt=b._origTxt||b.textContent;b.disabled=true;b.textContent='保存中…';b.style.opacity='.65';b.style.cursor='not-allowed'}else{b.disabled=false;if(b._origTxt)b.textContent=b._origTxt;b.style.opacity='';b.style.cursor=''}})}
+function setState(t){var el=$('save-state');if(el)el.textContent=t}
+function tokText(t){return t ? ('\u2713 \u5df2\u4fdd\u5b58\uff08\u672c\u673a\uff09\u2026' + t.slice(-4)) : '\u672a\u4fdd\u5b58\u5bc6\u94a5'}
+function refreshTokenState(){var el=$('token-state');if(el)el.textContent=tokText(token())}
+function saveTokenNow(){var v=$('token').value.trim();if(!v){Msg('请先粘贴密钥',false);return}localStorage.setItem(KEY,v);refreshTokenState();Msg('密钥已保存（本机）',true)}
+$('btn-token-save').addEventListener('click',saveTokenNow);
+$('token').addEventListener('paste',function(){setTimeout(function(){saveTokenNow()},80)});
+$('token').addEventListener('input',function(){var v=this.value.trim();if(/^github_pat/.test(v)||v.length>40){localStorage.setItem(KEY,v);refreshTokenState();Msg('密钥已保存（本机）',true)}});
+$('btn-clear').addEventListener('click',function(){localStorage.removeItem(KEY);$('token').value='';refreshTokenState();Msg('已清除本机密钥',true)});
+if($('token'))$('token').value=token();refreshTokenState();
+$('btn-refresh').addEventListener('click',function(){loadAll().then(function(){enableSave();Msg('已重新载入线上数据',true)}).catch(function(e){LOADED=false;setSaveEnabled(false);Msg('重新载入失败：'+e.message,false)})});
+if($('token'))$('token').value=token();
+if (BACKEND === 'worker') {
+  $('login-panel').style.display = '';
+  $('btn-login').addEventListener('click', async function(){
+    var b=this; b.disabled=true; b.textContent='登录中…';
+    try { await wfetch('/api/login',{method:'POST',body:JSON.stringify({password:$('pw').value})});
+      Msg('登录成功',true); $('btn-logout').style.display=''; loadAll().then(commitList).catch(function(){});
+    } catch(e){ Msg('登录失败：'+e.message,false); }
+    b.disabled=false; b.textContent='登录';
+  });
+  $('btn-logout').addEventListener('click', async function(){
+    try { await wfetch('/api/logout',{method:'POST',body:'{}'}); } catch(e){}
+    Msg('已退出登录',true); $('btn-logout').style.display='none';
+  });
+}
+function enableSave(){setSaveEnabled(true);LOADED=true}
+function setSaveEnabled(on){['btn-save','btn-save-bar','btn-save-top'].forEach(function(id){var b=$(id);if(b)b.disabled=!on})}
+loadAll().then(function(){LOADED=true;setSaveEnabled(true);commitList()}).catch(function(e){LOADED=false;setSaveEnabled(false);Msg('载入失败，已禁用保存：'+e.message,false)});
+
+/* ===== 资料自助录入（多板块） ===== */
+(function(){
+  var $d=function(id){return document.getElementById(id)};
+  var ZC='鼠牛虎兔龙蛇马羊猴鸡狗猪';
+  var SEQ=['马','蛇','龙','兔','虎','牛','鼠','猪','狗','鸡','猴','羊'];
+  var JSD='https://cdn.jsdelivr.net/gh/'+REPO+'@'+BRANCH+'/';
+  function zOf(n){return n?SEQ[(n-1)%12]:''}
+  function pad2(n){return (n<10?'0':'')+n}
+  function pair(s){s=String(s||'').trim();var re=new RegExp('(['+ZC+'])\\s*(\\d{1,2})');var m=s.match(re);if(!m)return null;var n=parseInt(m[2],10);return n>=1&&n<=49?{z:m[1],c:pad2(n)}:null}
+  function pairs(listStr,limit){return String(listStr||'').split(/\s+/).filter(Boolean).map(pair).filter(Boolean).slice(0,limit)}
+  function zsOf(s,limit){return String(s||'').split('').filter(function(c){return ZC.indexOf(c)>=0}).slice(0,limit)}
+  function pairStr(list){return (list||[]).map(function(x){return x.z+x.c}).join(' ')}
+  var LOAD={},SAVE={};
+  LOAD.ziliao=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),oe:r.oddEven||'',zs:(r.threeZodiac||[]).join(''),num:(r.result&&r.result.c)||''}})};
+  SAVE.ziliao=function(rows,base){base=base||{};base.name=base.name||'新香港';base.rows=rows.map(function(x){var n=parseInt(x.num,10);var ok=n>=1&&n<=49;return {issue:parseInt(x.issue,10)||0,oddEven:(x.oe==='单'||x.oe==='双')?x.oe:'',threeZodiac:zsOf(x.zs,3),result:ok?{c:pad2(n),z:zOf(n)}:{c:'',z:''},text:'内幕【提前公开】',status:ok?'live':'upcoming',updated:new Date().toISOString()}});base.updated=new Date().toISOString();return base};
+  LOAD.pick=function(j){return (j.rows||[]).map(function(r){
+    var f=function(o){return {z:((o&&o.zodiac)||[]).join(''),n:((o&&o.nums)||[]).join(' ')}}
+    var s=f(r.seven),w=f(r.five),t=f(r.three);
+    return {issue:String(r.issue||''),sevenZ:s.z,sevenN:s.n,fiveZ:w.z,fiveN:w.n,threeZ:t.z,threeN:t.n,pickZ:(r.pick&&r.pick.zodiac)||'',pickN:(r.pick&&r.pick.num)||'',slogan:r.slogan||''};
+  })};
+  SAVE.pick=function(rows,base){
+    base=base||{};base.updated=new Date().toISOString();
+    base.rows=rows.map(function(x){
+      function zs(v){return String(v||'').split('').filter(function(c){return ZC.indexOf(c)>=0})}
+      function ns(v){return String(v||'').replace(/[，,、]/g,' ').split(/\s+/).filter(Boolean).map(function(n){var k=parseInt(n,10);return isFinite(k)?pad2(k):''}).filter(Boolean)}
+      var z7=zs(x.sevenZ),n7=ns(x.sevenN);
+      return {issue:String(parseInt(x.issue,10)||''),seven:{zodiac:z7.slice(0,7),nums:n7.slice(0,7)},five:{zodiac:zs(x.fiveZ).slice(0,5),nums:ns(x.fiveN).slice(0,5)},three:{zodiac:zs(x.threeZ).slice(0,3),nums:ns(x.threeN).slice(0,3)},pick:{zodiac:zs(x.pickZ)[0]||'',num:ns(x.pickN)[0]||''},slogan:String(x.slogan||'今晚中大奖')};
+    });
+    return base;
+  };
+  LOAD.wuxiao=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):'',list:pairStr(r.list)}})};
+  SAVE.wuxiao=function(rows,base){base=base||{name:'五肖五码'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,special:pair(x.sp)||{z:'',c:''},list:pairs(x.list,5)}});return base};
+  LOAD.santou=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),heads:(r.heads||[]).join(' '),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.santou=function(rows,base){base=base||{name:'三头中特'};base.rows=rows.map(function(x){var hs=String(x.heads||'').replace(/[^0-9]/g,' ').trim().split(/\s+/).filter(Boolean).map(function(v){return parseInt(v,10)}).filter(function(n){return n>=0&&n<=4}).slice(0,3);return {issue:parseInt(x.issue,10)||0,heads:hs,special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.shuangbo=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),waves:(r.waves||[]).join('+'),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.shuangbo=function(rows,base){base=base||{name:'必赢双波'};base.rows=rows.map(function(x){var ws=String(x.waves||'').split(/[^红蓝绿]+/).filter(Boolean).slice(0,2);return {issue:parseInt(x.issue,10)||0,waves:ws,special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.danshuang=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),oe:r.oddEven||'',zs:(r.zodiacs||[]).join(''),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.danshuang=function(rows,base){base=base||{name:'单双'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,oddEven:(x.oe==='单数'||x.oe==='双数')?x.oe:'',zodiacs:zsOf(x.zs,3),special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.liuxiao=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),list:pairStr(r.list),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.liuxiao=function(rows,base){base=base||{name:'六肖六码',author:'小小码神'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,list:pairs(x.list,6),special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.qiwei=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),tails:String(r.tails||''),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.qiwei=function(rows,base){base=base||{name:'七尾中特'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,tails:String(x.tails||'').replace(/[^0-9]/g,'').slice(0,7),special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.sisha=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),zs:(r.sisha||[]).join(''),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.sisha=function(rows,base){base=base||{name:'死杀三肖'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,sisha:zsOf(x.zs,3),special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.pingte=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),zod:r.zod||'',sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.pingte=function(rows,base){base=base||{name:'平特①肖'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,zod:zsOf(x.zod,1).join(''),special:pair(x.sp)||{z:'',c:''}}});return base};
+  LOAD.ds4=function(j){return (j.rows||[]).map(function(r){return {issue:String(r.issue||''),dan:(r.dan||[]).join(''),shuang:(r.shuang||[]).join(''),sp:(r.special&&r.special.z)?(r.special.z+r.special.c):''}})};
+  SAVE.ds4=function(rows,base){base=base||{name:'单双四肖'};base.rows=rows.map(function(x){return {issue:parseInt(x.issue,10)||0,dan:zsOf(x.dan,4),shuang:zsOf(x.shuang,4),special:pair(x.sp)||{z:'',c:''}}});return base};
+  var BOARDS=[
+    {id:'pick',name:'本期内幕精选',file:'data/pick.json',note:'每期：七肖/⑦码、五肖/⑤码、三肖/③码、精选肖+码、标语；最多保留 3 期，超了先删旧期。',cols:[{k:'issue',t:'期号',w:'56px',p:'316'},{k:'sevenZ',t:'七肖（7）',p:'龙猴牛狗马猪兔'},{k:'sevenN',t:'⑦码（7）',p:'03 35 18 45 01 20 40'},{k:'fiveZ',t:'五肖（5）',p:'龙猴牛狗马'},{k:'fiveN',t:'⑤码（5）',p:'03 35 18 45 01'},{k:'threeZ',t:'三肖（3）',p:'龙猴牛'},{k:'threeN',t:'③码（3）',p:'03 35 18'},{k:'pickZ',t:'精选肖',w:'64px',p:'龙'},{k:'pickN',t:'精选码',w:'64px',p:'03'},{k:'slogan',t:'标语',p:'今晚中大奖'}]},
+    {id:'wuxiao',name:'五肖五码',file:'data/wuxiao.json',note:'5 组「生肖+号码」+ 特开；新一期特开留空显示 ?。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'list',t:'五肖五码（5组）',p:'鼠07 牛18 龙39 鸡10 猪20'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'santou',name:'三头中特',file:'data/santou.json',note:'3 个头（0-4）+ 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'heads',t:'三头',w:'90px',p:'1 2 3'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'shuangbo',name:'必赢双波',file:'data/shuangbo.json',note:'两个波（红/蓝/绿，用 + 分隔）+ 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'waves',t:'双波',w:'90px',p:'红+绿'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'danshuang',name:'单双',file:'data/danshuang.json',note:'单数/双数 + 三肖 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'oe',t:'单双',w:'76px',p:'单数/双数'},{k:'zs',t:'三肖',w:'84px',p:'牛鸡羊'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'liuxiao',name:'六肖六码',file:'data/liuxiao.json',note:'6 组「生肖+号码」+ 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'list',t:'六肖六码（6组）',p:'鼠04 羊12 鼠07 猪08 牛06 龙39'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'qiwei',name:'七尾中特',file:'data/qiwei.json',note:'7 位尾数 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'tails',t:'七尾',w:'100px',p:'1236789'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'sisha',name:'死杀三肖',file:'data/sisha.json',note:'3 肖 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'zs',t:'三肖',w:'84px',p:'猪羊鸡'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'pingte',name:'平特①肖',file:'data/pingte.json',note:'1 个平特肖 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'zod',t:'平特肖',w:'76px',p:'龙'},{k:'sp',t:'特开',w:'76px',p:'留空'}]},
+    {id:'ds4',name:'单双四肖',file:'data/danshuangsixiao.json',note:'单组四肖 + 双组四肖 + 特开。',cols:[{k:'issue',t:'期号',w:'64px',p:'315'},{k:'dan',t:'单组四肖',w:'96px',p:'狗鼠龙虎'},{k:'shuang',t:'双组四肖',w:'96px',p:'猪鸡羊兔'},{k:'sp',t:'特开',w:'76px',p:'留空'}]}
+  ];
+  var state={cur:0,data:{},raw:{},deleted:{}};
+  function boardLimit(b){return b&&b.id==='pick'?3:10}
+  function limitMsg(b){return '最多保留 '+boardLimit(b)+' 期，请先删除旧期'}
+  window.__daGetZiliao=function(){return JSON.parse(JSON.stringify(state.data['ziliao']||[]))};
+window.__daGetDeleted=function(){return JSON.parse(JSON.stringify(state.deleted||{}))};
+window.__daClearDeleted=function(b){if(!b){state.deleted={}}else{delete state.deleted[b]}};
+window.__daUndoDelete=function(b,issue){try{if(state.deleted&&state.deleted[b])delete state.deleted[b][String(parseInt(issue,10))]}catch(e){}};
+  window.__daSetZiliao=function(rows){state.data['ziliao']=(rows||[]).slice();if(state.cur===0)daRender()};
+  function fetchData(rel){
+  var attempts=[];
+  function attempt(name,fn,ms){var st=Date.now();return fn().then(function(j){return {ok:true,source:name,data:j,ms:Date.now()-st}},function(e){attempts.push(name+': '+srcErr(e,ms));return {ok:false}})}
+  function local(){return srcFetchJson(rel+'?t='+Date.now(),null,SRC_TO)}
+  function jsd(){return srcFetchJson(JSD_URL+rel+'?t='+Date.now(),null,SRC_TO)}
+  function raw(){return srcFetchJson(RAW+rel+'?t='+Date.now(),null,SRC_TO)}
+  function api(){if(!token())return Promise.reject(Object.assign(new Error('未填 token'),{status:0}));return srcFetchJson('https://api.github.com/repos/'+REPO+'/contents/'+rel+'?ref='+BRANCH+'&t='+Date.now(),{headers:{Authorization:'Bearer '+token(),Accept:'application/vnd.github+json'}},SRC_API_TO).then(function(j){var b64=String(j.content||'').replace(/\n/g,'');return JSON.parse(decodeURIComponent(escape(atob(b64))))})}
+  var steps=[['本地',local,SRC_TO],['jsDelivr',jsd,SRC_TO],['raw',raw,SRC_TO],['API',api,SRC_API_TO]];
+  function go(i){
+    if(i>=steps.length){var er=new Error(rel+' 载入失败：'+attempts.join(' | '));er.detail=attempts.join(' | ');er.missing=attempts.length>0&&attempts.every(function(x){return /HTTP 404/.test(x)});throw er}
+    return attempt(steps[i][0],steps[i][1],steps[i][2]).then(function(r){return r.ok?r:go(i+1)});
+  }
+  return go(0);
+}
+function setState(id,txt,cls){var el=$d(id);if(!el)return;el.textContent=txt;if(cls)el.className=cls;el.style.display='block'}
+  function loadAll(){state.status=state.status||{};setState('da-src','载入中…（jsDelivr / raw / API 独立超时）');return Promise.all(BOARDS.map(function(b){return fetchData(b.file).then(function(r){state.raw[b.id]=r.data;state.data[b.id]=LOAD[b.id](r.data);state.status[b.id]={ok:true,source:r.source,ms:r.ms}},function(e){state.raw[b.id]=null;state.data[b.id]=[];state.status[b.id]={ok:false,missing:!!e.missing,error:e.detail||e.message}})})).then(function(){var n=BOARDS.filter(function(b){return state.status[b.id]&&state.status[b.id].ok}).length;var f=BOARDS.length-n;setState('da-src','已载入 '+n+'/'+BOARDS.length+(f?('，'+f+' 个失败/待创建'):'')+' 个板块');daRender()})}
+function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&&state.status[b.id];var bad=st&&!st.ok;h+='<button data-i="'+i+'" class="'+(i===state.cur?'on':'')+(bad?' bad':'')+'" title="'+(bad?(st.missing?'文件不存在（保存时新建）':'载入失败'):'')+'">'+b.name+(bad?' ⚠':'')+'</button>'});$d('da-tabs').innerHTML=h;$d('da-tabs').querySelectorAll('button').forEach(function(btn){btn.addEventListener('click',function(){state.cur=parseInt(btn.getAttribute('data-i'),10);daRender()})})}
+  function daRender(){renderTabs();var b=BOARDS[state.cur];$d('da-note').textContent=b.note;var rows=state.data[b.id]||[];$d('da-count').textContent='共 '+rows.length+' 行';
+    var th='<tr><th style="width:36px">#</th>';b.cols.forEach(function(c){th+='<th style="width:'+(c.w||'auto')+'">'+c.t+'</th>'});th+='<th style="width:42px">操作</th></tr>';$d('da-thead').innerHTML=th;
+    var tb='';rows.forEach(function(r,i){tb+='<tr><td style="text-align:center;color:#888">'+(i+1)+'</td>';b.cols.forEach(function(c){var v=String(r[c.k]==null?'':r[c.k]).replace(/"/g,'&quot;');tb+='<td><input data-r="'+i+'" data-k="'+c.k+'" value="'+esc(v)+'" placeholder="'+esc(c.p||'')+'"></td>'});tb+='<td><button class="gray small" data-del="'+i+'">删</button></td></tr>'});
+    $d('da-tbody').innerHTML=tb||'<tr><td colspan="'+(b.cols.length+2)+'" style="color:#999">暂无数据，点「加行」或「生成本期空行」</td></tr>';
+    $d('da-tbody').querySelectorAll('input').forEach(function(inp){inp.addEventListener('input',function(){state.data[b.id][parseInt(inp.getAttribute('data-r'),10)][inp.getAttribute('data-k')]=inp.value;softCheck()});if(inp.getAttribute('data-k')==='issue'){inp.addEventListener('blur',function(){sortBoard(false)})}});
+    $d('da-tbody').querySelectorAll('button[data-del]').forEach(function(btn){btn.addEventListener('click',function(){var ii=parseInt(btn.getAttribute('data-del'),10);var row=state.data[b.id][ii];if(row&&parseInt(row.issue,10)){state.deleted[b.id]=state.deleted[b.id]||{};state.deleted[b.id][String(parseInt(row.issue,10))]=1}state.data[b.id].splice(ii,1);daRender();setState('da-state','已从列表移除，点「保存本板块」生效（顶部保存也会排除该行）','da-ok')})});
+    softCheck();
+    var st=state.status&&state.status[b.id];
+    if(st&&!st.ok){var el=$d('da-warn');el.style.display='block';el.innerHTML='⚠ 板块「'+b.name+'」'+(st.missing?'data 文件不存在（保存时会新建）':'载入失败')+'：'+esc(b.file)+'<br>原因：'+esc(st.error||'')+(st.missing?'':'<br>其它板块可正常编辑保存；可点「重新载入线上资料」重试')+(el.innerHTML&&el.innerHTML.indexOf('软提示')>=0?'<hr style="border:0;border-top:1px dashed #E8C86A;margin:6px 0">'+el.innerHTML:'')}
+  }
+  function softCheck(){var b=BOARDS[state.cur];var rows=state.data[b.id]||[];var w=[];
+    rows.forEach(function(r,i){if(!/^\d{3,4}$/.test(String(r.issue||'')))w.push('第 '+(i+1)+' 行「期号」建议填 3-4 位数字');
+      if(r.sp!==undefined&&String(r.sp||'').trim()!==''&&!pair(r.sp))w.push('第 '+(i+1)+' 行「特开」建议填「生肖+号码」（例：鸡22），留空表示 ?');
+      if(r.list!==undefined&&String(r.list||'').trim()!==''&&pairs(r.list,99).length===0)w.push('第 '+(i+1)+' 行「'+b.cols[1].t+'」没识别到「生肖+号码」组合');
+      if(r.zs!==undefined&&String(r.zs||'').trim()!==''){var bad=String(r.zs).split('').filter(function(c){return ZC.indexOf(c)<0});if(bad.length)w.push('第 '+(i+1)+' 行「'+b.cols[2].t+'」忽略非生肖字符「'+bad.join('')+'」')}});
+    var el=$d('da-warn');if(w.length){el.style.display='block';el.innerHTML='⚠ 软提示（不会阻止保存）：<br>'+w.slice(0,12).map(function(x){return '· '+esc(x)}).join('<br>')+(w.length>12?'<br>· …共 '+w.length+' 条':'')}else el.style.display='none';
+  }
+  function highlightTop(){setTimeout(function(){var tr=$d('da-tbody').querySelector('tr');if(tr){tr.classList.add('da-new');tr.scrollIntoView({block:'center'});setTimeout(function(){try{tr.classList.remove('da-new')}catch(e){}},2200)}},30)}
+  function sortBoard(silent){var b=BOARDS[state.cur];var rows=state.data[b.id]||[];rows.sort(function(x,y){return (parseInt(y.issue,10)||0)-(parseInt(x.issue,10)||0)});daRender();if(!silent)topToast('已按期号排序',true)}
+  function rowsNow(){return state.data[BOARDS[state.cur].id]||[]}
+  function blankRow(){var b=BOARDS[state.cur];var r={};b.cols.forEach(function(c){r[c.k]=''});return r}
+  function addRow(){var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}
+    if(rows.length>=boardLimit(BOARDS[state.cur])){topToast(limitMsg(BOARDS[state.cur]),false,true);return}var max=0;rows.forEach(function(x){var n=parseInt(x.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender();highlightTop()}
+  function copyPrev(){var b=BOARDS[state.cur];var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}if(rows.length>=boardLimit(b)){topToast(limitMsg(b),false,true);return}if(!rows.length)return;var last=rows[rows.length-1];var r={};b.cols.forEach(function(c){r[c.k]=last[c.k]||''});var max=0;rows.forEach(function(x){var n=parseInt(x.issue,10);if(n>max)max=n});r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(b.id,r.issue);daRender();highlightTop()}
+  function newIssueRow(){var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}if(rows.length>=boardLimit(BOARDS[state.cur])){topToast(limitMsg(BOARDS[state.cur]),false,true);return}var max=0;rows.forEach(function(r){var n=parseInt(r.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender()}
+  function saveBoard(){if(window.__boardBusy)return;sortBoard(true);var b=BOARDS[state.cur];if(rowsNow().length>boardLimit(b)){var lm=limitMsg(b);setState('da-state',lm,'da-warn');topToast(lm,false,true);return}if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}window.__boardBusy=true;busySet(['da-save'],true);
+    var badRows=rowsNow().filter(function(x){return !parseInt(x.issue,10)}).length;
+    var obj=SAVE[b.id](rowsNow(),state.raw[b.id]||{});var bfile=b.file;
+    setState('da-state','提交中…（'+b.name+'）','da-ok');
+    (async function(){
+      try{
+        delete SHA_CACHE[bfile];
+        await saveFile(bfile,obj,'资料录入：'+b.name+'（自助后台）');
+        var _bd=await pagesDispatch();if(!_bd.ok){topToast('已保存，但 Pages 构建未触发：'+_bd.error,false,true)}
+        state.raw[b.id]=obj;state.status=state.status||{};state.status[b.id]={ok:true};if(window.__daClearDeleted)window.__daClearDeleted(b.id);
+        setState('da-state','✅ 已提交「'+b.name+'」；约 90 秒生效（已自动触发 Pages 构建）','da-ok');
+        daRender();
+      }catch(e){setState('da-state','保存失败：'+(e&&e.message?e.message:'未知错误')+'（文件：'+bfile+'）','da-warn')}finally{busySet(['da-save'],false);window.__boardBusy=false}
+    })();
+  }
+  $d('da-reload').addEventListener('click',loadAll);
+  $d('da-add').addEventListener('click',addRow);
+  $d('da-copy').addEventListener('click',copyPrev);
+  $d('da-empty').addEventListener('click',newIssueRow);
+  $d('da-save').addEventListener('click',saveBoard);
+  
+
+async function saveDrawTimesImpl(){
+  var out={};
+  for(var i=0;i<3;i++){
+    var key=['newhk','newmo','hk'][i];
+    var hm=String(($('g-time-'+key)||{}).value||'').trim();
+    if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(hm)){topToast('开奖时间格式应为 HH:mm（新港/新澳/香港）',false,true);return}
+    var days=[].map.call(document.querySelectorAll('#g-days-'+key+' .daybtn.on'),function(btn){return parseInt(btn.getAttribute('data-day'),10)});
+    if(!days.length){topToast('每个彩种至少选一个开奖日',false,true);return}
+    out[key]={time:hm,days:days};
+  }
+  SITE_CFG.drawTimes=out;
+  if(!token()){topToast('请先在页面顶部保存密钥',false,true);return}
+  setState('保存开奖时间…');
+  saveFile('data/site-config.json',SITE_CFG,'CMS: update draw times').then(function(){
+    try{pagesDispatch()}catch(e){}
+    fillTimesUI();updateAutoInfo();
+    topToast('开奖时间/开奖日已更新，立即生效',true,false);setState('开奖时间已更新');
+  }).catch(function(e){topToast('保存失败：'+(e&&e.message||e),false,true);setState('保存失败')});
+}
+if($('maint-regen'))$('maint-regen').addEventListener('click',async function(){
+  var b=$('maint-regen');if(b._busy)return;b._busy=1;b.disabled=true;b.textContent='处理中…';
+  try{var code=genMaintCode();$('maint-code').value=code;var m=(SITE_CFG.maintenance||{});await saveMaintenanceNow(!!m.enabled,code);}
+  finally{b._busy=0;b.disabled=false;b.textContent='重新生成'}
+});
+if($('maint-toggle'))$('maint-toggle').addEventListener('click',async function(){
+  var b=$('maint-toggle');if(b._busy)return;b._busy=1;var old=b.textContent;b.disabled=true;b.textContent='处理中…';
+  try{var m=(SITE_CFG&&SITE_CFG.maintenance)||{};await saveMaintenanceNow(!m.enabled,($('maint-code')&&$('maint-code').value)||m.code);}
+  finally{b._busy=0;b.disabled=false;b.textContent=old;updateMaintToggle()}
+});
+if(document.getElementById('btn-save-times'))document.getElementById('btn-save-times').addEventListener('click',function(){if(window.__timesBusy)return;window.__timesBusy=true;busySet(['btn-save-times'],true);Promise.resolve(saveDrawTimesImpl()).finally(function(){busySet(['btn-save-times'],false);window.__timesBusy=false})});
+
+async function saveMaintenanceNow(nextEnabled,nextCode){
+  if(!token()){topToast('请先在页面顶部保存密钥',false,true);return false}
+  var c=null;try{c=await loadJSON('data/site-config.json')}catch(e){}
+  var base=(c&&c.drawTimes)?c:SITE_CFG;
+  base.maintenance={enabled:!!nextEnabled,code:String(nextCode||($('maint-code')&&$('maint-code').value)||'').trim(),hint:String(($('maint-hint')&&$('maint-hint').value)||'').trim()};
+  SITE_CFG=base;
+  try{
+    await saveFile('data/site-config.json',base,nextEnabled?'CMS: enable maintenance':'CMS: disable maintenance');
+    try{pagesDispatch()}catch(e){}
+    updateMaintToggle();
+    topToast(nextEnabled?'已开启测试模式（约1-2分钟生效，首页显示遮罩）':'已关闭测试模式（约1-2分钟生效）',true,false);
+    return true;
+  }catch(e){topToast('保存测试模式失败：'+(e&&e.message||e),false,true);return false}
+}
+var __adminVer={base:'',busy:false,notified:false,timer:null,dirty:false};
+function __fp(txt){var h=5381;for(var i=0;i<txt.length;i++){h=((h<<5)+h+txt.charCodeAt(i))|0}return (h>>>0).toString(36)+'-'+txt.length}
+async function __fetchSelf(){var r=await fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);return await r.text()}
+function __hideUpdateBar(){var el=document.getElementById('admin-update-bar');if(el)el.remove()}
+function __showUpdateBar(){if(document.getElementById('admin-update-bar'))return;var el=document.createElement('div');el.id='admin-update-bar';el.style.cssText='position:fixed;left:0;right:0;top:0;z-index:2147483600;background:#FFF3D6;border-bottom:1px solid #E8C98A;color:#7a4a00;font:700 13px/1.45 "Microsoft YaHei",Arial;padding:10px 12px;display:flex;align-items:center;gap:8px;box-sizing:border-box';el.innerHTML='<span style="flex:1">后台已更新，处理完后点此刷新</span><button id="admin-update-go" style="height:34px;padding:0 12px;border:0;border-radius:6px;background:#0b7a45;color:#fff;font-weight:800">立即刷新</button>';document.body.appendChild(el);document.getElementById('admin-update-go').onclick=function(){location.reload()}}
+async function __adminCheck(manual){
+  if(__adminVer.busy)return __adminVer.busy;
+  __adminVer.busy=true;
+  try{
+    var txt=await __fetchSelf();var h=__fp(txt);
+    if(!__adminVer.base){__adminVer.base=h;if(manual)topToast('已记录当前版本（'+h+'）',true,false);return 'baseline'}
+    if(h!==__adminVer.base){
+      if(__adminVer.dirty){__showUpdateBar();if(!__adminVer.notified){__adminVer.notified=true;topToast('后台已更新：有未保存输入，已提示，不会自动刷新',false,true)}return 'dirty'}
+      topToast('后台已更新，正在刷新…',true,false);await new Promise(function(r){setTimeout(r,700)});location.reload();return 'reload'
+    }else if(manual){topToast('已是最新版本（'+h+'）',true,false)}
+    return 'same'
+  }catch(e){if(manual)topToast('检查更新失败：'+(e&&e.message||e),false,true);return 'err'}
+  finally{__adminVer.busy=false}
+}
+async function __adminInitVer(){
+  try{__adminVer.base=__fp(await __fetchSelf())}catch(e){__adminVer.base=''}
+  if(__adminVer.timer)clearInterval(__adminVer.timer);
+  __adminVer.timer=setInterval(function(){__adminCheck(false)},60000);
+  setTimeout(function(){document.addEventListener('input',function(e){var t=e.target;if(t&&/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName))__adminVer.dirty=true},true);document.addEventListener('change',function(e){var t=e.target;if(t&&/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName))__adminVer.dirty=true},true)},1500);
+}
+window.__adminCheckNow=function(){return __adminCheck(true)};
+window.__adminDirtyState=function(){return __adminVer.dirty};
+if(document.getElementById('btn-check-admin'))document.getElementById('btn-check-admin').addEventListener('click',function(){__adminCheck(true)});
+setTimeout(__adminInitVer,800);
+loadAll();
+})();
+
+function loadRevealConfig(){
+  return loadJSON('data/site-config.json').then(function(c){
+    window.__siteCfg=c||{};
+    var r=(c&&c.reveal)||{};var set=function(id,v){var el=$(id);if(el&&v!==undefined&&v!==null)el.value=v};
+    set('reveal-mode',r.mode||'fixed');set('reveal-seconds',isFinite(r.seconds)?r.seconds:10);
+    set('reveal-min',isFinite(r.min)?r.min:8);set('reveal-max',isFinite(r.max)?r.max:15);set('reveal-special',isFinite(r.specialExtra)?r.specialExtra:5);
+  }).catch(function(){});
+}
+function clampNum(v,def,lo,hi){var n=parseInt(v,10);if(!isFinite(n))n=def;return Math.max(lo,Math.min(hi,n))}
+function saveRevealConfigImpl(){
+  var mode=$('reveal-mode')?$('reveal-mode').value:'fixed';
+  var seconds=clampNum($('reveal-seconds')&&$('reveal-seconds').value,10,1,120);
+  var min=clampNum($('reveal-min')&&$('reveal-min').value,8,1,120);
+  var max=clampNum($('reveal-max')&&$('reveal-max').value,15,1,120);
+  if(mode==='random'&&min>max){var t=min;min=max;max=t}
+  var specialExtra=clampNum($('reveal-special')&&$('reveal-special').value,5,0,120);
+  var base=window.__siteCfg||{};
+  base.reveal={mode:mode,seconds:seconds,min:min,max:max,specialExtra:specialExtra};
+  setState('reveal-state','保存中…');
+  return saveFile('data/site-config.json',base,'CMS: update reveal config').then(function(){
+    window.__siteCfg=base;topToast('已更新，下一期开奖生效',true,false);setState('reveal-state','已更新，下一期开奖生效');
+  }).catch(function(e){setState('reveal-state','保存失败：'+(e&&e.message||e));});
+}
+if(document.getElementById('btn-save-reveal'))document.getElementById('btn-save-reveal').addEventListener('click',function(){if(window.__revealBusy)return;window.__revealBusy=true;busySet(['btn-save-reveal'],true);Promise.resolve(saveRevealConfigImpl()).finally(function(){busySet(['btn-save-reveal'],false);window.__revealBusy=false})});
+setTimeout(loadRevealConfig,2500);
+
+</script></body></html>

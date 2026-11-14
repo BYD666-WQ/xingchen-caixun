@@ -53,6 +53,17 @@ body{padding-bottom:76px}
 #xc-toast .x{position:absolute;right:6px;top:4px;width:26px;height:26px;border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:50%;font-size:16px;line-height:1}
 @keyframes daFlash{0%{background:#FFF3C4}70%{background:#FFF3C4}100%{background:transparent}}
 #da-tbody tr.da-new td{animation:daFlash 2s ease}
+
+  .pick-edit{background:#fbfdf9;border:1px solid #cfe3cf;border-radius:8px;padding:10px;margin:10px 0}
+  .pick-edit-hd{display:flex;align-items:center;gap:8px;margin:0 0 8px;color:#0b7a45;font-weight:800;font-size:14px}
+  .pick-edit-hd button{margin-left:auto;background:#fff5f6;color:#b00020;border:1px solid #e3a6ad;border-radius:5px;padding:5px 12px;font-size:12px;font-weight:700}
+  .pick-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pick-edit label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#555;font-weight:700;min-width:0}
+  .pick-edit input,.pick-edit textarea{width:100%;box-sizing:border-box;border:1px solid #cfd8cf;border-radius:6px;padding:8px 9px;font:14px/1.5 "Microsoft YaHei",Arial,sans-serif;color:#222;background:#fff}
+  .pick-edit input{height:40px}
+  .pick-edit textarea{min-height:64px;resize:vertical;white-space:pre-wrap;word-break:break-all}
+  .pick-edit .full{grid-column:1/-1}
+  @media(max-width:520px){.pick-edit-grid{grid-template-columns:1fr}}
 </style></head><body>
 <div id="xc-toast"><span id="xc-toast-t"></span><button class="x" id="xc-toast-x">×</button></div>
 <header><b>新港摇钱树 · 内容管理</b><span id="who" style="font-size:12px;opacity:.9"></span></header>
@@ -909,7 +920,46 @@ window.__daUndoDelete=function(b,issue){try{if(state.deleted&&state.deleted[b])d
 function setState(id,txt,cls){var el=$d(id);if(!el)return;el.textContent=txt;if(cls)el.className=cls;el.style.display='block'}
   function loadAll(){state.status=state.status||{};setState('da-src','载入中…（jsDelivr / raw / API 独立超时）');return Promise.all(BOARDS.map(function(b){return fetchData(b.file).then(function(r){state.raw[b.id]=r.data;state.data[b.id]=LOAD[b.id](r.data);state.status[b.id]={ok:true,source:r.source,ms:r.ms}},function(e){state.raw[b.id]=null;state.data[b.id]=[];state.status[b.id]={ok:false,missing:!!e.missing,error:e.detail||e.message}})})).then(function(){var n=BOARDS.filter(function(b){return state.status[b.id]&&state.status[b.id].ok}).length;var f=BOARDS.length-n;setState('da-src','已载入 '+n+'/'+BOARDS.length+(f?('，'+f+' 个失败/待创建'):'')+' 个板块');daRender()})}
 function renderTabs(){var h='';BOARDS.forEach(function(b,i){var st=state.status&&state.status[b.id];var bad=st&&!st.ok;h+='<button data-i="'+i+'" class="'+(i===state.cur?'on':'')+(bad?' bad':'')+'" title="'+(bad?(st.missing?'文件不存在（保存时新建）':'载入失败'):'')+'">'+b.name+(bad?' ⚠':'')+'</button>'});$d('da-tabs').innerHTML=h;$d('da-tabs').querySelectorAll('button').forEach(function(btn){btn.addEventListener('click',function(){state.cur=parseInt(btn.getAttribute('data-i'),10);daRender()})})}
-  function daRender(){renderTabs();var b=BOARDS[state.cur];$d('da-note').textContent=b.note;var rows=state.data[b.id]||[];$d('da-count').textContent='共 '+rows.length+' 行';
+  function daRenderPick(b){
+  var rows=state.data[b.id]||[];
+  var col={};b.cols.forEach(function(c){col[c.k]=c});
+  function inp(k){var c=col[k]||{};return '<input data-r="__R__" data-k="'+k+'" value="__V__" placeholder="'+esc(c.p||'')+'">'}
+  function area(k,rows2,cls){var c=col[k]||{};return '<label class="'+(cls||'')+'"><span>'+esc(c.t||k)+'</span><textarea data-r="__R__" data-k="'+k+'" rows="'+rows2+'" placeholder="'+esc(c.p||'')+'">__V__</textarea></label>'}
+  var html='';
+  rows.forEach(function(r,i){
+    var V=function(k){return esc(String(r[k]==null?'':r[k]))};
+    html+='<div class="pick-edit" data-row="'+i+'">'+
+      '<div class="pick-edit-hd"><span>第 '+(i+1)+' 条 · 期号 '+(r.issue||'—')+'</span><button type="button" data-pdel="'+i+'">删除本期</button></div>'+
+      '<div class="pick-edit-grid">'+
+        '<label><span>期号</span>'+inp('issue').replace('__R__',i).replace('__V__',V('issue'))+'</label>'+
+        area('sevenZ',3).replace('__R__',i).replace('__V__',V('sevenZ'))+
+        area('sevenN',2).replace('__R__',i).replace('__V__',V('sevenN'))+
+        area('fiveZ',2).replace('__R__',i).replace('__V__',V('fiveZ'))+
+        area('fiveN',2).replace('__R__',i).replace('__V__',V('fiveN'))+
+        area('threeZ',2).replace('__R__',i).replace('__V__',V('threeZ'))+
+        area('threeN',2).replace('__R__',i).replace('__V__',V('threeN'))+
+        '<label><span>精选肖</span>'+inp('pickZ').replace('__R__',i).replace('__V__',V('pickZ'))+'</label>'+
+        '<label><span>精选码</span>'+inp('pickN').replace('__R__',i).replace('__V__',V('pickN'))+'</label>'+
+        area('slogan',2,'full').replace('__R__',i).replace('__V__',V('slogan'))+
+      '</div></div>';
+  });
+  $d('da-thead').innerHTML='';
+  $d('da-tbody').innerHTML='<tr><td colspan="2" style="border:0;padding:0;background:#fff">'+(html||'<div style="padding:14px;color:#999">暂无数据，点「加行」或「生成本期空行」</div>')+'</td></tr>';
+  $d('da-tbody').querySelectorAll('input,textarea').forEach(function(inp){
+    inp.addEventListener('input',function(){state.data[b.id][parseInt(inp.getAttribute('data-r'),10)][inp.getAttribute('data-k')]=inp.value;softCheck()});
+    if(inp.getAttribute('data-k')==='issue')inp.addEventListener('blur',function(){sortBoard(false)});
+  });
+  $d('da-tbody').querySelectorAll('button[data-pdel]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var ii=parseInt(btn.getAttribute('data-pdel'),10);var row=state.data[b.id][ii];
+      if(row&&parseInt(row.issue,10)){state.deleted[b.id]=state.deleted[b.id]||{};state.deleted[b.id][String(parseInt(row.issue,10))]=1}
+      state.data[b.id].splice(ii,1);daRender();setState('da-state','已从列表移除，点「保存本板块」生效','da-ok');
+    });
+  });
+  softCheck();
+}
+function daRender(){renderTabs();var b=BOARDS[state.cur];$d('da-note').textContent=b.note;var rows=state.data[b.id]||[];$d('da-count').textContent='共 '+rows.length+' 行';
+    if(b.id==='pick'){daRenderPick(b);return}
     var th='<tr><th style="width:36px">#</th>';b.cols.forEach(function(c){th+='<th style="width:'+(c.w||'auto')+'">'+c.t+'</th>'});th+='<th style="width:42px">操作</th></tr>';$d('da-thead').innerHTML=th;
     var tb='';rows.forEach(function(r,i){tb+='<tr><td style="text-align:center;color:#888">'+(i+1)+'</td>';b.cols.forEach(function(c){var v=String(r[c.k]==null?'':r[c.k]).replace(/"/g,'&quot;');tb+='<td><input data-r="'+i+'" data-k="'+c.k+'" value="'+esc(v)+'" placeholder="'+esc(c.p||'')+'"></td>'});tb+='<td><button class="gray small" data-del="'+i+'">删</button></td></tr>'});
     $d('da-tbody').innerHTML=tb||'<tr><td colspan="'+(b.cols.length+2)+'" style="color:#999">暂无数据，点「加行」或「生成本期空行」</td></tr>';
