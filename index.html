@@ -396,9 +396,29 @@ details.mini>summary::-webkit-details-marker{display:none}
       parent.insertBefore(c,base.nextSibling);
     });
   }
+  var WAIT_TIMEOUT_MS=30*60*1000;
+  function doy(d){var s=new Date(d.getFullYear(),0,0);return Math.floor((d-s)/86400000)}
+  function waitBalls(){var h='';for(var i=0;i<6;i++)h+='<div class="tile gray"><div class="num">?</div><div class="zod">?</div></div>';h+='<span class="plus">+</span><div class="tile gray"><div class="num">?</div><div class="zod">?</div></div>';return h}
+  function newmoWaitInfo(){
+    try{
+      var d=D&&D.newmo;if(!d||!d.issue)return null;
+      var now=new Date(),hm=TIME_TABLE['新澳']||'21:30',q=String(hm).split(':');
+      var _hh=parseInt(q[0],10),_mm=parseInt(q[1],10);if(!isFinite(_hh))_hh=21;if(!isFinite(_mm))_mm=30;
+      var due=new Date(now.getFullYear(),now.getMonth(),now.getDate(),_hh,_mm,0,0);
+      var days=DAYS['新澳']||[0,1,2,3,4,5,6];
+      if(days.length&&days.indexOf(now.getDay())<0)return null;
+      if(now.getTime()<due.getTime())return null;
+      var exp=now.getFullYear()*1000+doy(now);
+      var cur=parseInt(d.issue,10)||0;
+      if(cur>=exp)return null;
+      if(now.getTime()-due.getTime()>WAIT_TIMEOUT_MS)return {expired:true,expected:exp,short:exp%1000};
+      return {waiting:true,expected:exp,short:exp%1000,due:due.getTime()};
+    }catch(e){return null}
+  }
   function fill(){
     KEYS.forEach(function(k){
       var c=document.getElementById('blk-'+k);if(!c)return;var d=D[k]||{};var hm=TIME_TABLE[LABEL[k]==='新澳彩'?'新澳':(LABEL[k]==='香港彩'?'香港':'新港')];
+      if(k==='newmo'){var _w=newmoWaitInfo();if(_w&&_w.waiting){window.__newmoWaitActive=1;var _b=c.querySelector('.hd b');if(_b)_b.textContent=LABEL[k]+'第'+_w.short+'期';var _bb=c.querySelector('.balls');if(_bb)_bb.innerHTML=waitBalls();var _t=c.querySelector('.hd .t');if(_t)_t.textContent='等待开奖数据';var _nx=c.querySelector('.next span');if(_nx)_nx.textContent='第'+_w.short+'期 · 开奖中，请稍候';var _cd=c.querySelector('.xc-cd');if(!_cd){_cd=document.createElement('span');_cd.className='xc-cd';c.querySelector('.hd').appendChild(_cd)}_cd.id='xc-cd-'+k;_cd.textContent='开奖中，请稍候';return}window.__newmoWaitActive=0}
       var b=c.querySelector('.hd b');if(b&&d.issue)b.textContent=LABEL[k]+'第'+String(d.issue).slice(-3)+'期';
       var bb=c.querySelector('.balls');if(bb&&d.nums)bb.innerHTML=ballHtml(d.nums);
       var t=c.querySelector('.hd .t');if(t)t.textContent='数据更新 '+p2(new Date().getHours())+':'+p2(new Date().getMinutes());
@@ -415,6 +435,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     try{if(window.__xcEnsureWaiting)window.__xcEnsureWaiting();if(VF&&VF.phase==='revealing')vfRestore()}catch(e){}
     KEYS.forEach(function(k){
       var e=document.getElementById('xc-cd-'+k);if(!e)return;
+      if(k==='newmo'){var _w=newmoWaitInfo();if(_w&&_w.waiting){if(!window.__newmoWaitActive){window.__newmoWaitActive=1;try{fill()}catch(ex){}}e.textContent='开奖中，请稍候';return}if(window.__newmoWaitActive){window.__newmoWaitActive=0;try{fill()}catch(ex){}}}
       if(k==='newhk'&&((D.newhk&&D.newhk._xcWaiting)||window.__xcWaiting)){e.textContent='待开';return}var hm=TIME_TABLE[LABEL[k]==='新澳彩'?'新澳':(LABEL[k]==='香港彩'?'香港':'新港')];
       var n=new Date();var t=nextDate(hm,DAYS[kindOf(k)]);var left=Math.floor((t-n)/1000);
       e.textContent='距开奖 '+p2(Math.floor(left/3600))+':'+p2(Math.floor(left%3600/60))+':'+p2(left%60);
@@ -424,6 +445,8 @@ details.mini>summary::-webkit-details-marker{display:none}
     window.__curTab=k;
     var d=D[k]||{};
     KEYS.forEach(function(x){var c=document.getElementById('blk-'+x);if(c)c.style.display=(x===k?'':'none')});
+    var _nw=(k==='newmo')?newmoWaitInfo():null;
+    if(_nw&&_nw.waiting){var _obi=document.getElementById('xc-ob-issue');if(_obi)_obi.textContent=_nw.short+'期';var _box=document.getElementById('xc-ob-balls')||document.querySelector('.openbar .ob');if(_box)_box.innerHTML=waitBalls();document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.classList.toggle('on',i===KEYS.indexOf(k))});return}
     var ob=document.getElementById('xc-openbar');var obi=document.getElementById('xc-ob-issue');
     if(obi)obi.textContent=shortIssue(d.issue||'')+'期开';
     if(ob){ob.setAttribute('data-issue',shortIssue(d.issue||''));ob.setAttribute('data-nums',(d.nums||[]).map(function(x){return x.c}).join(','))}
@@ -959,6 +982,7 @@ section.card{border-radius:14px!important;border:1px solid #E0B94A!important;bor
 #nm-final .pk-block:first-of-type{border-top:0!important}
 #nm-final .pk-block:last-of-type{border-bottom:0!important}
 #nm-final .pk-ad{background:#F7F3E8!important;border-top:1px dashed #C9A227!important;border-bottom:1px dashed #C9A227!important;color:#8a6b3a!important;font-size:14px!important;font-weight:600!important;letter-spacing:1px!important;padding:8px 6px!important}
+.tile.gray{background:#9a9a9a!important}.tile.gray .zod{background:rgba(0,0,0,.38)!important}
 #nm-final .pk-ad:before{content:'广告';display:inline-block;font-size:10px;font-weight:400;color:#a89a80;border:1px solid #d8c9a8;border-radius:3px;padding:0 3px;margin-right:5px;vertical-align:1px}
 </style>
 <script>
