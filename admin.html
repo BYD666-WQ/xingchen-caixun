@@ -586,6 +586,7 @@ function calcAutoVf(newIssue,times){
 }
 
 
+function autoPublishedAt(vf){if(!vf)return '';var t=(vf instanceof Date)?vf.getTime():new Date(vf).getTime();if(isNaN(t))return '';return t<=Date.now()?new Date(t).toISOString():''}
 var __vfTouched=false;
 function genMaintCode(){var ch='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<6;i++){var r=(window.crypto&&crypto.getRandomValues)?crypto.getRandomValues(new Uint8Array(1))[0]:Math.floor(Math.random()*256);s+=ch[r%ch.length]}return s}
 function collectMaintUI(){var codeEl=$('maint-code'),hintEl=$('maint-hint'),base=(SITE_CFG&&SITE_CFG.maintenance)||{};return {enabled:!!base.enabled,code:String((codeEl&&codeEl.value)||base.code||'').trim(),hint:String((hintEl&&hintEl.value)||base.hint||'').trim()}}
@@ -676,12 +677,13 @@ async function saveImpl(){
   var _autoVf;
   try{_autoVf=calcAutoVf(newIssueVal,_useTimes)}catch(ve){return Msg('保存失败（drawTimes 非法/缺失）：'+ve.message+'；未写入',false)}
   var vfMs=_autoVf.getTime();
+   var _vfInput=$('g-visiblefrom');if(window.__vfTouched&&_vfInput&&_vfInput.value){var _mv=new Date(_vfInput.value);if(!isNaN(_mv.getTime()))vfMs=_mv.getTime()}
   var _diag='src='+_timeSrc+' drawTimes.newhk='+_useTimes.newhk.time+' days=['+_useTimes.newhk.days.join(',')+'] now='+fmtVfStr(new Date())+' → vf='+fmtVfStr(new Date(vfMs));
   try{console.log('[vf-diag] '+_diag)}catch(e){}
   try{topToast('诊断：'+_diag,true,false)}catch(e){}
   if($('g-visiblefrom'))$('g-visiblefrom').value=vfLocalStr(new Date(vfMs));
   newDraw.visibleFrom=new Date(vfMs).toISOString();
-  newDraw.publishedAt='';
+  newDraw.publishedAt=autoPublishedAt(newDraw.visibleFrom);
   var dl=new Date(vfMs);var publishLabel=fmtVfStr(dl);
   if(vfMs>Date.now()){newDraw.numsEnc=vfEnc(newDraw.nums);newDraw.nums=[]}
   var newPlay={name:newDraw.name,issue:newDraw.issue,oddEven:$('p-oe').value,threeZodiac:zs,note:$('p-note').value.trim(),status:'live',updated:new Date().toISOString()};
