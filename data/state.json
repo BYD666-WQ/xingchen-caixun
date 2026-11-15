@@ -1,10 +1,10 @@
 {
  "ok": true,
  "status": "success",
- "message": "狂暴模式：实时 2 彩种",
- "updated": "2026-11-15 21:34:37",
- "updatedAt": "2026-11-15T21:34:37+08:00",
- "lastSuccess": "2026-11-15 21:34:37",
+ "message": "云端 Worker 已更新（实时 1 彩种）",
+ "updated": "2026-11-15 21:35:04",
+ "updatedAt": "2026-11-15T21:35:04.560+08:00",
+ "lastSuccess": "2026-11-15 21:35:04",
  "newest_seen_ts": "318",
  "newest_seen_ids": [
   "Macau:318",
