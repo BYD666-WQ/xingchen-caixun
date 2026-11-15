@@ -1,14 +1,14 @@
 {
  "ok": true,
  "status": "ok",
- "source": "draw-sprint",
- "updated": "2026-11-15 21:34:37",
- "updatedAt": "2026-11-15T21:34:37+08:00",
+ "source": "gh-actions",
+ "updated": "2026-11-15 22:51:14",
+ "updatedAt": "2026-11-15T22:51:14+08:00",
  "games": [
   {
    "rule": "Macau",
    "name": "新澳彩",
-   "widgetId": 24186,
+   "widgetId": 41362,
    "issue": 2026319,
    "shortIssue": 319,
    "nums": [
@@ -41,7 +41,7 @@
      "z": "虎"
     }
    ],
-   "sourcePackage": "api-warp",
+   "sourcePackage": "temps_result_1.json",
    "live": true,
    "history": [
     {
@@ -422,7 +422,7 @@
      "z": "羊"
     }
    ],
-   "sourcePackage": "api-warp",
+   "sourcePackage": "temps_result_2.json",
    "live": true,
    "history": [
     {
