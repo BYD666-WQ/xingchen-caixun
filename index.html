@@ -866,12 +866,15 @@ details.mini>summary::-webkit-details-marker{display:none}
     var ex=document.getElementById('xc-extra');if(!ex){ex=document.createElement('div');ex.id='xc-extra';host.parentNode.insertBefore(ex,host)}return ex;
   }
   get('data/manual-ziliao.json').then(function(zl){
+    var run=function(){
     var rows=(zl&&zl.rows||[]).slice(0,10).sort(function(a,b){return (parseInt(a.issue,10)||0)-(parseInt(b.issue,10)||0)});var ex=mount();if(!ex)return;
     var hist=rows.map(function(d){var c=d.result&&d.result.c,z=d.result&&d.result.z,ok=(c&&c!=='NaN'&&d.status!=='upcoming');if(!ok){var ar=window.__xcActualResult?window.__xcActualResult(d.issue):null;if(ar){c=ar.c;z=ar.z;ok=true}}return '<div class="row"><i>'+d.issue+'期</i><span>'+(ok?((d.threeZodiac||[]).join('')+' 开'+(z||'')+c):'待开')+'</span></div>'}).join('');
     var zt=['鼠 07 19 31 43','牛 06 18 30 42','虎 05 17 29 41','兔 04 16 28 40','龙 03 15 27 39','蛇 02 14 26 38','马 01 13 25 37 49','羊 12 24 36 48','猴 11 23 35 47','鸡 10 22 34 46','狗 09 21 33 45','猪 08 20 32 44'];
     ex.innerHTML = ('<section class="mini"><h5>历史开奖记录</h5>'+hist+'</section>'+
       '<section class="mini"><h5>玄机诗象</h5><div style="padding:10px;font-size:17px;line-height:1.7;color:#6b4a10">本期玄机：龙争虎斗，马到成功；留意单数生肖，特码看虎马羊。</div></section>'+
       '<section class="mini"><h5>生肖号码大表</h5><div class="zgrid">'+zt.map(function(s){var p=s.split(' ');return '<div style="border:1px solid #E8D098;border-radius:4px;text-align:center;padding:4px 2px;font-size:12px;background:#FFFDF6"><b style="color:#C90000;font-size:15px;display:block">'+p[0]+'</b>'+p.slice(1).join(' ')+'</div>'}).join('')+'</div></section>');
+    };
+    if(window.__xcDrawsReady)run();else{var _n=0,_iv=setInterval(function(){if(window.__xcDrawsReady||++_n>30){clearInterval(_iv);run()}},100)}
   }).catch(function(e){});
 })();
 </script><script>
