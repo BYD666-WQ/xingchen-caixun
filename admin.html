@@ -190,6 +190,24 @@ body{padding-bottom:76px}
   <label>提示文案（可选）</label><input id="maint-hint" placeholder="例如：测试中，请输入访问代号">
   <p style="font-size:12px;color:#888;margin:6px 0 0">改完点底部「保存并发布」生效；开启后页面会加 noindex。</p>
 </div></details></div>
+<div class="panel" id="cbw-panel"><details><summary>🎨 彩霸王 · 资料管理（写入 xingchen-site1）</summary><div class="body">
+  <p style="font-size:12px;color:#666;line-height:1.6;margin:0 0 6px">独立管理彩霸王资料；保存提交到 <b>BYD666-WQ/xingchen-site1</b> 并触发其 Pages。开奖号码仍由主站维护。</p>
+  <div class="row"><button id="cbw-load" type="button">读取彩霸王资料</button><span id="cbw-status" style="font-size:12px;color:#888"></span></div>
+  <div id="cbw-editor" style="display:none;margin-top:8px">
+    <label>板块</label><select id="cbw-sec"></select>
+    <label>板块标题</label><input id="cbw-title" placeholder="六肖精选">
+    <label>类型（six/five/wave/oddeven/pick/heads/tails/jiaye/nine/kill2）</label><input id="cbw-type" placeholder="six">
+    <label>备注（可留空）</label><input id="cbw-note" placeholder="示例">
+    <div class="row" style="margin:6px 0"><button id="cbw-add-sec" type="button" class="small gray">＋ 新增板块</button><button id="cbw-del-sec" type="button" class="small gray">删除当前板块</button><button id="cbw-add-row" type="button" class="small gray">＋ 新增行</button></div>
+    <div style="border:1px dashed #d8c08b;padding:6px;margin:6px 0;border-radius:5px">
+      <div style="font-size:12px;color:#666;margin-bottom:4px">新增板块（id 只允许小写字母/数字/-）</div>
+      <div class="row"><input id="cbw-new-id" placeholder="new-section" style="flex:1"><input id="cbw-new-title" placeholder="新板块标题" style="flex:1"><input id="cbw-new-type" placeholder="six" style="flex:1"></div>
+    </div>
+    <div style="overflow:auto;max-height:45vh"><table id="cbw-rows"><thead><tr><th>期号</th><th>生肖/波/头/尾</th><th>号码</th><th>特码(肖码)</th><th>结果</th><th></th></tr></thead><tbody></tbody></table></div>
+    <p style="font-size:12px;color:#888;line-height:1.6">提示：六肖/五肖按「生肖逗号 + 号码逗号」保存；波填「红,绿」；头填「1,2,4」；尾填「0124568」；内幕一肖一码的七/五/三组请在原始 JSON 中编辑。</p>
+    <div class="row" style="margin-top:6px"><button id="cbw-save" type="button">保存到彩霸王并部署</button></div>
+  </div>
+</div></details></div>
 <div id="savebar">
   <span id="save-state">未保存</span>
   <button id="btn-save-bar" style="min-height:44px;padding:0 18px">保存并发布</button>
@@ -1175,4 +1193,73 @@ function saveRevealConfigImpl(){
 if(document.getElementById('btn-save-reveal'))document.getElementById('btn-save-reveal').addEventListener('click',function(){if(window.__revealBusy)return;window.__revealBusy=true;busySet(['btn-save-reveal'],true);Promise.resolve(saveRevealConfigImpl()).finally(function(){busySet(['btn-save-reveal'],false);window.__revealBusy=false})});
 setTimeout(loadRevealConfig,2500);
 
-</script></body></html>
+</script><script>
+(function(){
+  var SREPO='BYD666-WQ/xingchen-site1',SPATH='data/site-data.json',SREF='main';
+  var OWN=null,SHA=null;
+  function tok(){try{return localStorage.getItem('xc-gh-pat')||''}catch(e){return ''}}
+  function st(txt,bad){var e=document.getElementById('cbw-status');if(!e)return;e.textContent=txt;e.style.color=bad?'#b00020':'#0b7a45'}
+  function enc(s){return btoa(unescape(encodeURIComponent(s)))}
+  function dec(s){return decodeURIComponent(escape(atob(String(s).replace(/\n/g,''))))}
+  async function gapi(url,opt){opt=opt||{};var h=Object.assign({Authorization:'Bearer '+tok(),Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},opt.headers||{});if(opt.body)h['Content-Type']='application/json';var r=await fetch(url,{method:opt.method||'GET',headers:h,body:opt.body});var txt=await r.text();var j;try{j=JSON.parse(txt)}catch(e){j={message:txt}}if(!r.ok){var e=new Error((j&&j.message)||('HTTP '+r.status));e.status=r.status;throw e}return j}
+  function secs(){return OWN&&OWN.sections||[]}
+  function current(){var s=document.getElementById('cbw-sec');return secs().filter(function(x){return x.id===s.value})[0]||null}
+  function split(s){return String(s||'').split(/[,，\s]+/).map(function(x){return x.trim()}).filter(Boolean)}
+  function specialOf(s){s=String(s||'').trim();if(!s)return null;var m=s.match(/^([\u4e00-\u9fa5?])\s*[+,\s-]*\s*(\d{1,2})$/);if(m)return {z:m[1],c:('0'+m[2]).slice(-2),color:''};var n=s.match(/(\d{1,2})/);return n?{z:'',c:('0'+n[1]).slice(-2),color:''}:null}
+  function rowVals(s,r){var z='',n='',sp=r.special&&r.special.z?(r.special.z+(r.special.c||'')):'';if(s.type==='pick'){z=((r.seven&&r.seven.zodiac)||[]).join(',');n=((r.seven&&r.seven.nums)||[]).join(',')}else if(s.type==='wave'||s.type==='wave2'){z=(r.waves||[]).join(',')}else if(s.type==='oddeven'){z=(r.zodiacs||[]).join(',')}else if(s.type==='heads'){z=(r.heads||[]).join(',')}else if(s.type==='tails'){z=String(r.tails||'').split('').join(',')}else if(s.type==='kill2'){z=(r.pair||[]).join(',')}else if(s.type==='jiaye'||s.type==='nine'){z=(r.zodiacs||[]).join(',')}else if(s.type==='poem'||s.type==='attrs'||s.type==='ziliao'){z=r.text||r.zodiac||''}else{z=(r.list||[]).map(function(x){return x.z}).join(',');n=(r.list||[]).map(function(x){return x.c}).join(',')}return {z:z,n:n,sp:sp,result:r.result||''}}
+  function applyVals(s,r,z,n,sp,res){
+    var zs=split(z),ns=split(n);r.issue=String(r.issue||'');r.result=res||'';
+    if(s.type==='wave'||s.type==='wave2'){r.waves=zs;r.special=specialOf(sp)}
+    else if(s.type==='oddeven'){r.zodiacs=zs;r.special=specialOf(sp)}
+    else if(s.type==='heads'){r.heads=zs.map(function(x){return parseInt(x,10)}).filter(function(x){return !isNaN(x)});r.special=specialOf(sp)}
+    else if(s.type==='tails'){r.tails=zs.join('');r.special=specialOf(sp)}
+    else if(s.type==='kill2'){r.pair=zs;r.special=specialOf(sp)}
+    else if(s.type==='jiaye'||s.type==='nine'){r.zodiacs=zs;r.special=specialOf(sp)}
+    else if(s.type==='pick'){r.seven=r.seven||{};r.seven.zodiac=zs;r.seven.nums=ns;r.special=specialOf(sp)}
+    else if(s.type==='poem'||s.type==='attrs'||s.type==='ziliao'){r.text=z;if(s.type==='attrs')r.num=ns[0]||r.num}
+    else{r.list=zs.map(function(zz,i){return {z:zz,c:ns[i]||'',color:''}});r.special=specialOf(sp)}
+  }
+  function renderRows(){
+    var s=current(),tb=document.querySelector('#cbw-rows tbody');if(!tb)return;var rows=s&&s.rows||[];
+    tb.innerHTML=rows.map(function(r,i){var v=rowVals(s,r);return '<tr><td><input data-i="'+i+'" data-f="issue" value="'+escAttr(r.issue||'')+'" style="width:72px"></td><td><input data-i="'+i+'" data-f="z" value="'+escAttr(v.z)+'" style="width:170px"></td><td><input data-i="'+i+'" data-f="n" value="'+escAttr(v.n)+'" style="width:130px"></td><td><input data-i="'+i+'" data-f="sp" value="'+escAttr(v.sp)+'" style="width:70px"></td><td><input data-i="'+i+'" data-f="res" value="'+escAttr(v.result)+'" style="width:50px"></td><td><button class="small gray" data-delrow="'+i+'">删</button></td></tr>'}).join('');
+    tb.querySelectorAll('[data-delrow]').forEach(function(b){b.onclick=function(){if(!confirm('删除这一行？'))return;var s=current();s.rows.splice(+b.getAttribute('data-delrow'),1);renderRows()}});
+  }
+  function escAttr(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function renderEditor(){
+    var sel=document.getElementById('cbw-sec');sel.innerHTML=secs().map(function(s){return '<option value="'+escAttr(s.id)+'">'+escAttr(s.title||s.id)+'</option>'}).join('');
+    if(secs()[0])sel.value=secs()[0].id;
+    sel.onchange=function(){var s=current();if(!s)return;document.getElementById('cbw-title').value=s.title||'';document.getElementById('cbw-type').value=s.type||'';document.getElementById('cbw-note').value=s.note||'';renderRows()};
+    sel.onchange();
+  }
+  async function loadOwn(){
+    if(!tok()){st('先在上方保存 GitHub 密钥',true);return}
+    st('读取中…');
+    try{var j=await gapi('https://api.github.com/repos/'+SREPO+'/contents/'+SPATH+'?ref='+SREF+'&t='+Date.now());SHA=j.sha;OWN=JSON.parse(dec(j.content));document.getElementById('cbw-editor').style.display='block';renderEditor();st('已读取 '+secs().length+' 个板块；可编辑后保存')}
+    catch(e){if(e.status===404)st('读取失败：彩霸王仓库/数据文件不存在，或 PAT 无 xingchen-site1 访问权限',true);else if(e.status===401||e.status===403)st('读取失败：PAT 无权限（需要 xingchen-site1 Contents 读取）',true);else st('读取失败：'+e.message,true)}
+  }
+  function gather(){
+    var s=current();if(!s)return;var tb=document.querySelectorAll('#cbw-rows tbody tr');var rows=s.rows||[];
+    tb.forEach(function(tr){var i=+tr.querySelector('[data-f=issue]').getAttribute('data-i');var z=tr.querySelector('[data-f=z]').value,n=tr.querySelector('[data-f=n]').value,sp=tr.querySelector('[data-f=sp]').value,res=tr.querySelector('[data-f=res]').value;if(rows[i]){rows[i].issue=tr.querySelector('[data-f=issue]').value;applyVals(s,rows[i],z,n,sp,res)}});
+  }
+  async function saveOwn(){
+    var s=current();if(!s){st('没有板块可保存',true);return}
+    gather();s.title=document.getElementById('cbw-title').value.trim()||s.title;s.type=document.getElementById('cbw-type').value.trim()||s.type;s.note=document.getElementById('cbw-note').value.trim();
+    OWN.updated=new Date().toISOString();st('提交中…');
+    try{
+      var put=await gapi('https://api.github.com/repos/'+SREPO+'/contents/'+SPATH,{method:'PUT',body:JSON.stringify({message:'cbw: update site1 material data',content:enc(JSON.stringify(OWN,null,1)),branch:SREF,sha:SHA})});
+      SHA=put.content&&put.content.sha||SHA;
+      try{await gapi('https://api.github.com/repos/'+SREPO+'/actions/workflows/pages.yml/dispatches',{method:'POST',body:JSON.stringify({ref:SREF})});st('已提交并触发彩霸王 Pages；约 1–2 分钟生效')}
+      catch(e){st('数据已提交，但触发 Pages 失败（需 Actions:write）：'+e.message,true)}
+    }catch(e){var m=e.status===401||e.status===403?'PAT 无 xingchen-site1 写权限（需 Contents:write）':e.status===409?'文件冲突，请先重新读取':e.message;st('保存失败：'+m,true)}
+  }
+  function bind(){
+    var L=document.getElementById('cbw-load');if(!L)return;L.onclick=loadOwn;
+    document.getElementById('cbw-save').onclick=saveOwn;
+    document.getElementById('cbw-add-row').onclick=function(){var s=current();if(!s)return;s.rows=s.rows||[];s.rows.push({issue:'',list:[],special:null,result:''});renderRows()};
+    document.getElementById('cbw-del-sec').onclick=function(){var s=current();if(!s||!confirm('删除板块「'+(s.title||s.id)+'」？'))return;OWN.sections=secs().filter(function(x){return x.id!==s.id});renderEditor();st('已从内存删除；点保存生效')};
+    document.getElementById('cbw-add-sec').onclick=function(){var id=document.getElementById('cbw-new-id').value.trim(),title=document.getElementById('cbw-new-title').value.trim(),type=document.getElementById('cbw-new-type').value.trim()||'six';if(!/^[a-z0-9-]+$/.test(id)){st('板块 id 只能用小写字母/数字/-',true);return}if(secs().some(function(x){return x.id===id})){st('板块 id 已存在',true);return}OWN.sections.push({id:id,title:title||id,type:type,note:'',rows:[]});renderEditor();document.getElementById('cbw-sec').value=id;document.getElementById('cbw-sec').onchange();st('已新增板块；点保存生效')};
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+})();
+</script>
+</body></html>
