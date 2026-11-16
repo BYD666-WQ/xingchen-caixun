@@ -456,7 +456,9 @@ details.mini>summary::-webkit-details-marker{display:none}
     if(!issue||!nums||nums.length!==7)return false;
     if(md){md.issue=issue;md.nums=nums;md._vfDone=1}
     VF={vf:Date.now(),issue:issue,enc:'',md:md,phase:'done',revealed:7,nums:nums,played:true,timer:null,timeline:[]};
-    vfSaveState();return true;
+    vfSaveState();
+    try{vfRender(nums,7,-1);vfHideProgress()}catch(e){}
+    return true;
   }
   function vfNormCfg(c){
     var o={mode:'fixed',seconds:10,min:8,max:15,specialExtra:5};
