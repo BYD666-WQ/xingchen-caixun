@@ -445,6 +445,19 @@ details.mini>summary::-webkit-details-marker{display:none}
   function mdCompat(md){if(md&&md.current&&md.current.issue!==undefined){var c=md.current;return {name:md.name,issue:c.issue,nums:c.nums||[],numsEnc:c.numsEnc,visibleFrom:c.visibleFrom,publishedAt:c.publishedAt||md.publishedAt,history:md.history||[],updated:md.updated,drawTime:md.drawTime,dailyTime:md.dailyTime}}return md}
   var VF_CFG={mode:'fixed',seconds:10,min:8,max:15,specialExtra:5};
   var VF=null;
+  var VF_LS_KEY='xc-vf-newhk';
+  function vfLoadState(issue){
+    try{var s=JSON.parse(localStorage.getItem(VF_LS_KEY)||'null');if(!s)return null;if(issue!=null&&String(s.issue)!==String(issue))return null;return s}catch(e){return null}
+  }
+  function vfSaveState(){
+    try{if(!VF||!VF.issue)return;localStorage.setItem(VF_LS_KEY,JSON.stringify({issue:String(VF.issue),phase:VF.phase,revealed:VF.revealed||0,nums:VF.nums||[],start:VF.vf||0}))}catch(e){}
+  }
+  function vfDoneState(issue,nums,md){
+    if(!issue||!nums||nums.length!==7)return false;
+    if(md){md.issue=issue;md.nums=nums;md._vfDone=1}
+    VF={vf:Date.now(),issue:issue,enc:'',md:md,phase:'done',revealed:7,nums:nums,played:true,timer:null,timeline:[]};
+    vfSaveState();return true;
+  }
   function vfNormCfg(c){
     var o={mode:'fixed',seconds:10,min:8,max:15,specialExtra:5};
     try{
@@ -505,7 +518,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     else{var c=VF.revealed||0;vfRender(VF.nums||[],c,-1);vfProgress(c>=7?'开奖中… 7/7':'开奖中… '+c+'/7')}
   }
   function vfDone(){
-    vfClearTimer();VF.phase='done';VF.played=true;
+    vfClearTimer();VF.phase='done';VF.played=true;vfSaveState();
     if(VF.nums&&VF.nums.length){try{VF.md.nums=VF.nums;D.newhk=VF.md;fill();show('newhk')}catch(e){console.log('[vfdone] ERR '+e)}}
     console.log('[vfdone] after fill cds='+document.querySelectorAll('.xc-cd').length)
     vfRender(VF.nums||[],7,-1);vfProgress('本期已开出');
@@ -570,6 +583,10 @@ details.mini>summary::-webkit-details-marker{display:none}
     var nums=null;
     if(md.numsEnc){nums=vfDec(md.numsEnc)}
     else if(md.nums&&md.nums.length){nums=md.nums}
+    var _stored=vfLoadState(md.issue);
+    if(_stored&&_stored.phase==='done'&&_stored.nums&&_stored.nums.length===7){if(vfDoneState(md.issue,_stored.nums,md))return false}
+    var _pubMs=Date.parse(md.publishedAt||'');
+    if(isFinite(_pubMs)&&Date.now()>=_pubMs&&nums&&nums.length===7){if(vfDoneState(md.issue,nums,md))return false}
     if(VF&&VF.issue===md.issue){
       md.issue=VF.issue;
       if(VF.phase==='done'){if(nums)md.nums=nums;return false}
@@ -584,6 +601,10 @@ details.mini>summary::-webkit-details-marker{display:none}
       return true;
     }
     var prev=(md.history||[])[0]||null;
+    if(prev&&prev.nums&&prev.nums.length===7){
+      var _pIssue=prev.issue,_pNums=prev.nums,_pst=vfLoadState(_pIssue),_ppub=Date.parse(prev.publishedAt||'');
+      if((isFinite(_ppub)&&Date.now()>=_ppub)||(_pst&&_pst.phase==='done')){if(vfDoneState(_pIssue,_pNums,md))return false}
+    }
     VF={vf:vf,issue:md.issue,enc:md.numsEnc,md:md,phase:'idle',revealed:0,nums:[],played:false,timer:null,timeline:vfTimeline(md.issue,VF_CFG),prevIssue:prev&&prev.issue,prevNums:prev&&prev.nums};
     if(prev&&prev.nums&&prev.nums.length){md.issue=prev.issue;md.nums=prev.nums}else{md.issue=md.issue-1;md.nums=[]}
     VF.timer=setTimeout(vfDue,Math.max(0,vf-Date.now()));
@@ -608,7 +629,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     return t;
   }
   function xcEnsureWaiting(){
-    var md=D&&D.newhk;if(!md||!md.issue)return;
+    var md=D&&D.newhk;if(!md||!md.issue)return;if(md._vfDone)return;
     if(VF&&(VF.phase==='revealing'||VF.phase==='pending'||VF.phase==='waiting'))return;
     if(!md._virtual&&xcHasNums(md)){
       var _pub=xcPubDate(md);
