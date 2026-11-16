@@ -1,9 +1,9 @@
 {
  "ok": true,
  "status": "ok",
- "source": "cf-worker",
- "updated": "2026-11-16 21:35:04",
- "updatedAt": "2026-11-16T21:35:04.537+08:00",
+ "source": "draw-sprint",
+ "updated": "2026-11-16 21:34:42",
+ "updatedAt": "2026-11-16T21:34:42+08:00",
  "games": [
   {
    "rule": "Macau",
@@ -41,7 +41,7 @@
      "z": "猪"
     }
    ],
-   "sourcePackage": "cf-worker",
+   "sourcePackage": "api-warp",
    "live": true,
    "history": [
     {
