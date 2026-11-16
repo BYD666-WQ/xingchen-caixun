@@ -881,6 +881,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   function place(){var sec=document.getElementById('wuxiao');if(!sec)return;var nm=document.getElementById('nm-final');if(nm&&nm.parentNode){if(nm.nextSibling!==sec)nm.parentNode.insertBefore(sec,nm.nextSibling);return}var nav=document.querySelector('.nav');if(nav&&nav.parentNode&&sec.parentNode!==nav.parentNode)nav.parentNode.insertBefore(sec,nav)}
   function mount(){var sec=document.getElementById('wuxiao');if(!sec){sec=document.createElement('section');sec.className='mini';sec.id='wuxiao';var nm=document.getElementById('nm-final');if(nm&&nm.parentNode){nm.parentNode.insertBefore(sec,nm.nextSibling)}else{var nav=document.querySelector('.nav');if(nav)nav.parentNode.insertBefore(sec,nav)}}return sec}
   get('data/wuxiao.json').then(function(w){
+    var run=function(){
     var rows=(w&&w.rows||[]);if(!rows.length)return;
     var html=rows.map(function(r){
       var sp=r.special||{};if(!sp.z){var _ar=window.__xcActualResult?window.__xcActualResult(r.issue):null;if(_ar)sp={z:_ar.z,c:_ar.c}}var wait=!sp.z;
@@ -894,6 +895,8 @@ details.mini>summary::-webkit-details-marker{display:none}
     var sec=mount();sec.innerHTML='<h5>五肖五码</h5>'+html;
     window.__wuxiao={rows:rows.length};
     place();setTimeout(place,400);setTimeout(place,1400);setTimeout(place,2600);
+    };
+    if(window.__xcDrawsReady)run();else{var _n=0,_iv=setInterval(function(){if(window.__xcDrawsReady||++_n>100){clearInterval(_iv);run()}},100)}
   }).catch(function(){});
 })();
 </script><script>
