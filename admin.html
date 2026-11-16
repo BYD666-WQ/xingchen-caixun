@@ -547,17 +547,26 @@ async function waitOnline(files,timeoutMs){
   try{topToast('数据已保存，但线上仍未更新；请点「刷新线上（触发 Pages 构建）」重试，或更换有 Actions 权限的密钥',false,true)}catch(e){}
   return false;
 }
-function buildHistory(prevIssue,prevNums,newIssue,history){
+function buildHistory(prevIssue,prevNums,newIssue,history,prevEnc){
   var hist=(history||[]).map(function(h){return {issue:h.issue,nums:(h.nums||[]).slice()}});
   var pushed=false;
-  if(prevIssue&&prevNums&&prevNums.length&&String(prevIssue)!==String(newIssue)){
+  var nums=(prevNums||[]).slice();
+  if(prevIssue&&String(prevIssue)!==String(newIssue)&&!nums.length&&prevEnc){
+    try{nums=vfDec(prevEnc)||[]}catch(e){nums=[]}
+    if(!nums.length)return {history:hist,pushed:pushed,error:'上一期 '+prevIssue+' 有 numsEnc 但解密失败；已拦截，不能丢号码。'};
+  }
+  if(prevIssue&&nums.length&&String(prevIssue)!==String(newIssue)){
     hist=hist.filter(function(h){return String(h.issue)!==String(prevIssue)});
-    hist.unshift({issue:prevIssue,nums:prevNums.map(function(n){return {c:n.c,z:n.z||'',color:n.color||'',wuxing:n.wuxing||''}})});
+    hist.unshift({issue:prevIssue,nums:nums.map(function(n){return {c:n.c,z:n.z||'',color:n.color||'',wuxing:n.wuxing||''}})});
     pushed=true;
   }
   hist=hist.filter(function(h){return String(h.issue)!==String(newIssue)});
   var _seen={};hist=hist.filter(function(h){var k=String(h.issue);if(_seen[k])return false;_seen[k]=1;return true});
   hist.sort(function(a,b){return parseInt(b.issue,10)-parseInt(a.issue,10)});
+  if(hist.length){
+    var maxIssue=parseInt(hist[0].issue,10)||0;
+    if(parseInt(newIssue,10)!==maxIssue+1)return {history:hist,pushed:pushed,error:'期号不连续：新期号 '+newIssue+'，应 = 历史最大 '+maxIssue+' + 1；已拦截。'};
+  }
   return {history:hist,pushed:pushed};
 }
 window.__buildHistory=buildHistory;
@@ -653,7 +662,8 @@ async function saveImpl(){
   var _ai=autoIssueInfo();
   var newIssueVal=parseInt($('g-issue').value,10)||_ai.issue;
   var prevIssueRaw=(draw&&draw.issue)?parseInt(draw.issue,10):0;
-  var hb=buildHistory(prevIssueRaw,(draw&&draw.nums)||[],newIssueVal,(draw&&draw.history)||[]);
+  var hb=buildHistory(prevIssueRaw,(draw&&draw.nums)||[],newIssueVal,(draw&&draw.history)||[],(draw&&draw.numsEnc)||'');
+  if(hb.error){return Msg('保存失败（历史/期号护栏）：'+hb.error,false)}
   if(hb.pushed)warns.push('已自动把上一期 '+prevIssueRaw+' 压入历史记录');
   var orderTxt=nums.join(' ');
   try{console.log('[save] 号码顺序（按输入原序）= '+orderTxt)}catch(e){}
