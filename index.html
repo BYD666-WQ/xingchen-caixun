@@ -391,6 +391,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     for(var i=0;i<KEYS.length;i++){var d=D[KEYS[i]];if(!d)continue;var cs=[{issue:d.issue,nums:d.nums}].concat(d.history||[]);for(var j=0;j<cs.length;j++){var c=cs[j];if(String(c.issue==null?'':c.issue).slice(-3)!==want)continue;var ns=c.nums||[];if(ns.length===7&&ns[6]&&ns[6].z)return {z:ns[6].z,c:ns[6].c}}}
     return null;
   }
+  window.__xcActualResult=actualResult;
   function buildCards(){
     var base=document.querySelector('.card');if(!base)return;base.id='blk-newhk';
     var parent=base.parentNode;
@@ -442,7 +443,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.classList.toggle('on',i===KEYS.indexOf(k))});
   }
   window.__xcShow=show;
-  window.__applyDraw=function(dr,md){md=mdCompat(md);try{vfForceDue(md)}catch(e){}var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});D={newhk:md,newmo:by.Macau,hk:by.HongKong};buildCards();tick();var vfActive=false;try{vfActive=vfApply(md)}catch(e){}
+  window.__applyDraw=function(dr,md){md=mdCompat(md);try{vfForceDue(md)}catch(e){}var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});D={newhk:md,newmo:by.Macau,hk:by.HongKong};window.__xcDrawsReady=true;buildCards();tick();var vfActive=false;try{vfActive=vfApply(md)}catch(e){}
     if(!vfActive&&window.__xcWaiting&&xcHasNums(md)){try{xcEnsureWaiting();vfActive=(window.__xcWaiting===false)}catch(e){}}
     if(vfActive){try{vfRestore()}catch(e){}}else{fill();show(KEYS[window.__pendingTab||0])}try{xcEnsureWaiting()}catch(e){}try{window.__drawUpdatedAt=dr.updatedAt;xrDetectAll();var ct2=KEYS[window.__pendingTab||0];if(ct2!=='newhk')xrShow(ct2)}catch(e){}};
   window.__showTab=function(k){var M={newhk:0,newmo:1,hk:2,'新港':0,'新澳':1,'新澳彩':1,'香港':2,'香港彩':2};var i=(k in M)?M[k]:-1;if(i>=0){if(D[KEYS[i]])show(KEYS[i]);else{window.__pendingTab=i;document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,j){t.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}}return i>=0};
@@ -866,7 +867,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   }
   get('data/manual-ziliao.json').then(function(zl){
     var rows=(zl&&zl.rows||[]).slice(0,10).sort(function(a,b){return (parseInt(a.issue,10)||0)-(parseInt(b.issue,10)||0)});var ex=mount();if(!ex)return;
-    var hist=rows.map(function(d){var c=d.result&&d.result.c,z=d.result&&d.result.z,ok=(c&&c!=='NaN'&&d.status!=='upcoming');if(!ok){var ar=actualResult(d.issue);if(ar){c=ar.c;z=ar.z;ok=true}}return '<div class="row"><i>'+d.issue+'期</i><span>'+(ok?((d.threeZodiac||[]).join('')+' 开'+(z||'')+c):'待开')+'</span></div>'}).join('');
+    var hist=rows.map(function(d){var c=d.result&&d.result.c,z=d.result&&d.result.z,ok=(c&&c!=='NaN'&&d.status!=='upcoming');if(!ok){var ar=window.__xcActualResult?window.__xcActualResult(d.issue):null;if(ar){c=ar.c;z=ar.z;ok=true}}return '<div class="row"><i>'+d.issue+'期</i><span>'+(ok?((d.threeZodiac||[]).join('')+' 开'+(z||'')+c):'待开')+'</span></div>'}).join('');
     var zt=['鼠 07 19 31 43','牛 06 18 30 42','虎 05 17 29 41','兔 04 16 28 40','龙 03 15 27 39','蛇 02 14 26 38','马 01 13 25 37 49','羊 12 24 36 48','猴 11 23 35 47','鸡 10 22 34 46','狗 09 21 33 45','猪 08 20 32 44'];
     ex.innerHTML = ('<section class="mini"><h5>历史开奖记录</h5>'+hist+'</section>'+
       '<section class="mini"><h5>玄机诗象</h5><div style="padding:10px;font-size:17px;line-height:1.7;color:#6b4a10">本期玄机：龙争虎斗，马到成功；留意单数生肖，特码看虎马羊。</div></section>'+
@@ -882,7 +883,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   get('data/wuxiao.json').then(function(w){
     var rows=(w&&w.rows||[]);if(!rows.length)return;
     var html=rows.map(function(r){
-      var sp=r.special||{};if(!sp.z){var _ar=actualResult(r.issue);if(_ar)sp={z:_ar.z,c:_ar.c}}var wait=!sp.z;
+      var sp=r.special||{};if(!sp.z){var _ar=window.__xcActualResult?window.__xcActualResult(r.issue):null;if(_ar)sp={z:_ar.z,c:_ar.c}}var wait=!sp.z;
       var hit=!wait&&(r.list||[]).some(function(x){return x.z===sp.z});
       var res=wait?'待开':(hit?'对':'错');
       var tag=wait?'<span class="wx-tag wait">待开</span>':'<span class="wx-tag '+(hit?'ok':'no')+'">'+res+'</span>';
