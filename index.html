@@ -386,6 +386,11 @@ details.mini>summary::-webkit-details-marker{display:none}
     return out.filter(function(h){var iss=String(h.issue);if(cur&&iss===cur)return false;if(seen[iss])return false;seen[iss]=1;return true}).sort(function(a,b){return (parseInt(a.issue,10)||0)-(parseInt(b.issue,10)||0)})}
   function histHtml(k){var out='';histArr(k).forEach(function(h){var nums=h.nums||[];if(!nums.length){out+='<div class="hr"><i>'+shortIssue(h.issue)+'期</i><span class="hballs" style="color:#999">待开</span><span class="hz"></span></div>';return}var balls='';for(var i=0;i<nums.length;i++){if(i===6)balls+='<span class="hb plus">+</span>';balls+='<span class="hb '+numCls(parseInt(nums[i].c,10))+'" data-c="'+nums[i].c+'">'+nums[i].c+'</span>'}out+='<div class="hr"><i>'+shortIssue(h.issue)+'期</i><span class="hballs">'+balls+'</span><span class="hz">'+nums.map(function(x){return x.z||''}).join('')+'</span></div>'});return out}
   var D={},KEYS=['newhk','newmo','hk'],LABEL={newhk:'新港',newmo:'新澳彩',hk:'香港彩'};
+  function actualResult(issue){
+    var want=String(issue==null?'':issue).slice(-3);
+    for(var i=0;i<KEYS.length;i++){var d=D[KEYS[i]];if(!d)continue;var cs=[{issue:d.issue,nums:d.nums}].concat(d.history||[]);for(var j=0;j<cs.length;j++){var c=cs[j];if(String(c.issue==null?'':c.issue).slice(-3)!==want)continue;var ns=c.nums||[];if(ns.length===7&&ns[6]&&ns[6].z)return {z:ns[6].z,c:ns[6].c}}}
+    return null;
+  }
   function buildCards(){
     var base=document.querySelector('.card');if(!base)return;base.id='blk-newhk';
     var parent=base.parentNode;
@@ -416,7 +421,11 @@ details.mini>summary::-webkit-details-marker{display:none}
     try{if(window.__xcEnsureWaiting)window.__xcEnsureWaiting();if(VF&&VF.phase==='revealing')vfRestore();xrWaitingTick()}catch(e){}
     KEYS.forEach(function(k){
       var e=document.getElementById('xc-cd-'+k);if(!e)return;
-      if(k==='newhk'&&((D.newhk&&D.newhk._xcWaiting)||window.__xcWaiting)){e.textContent='待开';return}
+      if(k==='newhk'){
+        var _d=D.newhk,_has7=!!(_d&&_d.nums&&_d.nums.length===7);
+        if(!_has7&&_d&&_d.issue){var _ar=actualResult(_d.issue);if(_ar)_has7=true}
+        if(!_has7&&((_d&&_d._xcWaiting)||window.__xcWaiting)){e.textContent='待开';return}
+      }
       if(k!=='newhk'&&D[k]&&D[k]._xrWaiting){e.textContent='待开';return}var hm=TIME_TABLE[LABEL[k]==='新澳彩'?'新澳':(LABEL[k]==='香港彩'?'香港':'新港')];
       var n=new Date();var t=nextDate(hm,DAYS[kindOf(k)]);var left=Math.floor((t-n)/1000);
       e.textContent='距开奖 '+p2(Math.floor(left/3600))+':'+p2(Math.floor(left%3600/60))+':'+p2(left%60);
@@ -857,7 +866,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   }
   get('data/manual-ziliao.json').then(function(zl){
     var rows=(zl&&zl.rows||[]).slice(0,10).sort(function(a,b){return (parseInt(a.issue,10)||0)-(parseInt(b.issue,10)||0)});var ex=mount();if(!ex)return;
-    var hist=rows.map(function(d){var c=d.result&&d.result.c,ok=(c&&c!=='NaN'&&d.status!=='upcoming');return '<div class="row"><i>'+d.issue+'期</i><span>'+(ok?((d.threeZodiac||[]).join('')+' 开'+(d.result.z||'')+c):'待开')+'</span></div>'}).join('');
+    var hist=rows.map(function(d){var c=d.result&&d.result.c,z=d.result&&d.result.z,ok=(c&&c!=='NaN'&&d.status!=='upcoming');if(!ok){var ar=actualResult(d.issue);if(ar){c=ar.c;z=ar.z;ok=true}}return '<div class="row"><i>'+d.issue+'期</i><span>'+(ok?((d.threeZodiac||[]).join('')+' 开'+(z||'')+c):'待开')+'</span></div>'}).join('');
     var zt=['鼠 07 19 31 43','牛 06 18 30 42','虎 05 17 29 41','兔 04 16 28 40','龙 03 15 27 39','蛇 02 14 26 38','马 01 13 25 37 49','羊 12 24 36 48','猴 11 23 35 47','鸡 10 22 34 46','狗 09 21 33 45','猪 08 20 32 44'];
     ex.innerHTML = ('<section class="mini"><h5>历史开奖记录</h5>'+hist+'</section>'+
       '<section class="mini"><h5>玄机诗象</h5><div style="padding:10px;font-size:17px;line-height:1.7;color:#6b4a10">本期玄机：龙争虎斗，马到成功；留意单数生肖，特码看虎马羊。</div></section>'+
@@ -873,7 +882,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   get('data/wuxiao.json').then(function(w){
     var rows=(w&&w.rows||[]);if(!rows.length)return;
     var html=rows.map(function(r){
-      var sp=r.special||{};var wait=!sp.z;
+      var sp=r.special||{};if(!sp.z){var _ar=actualResult(r.issue);if(_ar)sp={z:_ar.z,c:_ar.c}}var wait=!sp.z;
       var hit=!wait&&(r.list||[]).some(function(x){return x.z===sp.z});
       var res=wait?'待开':(hit?'对':'错');
       var tag=wait?'<span class="wx-tag wait">待开</span>':'<span class="wx-tag '+(hit?'ok':'no')+'">'+res+'</span>';
