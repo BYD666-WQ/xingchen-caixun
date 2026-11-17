@@ -1161,7 +1161,7 @@ section.card{border-radius:14px!important;border:1px solid #E0B94A!important;bor
 <!-- 新版广告位：纯 CSS 动效，链接整块可点 -->
 <style id="cbw-ad-style">
 .cbw-ad{display:flex;align-items:center;gap:10px;box-sizing:border-box;width:calc(100% - 16px);margin:12px 8px;padding:12px 12px;min-height:92px;position:relative;overflow:hidden;text-decoration:none!important;border-radius:12px;border:0;background:linear-gradient(115deg,#26002f 0%,#54002e 42%,#a00018 100%);box-shadow:0 0 0 1px rgba(255,230,0,.15),0 4px 14px rgba(80,0,40,.35);isolation:isolate}
-.cbw-ad:before{content:"";position:absolute;inset:0;border-radius:12px;padding:2px;background:conic-gradient(from 0deg,#ff2ea6,#ffe600,#00e5ff,#7b2ff7,#ff2ea6);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:cbwAdHue 6s linear infinite;pointer-events:none;z-index:0}
+.cbw-ad:before{content:"";position:absolute;inset:0;border-radius:12px;padding:2px;background:linear-gradient(90deg,#ff2ea6,#ffe600,#00e5ff,#7b2ff7,#ff2ea6,#ffe600);background-size:300% 100%;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:cbwAdFlow 4s linear infinite;pointer-events:none;z-index:0}
 
 .cbw-ad>*{position:relative;z-index:1}
 .cbw-ad-main{flex:1 1 auto;min-width:0}
@@ -1171,7 +1171,7 @@ section.card{border-radius:14px!important;border:1px solid #E0B94A!important;bor
 .cbw-ad-sub{display:block;margin-top:4px;font-size:13px;font-weight:700;color:#ffd8ec;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cbw-ad-cta{flex:0 0 auto;display:inline-flex;align-items:center;gap:3px;padding:8px 10px;border-radius:7px;background:linear-gradient(#fff7a8,#ffd400 55%,#ffb800);color:#7a0010!important;font-size:14px;font-weight:900;white-space:nowrap;box-shadow:0 2px 0 #a86b00,0 0 12px rgba(255,230,0,.35)}
 .cbw-ad-cta b{font-size:18px;line-height:1;display:inline-block;}
-@keyframes cbwAdHue{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+@keyframes cbwAdFlow{0%{background-position:0% 50%}100%{background-position:300% 50%}}
 @media(max-width:360px){.cbw-ad{padding:10px;gap:7px;min-height:82px}.cbw-ad-title{font-size:19px}.cbw-ad-sub{font-size:12px}.cbw-ad-cta{font-size:12px;padding:7px 8px}}
 @media(prefers-reduced-motion:reduce){.cbw-ad:before{animation:none!important;filter:none!important}}
 </style>
