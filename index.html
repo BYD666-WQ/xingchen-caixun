@@ -1055,7 +1055,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   window.__rtTick=function(){poll()};
   window.__rtStoredCount=function(){return stored.length};
   window.__xcRefreshData=function(){
-    if(timer)clearTimeout(timer);
+    polls++;updates++;if(timer)clearTimeout(timer);
     return Promise.all(files.map(fetchJ)).then(function(j){
       applyRealtimeConfig(j[3]);
       if(window.__applyDraw)window.__applyDraw(j[0],j[1]);
