@@ -345,7 +345,7 @@ details.mini>summary::-webkit-details-marker{display:none}
 <div class="openbar" id="xc-openbar" data-issue="313"><div class="ol"><b id="xc-ob-issue">313期开</b><span>开奖记录</span></div><div class="ob" id="xc-ob-balls"><div class="tile r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div></div></div>
 <section class="card"><div class="hd"><b>新港第313期</b><span class="t">19:07</span><span class="h">历史记录</span></div><div class="balls"><div class="tile r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div></div><div class="next"><span>明天 21:34 开奖</span><span class="rf">刷新</span></div></section>
 
-<div class="nav"><a class="on">首页</a><a>资料大全</a><a>规律走势</a><a>寻宝</a><a href="gallery.html">图库</a></div><script>
+<div class="nav"><a class="on" href="index.html">首页</a><a href="ziliao.html">资料大全</a><a href="guilv.html">规律走势</a><a href="more.html">寻宝</a><a href="gallery.html">图库</a></div><script>
 (function(){
   var tabsImgs=['assets/theme/tabs/xianggang.webp','assets/theme/tabs/xin-aocai.webp','assets/theme/tabs/xianggang.webp'];
   function addBadge(a,i){var old=a.querySelector('svg,img');if(old)old.remove();var im=document.createElement('img');im.className='badge-img';im.alt='';im.src=tabsImgs[i];im.style.cssText='width:20px;height:20px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid #F6C65B;margin-right:5px;vertical-align:middle';a.insertBefore(im,a.firstChild)}
@@ -1054,6 +1054,16 @@ details.mini>summary::-webkit-details-marker{display:none}
   });
   window.__rtTick=function(){poll()};
   window.__rtStoredCount=function(){return stored.length};
+  window.__xcRefreshData=function(){
+    if(timer)clearTimeout(timer);
+    return Promise.all(files.map(fetchJ)).then(function(j){
+      applyRealtimeConfig(j[3]);
+      if(window.__applyDraw)window.__applyDraw(j[0],j[1]);
+      stored.forEach(runStored);
+      sig=getSig(j);fails=0;delay=12000;stats();schedule();
+      return j;
+    }).catch(function(e){fails++;window.__rtStats.lastErr=String(e&&e.message||e);delay=30000;stats();schedule();throw e});
+  };
   capture();
   // first check establishes signature; do not render yet
   Promise.all(files.map(fetchJ)).then(function(j){sig=getSig(j);stats();schedule()}).catch(function(){schedule()});
@@ -1177,4 +1187,30 @@ section.card{border-radius:14px!important;border:1px solid #E0B94A!important;bor
   <span class="cbw-ad-cta">点击进入 <b>→</b></span>
 </a>
 
+<style id="ref-btn-style">
+.next .rf{min-height:40px;min-width:64px;display:inline-flex!important;align-items:center;justify-content:center;gap:4px;box-sizing:border-box;cursor:pointer;user-select:none;border-radius:5px}
+.next .rf.busy{opacity:.8;pointer-events:none}
+.rf-spin{width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;display:inline-block;animation:rfSpin .7s linear infinite}
+@keyframes rfSpin{to{transform:rotate(360deg)}}
+.nav a{min-height:44px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center}
+@media(prefers-reduced-motion:reduce){.rf-spin{animation:none}}
+</style>
+<script id="ref-btn-js">(function(){
+  var btns=document.querySelectorAll('.next .rf');
+  Array.prototype.forEach.call(btns,function(b){
+    b.setAttribute('role','button');b.setAttribute('tabindex','0');
+    var busy=false,old=b.innerHTML;
+    function done(ok){
+      b.innerHTML=ok?'已刷新':'刷新失败，稍后重试';
+      setTimeout(function(){b.innerHTML=old;b.classList.remove('busy');busy=false},ok?900:2200);
+    }
+    function run(){
+      if(busy)return;busy=true;b.classList.add('busy');b.innerHTML='<i class="rf-spin"></i>刷新中…';
+      var p=window.__xcRefreshData?window.__xcRefreshData():Promise.reject(new Error('no refresh'));
+      p.then(function(){done(true)}).catch(function(){done(false)});
+    }
+    b.addEventListener('click',run);
+    b.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();run()}});
+  });
+})();</script>
 </body></html>
