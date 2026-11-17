@@ -1100,6 +1100,11 @@ details.mini>summary::-webkit-details-marker{display:none}
       var el=document.getElementById(IDS[i]);
       if(el&&el.parentNode===nav.parentNode&&el.nextSibling!==nav){nav.parentNode.insertBefore(el,nav)}
     }
+    var _ad=document.getElementById('cbw-ad'),_nm=document.getElementById('nm-final'),_card=document.getElementById('blk-newhk');
+    if(_ad&&_nm&&_card&&_ad.parentNode===_nm.parentNode){
+      var _hh=['blk-newmo','blk-hk'],_need=false;_hh.forEach(function(id){var x=document.getElementById(id);if(x&&x.parentNode===_nm.parentNode&&(x.compareDocumentPosition(_nm)&Node.DOCUMENT_POSITION_FOLLOWING))_need=true});if(_need)_hh.forEach(function(id){var x=document.getElementById(id);if(x&&x.parentNode===_nm.parentNode)_nm.parentNode.insertBefore(x,_nm.nextSibling)});
+      if(_ad.previousElementSibling!==_card||_ad.nextElementSibling!==_nm)_card.parentNode.insertBefore(_ad,_nm);
+    }
   }
   function schedule(){if(scheduled)return;scheduled=true;setTimeout(order,0)}
   window.__xcOrderBlocks=order;
