@@ -1234,12 +1234,12 @@ setTimeout(loadRevealConfig,2500);
   async function saveOwn(){
     var s=current();if(!s){st('没有选中板块',true);alert('没有选中板块：请在板块列表点「编辑」');return}
     if(!tok()){st('未保存全站 PAT',true);alert('保存失败：未保存全站 PAT，请先到「站点配置 → 密钥」设置');return}
-    gather();s.title=document.getElementById('cbw-title').value.trim()||s.title;s.type=document.getElementById('cbw-type').value.trim()||s.type;s.note=document.getElementById('cbw-note').value.trim();OWN.updated=new Date().toISOString();
+    gather();s.title=document.getElementById('cbw-title').value.trim()||s.title;s.type=document.getElementById('cbw-type').value.trim()||s.type;s.note=document.getElementById('cbw-note').value.trim();OWN.updated=new Date().toISOString();var payload={name:OWN.name||'彩霸王资料',updated:OWN.updated,sections:OWN.sections.slice()};
     st('提交中…');var put=null,lastErr=null,MAX=5;
     for(var attempt=0;attempt<MAX;attempt++){
       try{
         var fresh=await gapi('https://api.github.com/repos/'+SREPO+'/contents/'+SPATH+'?ref='+SREF+'&t='+Date.now());SHA=fresh.sha;
-        put=await gapi('https://api.github.com/repos/'+SREPO+'/contents/'+SPATH,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'cbw: update site1 material data',content:enc(JSON.stringify(OWN,null,1)),branch:SREF,sha:SHA})});break
+        put=await gapi('https://api.github.com/repos/'+SREPO+'/contents/'+SPATH,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'cbw: update site1 material data',content:enc(JSON.stringify(payload,null,1)),branch:SREF,sha:SHA})});break
       }catch(e){
         lastErr=e;
         if(e.status===409&&attempt<MAX-1){st('检测到并发更新（409），正在重取最新 sha 并保留当前编辑内容重试 '+(attempt+2)+'/'+MAX+'…');await new Promise(function(r){setTimeout(r,250*(attempt+1))});continue}
@@ -1249,7 +1249,7 @@ setTimeout(loadRevealConfig,2500);
     if(!put){var msg='保存失败 HTTP '+(lastErr&&lastErr.status||'?')+'：'+(lastErr&&lastErr.message||'未知')+'\n建议：'+advice(lastErr||{});st(msg,true);alert(msg);return}
     SHA=put.content&&put.content.sha||SHA;var csha=put.commit&&put.commit.sha;var clink=csha?('https://github.com/'+SREPO+'/commit/'+csha):'';
     sth('已提交'+(clink?' <a href="'+clink+'" target="_blank" rel="noopener" style="color:#0b7a45;text-decoration:underline">查看 commit '+csha.slice(0,7)+'</a>':'')+'；正在触发彩霸王 Pages…');
-    try{await gapi('https://api.github.com/repos/'+SREPO+'/actions/workflows/pages.yml/dispatches',{method:'POST',body:JSON.stringify({ref:SREF})});sth('已保存并触发彩霸王 Pages；约 1–2 分钟生效'+(clink?' · <a href="'+clink+'" target="_blank" style="color:#0b7a45">commit</a>':''))}
+    try{await gapi('https://api.github.com/repos/'+SREPO+'/actions/workflows/pages.yml/dispatches',{method:'POST',body:JSON.stringify({ref:SREF})});sth('已保存全部 '+payload.sections.length+' 个板块并触发彩霸王 Pages；约 1–2 分钟生效'+(clink?' · <a href="'+clink+'" target="_blank" style="color:#0b7a45">commit</a>':''))}
     catch(e){var dm='数据已保存，但触发 Pages 失败 HTTP '+(e.status||'?')+'：'+e.message+'。建议：全站 PAT 勾选 Actions:write，或到站点仓库手动运行 Pages。';st(dm,true);alert(dm)}
   }
   function bind(){var L=document.getElementById('cbw-load');if(!L)return;patState();L.onclick=loadOwn;document.getElementById('cbw-save').onclick=saveOwn;document.getElementById('cbw-add-row').onclick=function(){var s=current();if(!s){alert('请先在板块列表点「编辑」');return}s.rows=s.rows||[];s.rows.push({issue:'',list:[],special:null,result:''});renderRows()};document.getElementById('cbw-del-sec').onclick=function(){var s=current();if(!s||!confirm('删除板块「'+(s.title||s.id)+'」？'))return;OWN.sections=secs().filter(function(x){return x.id!==s.id});renderEditor();document.getElementById('cbw-edit-fields').style.display='none';st('已从内存删除；点保存生效')};document.getElementById('cbw-add-sec').onclick=function(){var id=document.getElementById('cbw-new-id').value.trim(),title=document.getElementById('cbw-new-title').value.trim(),type=document.getElementById('cbw-new-type').value.trim()||'six';if(!/^[a-z0-9-]+$/.test(id)){st('板块 id 只能用小写字母/数字/-',true);return}if(secs().some(function(x){return x.id===id})){st('板块 id 已存在',true);return}OWN.sections.push({id:id,title:title||id,type:type,note:'',rows:[]});renderEditor();selectSec(id);st('已新增板块；点保存生效')}}
