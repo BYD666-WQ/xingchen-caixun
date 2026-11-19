@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://cdn.jsdelivr.net; font-src 'self' data:; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://cdn.jsdelivr.net https://sgp.cloud.appwrite.io; font-src 'self' data:; object-src 'none'; base-uri 'self'">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -73,8 +73,56 @@ body{padding-bottom:76px}
 </style></head><body>
 <div id="xc-toast"><span id="xc-toast-t"></span><button class="x" id="xc-toast-x">×</button></div>
 <header><b>新港摇钱树 · 内容管理</b><span id="who" style="font-size:12px;opacity:.9"></span></header>
-<nav id="admin-cats"><button data-cat="entry" class="on">开奖录入</button><button data-cat="main">资料板块（主站）</button><button data-cat="cbw">彩霸王 · 资料管理</button><button data-cat="config">站点配置</button><button data-cat="logs">日志</button></nav>
+<nav id="admin-cats"><button data-cat="entry" class="on">开奖录入</button><button data-cat="main">资料板块（主站）</button><button data-cat="cbw">彩霸王 · 资料管理</button><button data-cat="config">站点配置</button><button data-cat="logs">日志</button><button data-cat="lottery">彩票大厅</button></nav>
 <div class="wrap">
+<div class="panel" id="lottery-panel" hidden><details open><summary>🎯 彩票大厅 · Appwrite 真接口</summary><div class="body">
+<style>
+#lottery-panel .lot-key{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:8px 0 3px}
+#lottery-panel .lot-key input{flex:1 1 300px;height:34px;font-size:12px;padding:0 8px;border:1px solid #dfe8e3;border-radius:5px;background:#fff}
+#lottery-panel .lot-key button{min-height:34px}
+#lottery-panel .lot-key span{font-size:10px;color:#999}
+#lottery-panel .lot-note{font-size:12px;line-height:1.7;color:#666;background:#f4faf7;border:1px solid #cce8da;border-radius:6px;padding:8px 10px;margin:0 0 10px}
+#lottery-panel h3{font-size:15px;margin:14px 0 7px;color:#173f2a}
+#lottery-panel .lot-sub{font-size:11px;color:#888;font-weight:400;margin-left:5px}
+#lottery-panel .lot-table{width:100%;border-collapse:collapse;font-size:12px;background:#fff}
+#lottery-panel .lot-table th,#lottery-panel .lot-table td{padding:7px 6px;border-bottom:1px solid #eef2f0;text-align:left;white-space:nowrap}
+#lottery-panel .lot-table th{background:#f7faf8;color:#687a70;font-weight:600}
+#lottery-panel .lot-table .num{font-variant-numeric:tabular-nums;color:#e04747;font-weight:700}
+#lottery-panel .lot-table .ops{display:flex;gap:4px}
+#lottery-panel .lot-table button{min-height:27px;padding:2px 8px;font-size:11px;border-radius:4px}
+#lottery-panel .lot-scroll{overflow-x:auto;border:1px solid #e7eee9;border-radius:7px}
+#lottery-panel .lot-add{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+#lottery-panel .lot-add input{height:34px;min-width:110px;font-size:12px}
+#lottery-panel .lot-games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+#lottery-panel .lot-game{display:block;border:1px solid #e7eee9;border-radius:6px;padding:7px 8px;background:#fff;font-size:11px}
+#lottery-panel .lot-game b{display:block;font-size:12px;color:#284638;margin-bottom:4px}
+#lottery-panel .lot-controls{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+#lottery-panel .lot-game select{height:28px;font-size:11px;min-width:0;width:72px;padding:0 4px;border:1px solid #e2e9e5;border-radius:4px;background:#fbfdfc}
+#lottery-panel .lot-game label{display:flex;align-items:center;gap:3px;font-size:11px;color:#5f7468;white-space:nowrap}
+#lottery-panel .lot-draw{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+#lottery-panel .lot-draw select,#lottery-panel .lot-draw input{height:34px;font-size:12px;border:1px solid #dfe8e3;border-radius:5px;padding:0 7px;background:#fff;min-width:100px;width:auto!important;flex:1 1 150px}
+#lottery-panel .lot-add input{width:auto!important;flex:1 1 160px}
+#lottery-panel .lot-draw button{min-height:34px}
+#lottery-panel #lot-draw-result{margin-top:8px;min-height:32px;padding:8px 10px;background:#f8fbf9;border:1px solid #e7eee9;border-radius:6px;font-size:12px;color:#456253;line-height:1.6}
+#lottery-panel .lot-api{font-size:10px;color:#999;margin:10px 0 0;line-height:1.8}
+#lottery-panel .lot-api code{background:#f3f6f4;padding:1px 4px;border-radius:3px;color:#45715b}
+@media(min-width:900px){body[data-admin-cat="lottery"] .wrap{max-width:1120px}#lottery-panel .lot-games{grid-template-columns:repeat(3,minmax(0,1fr))}} @media(max-width:600px){#lottery-panel .lot-games{grid-template-columns:1fr}}
+</style>
+<p class="lot-note"><b>Appwrite 真实接口</b> · 用户、积分、注单与开奖配置读写 <code>lottery</code> 数据库；API Key 只存本机浏览器。</p>
+<div class="lot-key"><input id="lot-key" type="password" autocomplete="off" placeholder="Appwrite API Key"><button id="lot-key-save" type="button">保存并读取</button><span>仅本地保存，勿外传</span></div>
+<div id="lot-status" style="font-size:11px;color:#888;margin:6px 0 2px">未连接 Appwrite</div>
+<h3>用户列表 <span class="lot-sub">用户名 / 积分 / 注册时间 / 状态</span></h3>
+<div class="lot-scroll"><table class="lot-table"><thead><tr><th>用户名</th><th>积分</th><th>注册时间</th><th>状态</th><th>加减积分</th></tr></thead><tbody id="lot-users"></tbody></table></div>
+
+<h3>开奖控制 <span class="lot-sub">手动指定 / 随机 · 难度</span></h3>
+<div class="lot-draw"><select id="lot-draw-game"></select><select id="lot-draw-mode"><option value="manual">手动指定</option><option value="random">随机开奖</option></select><select id="lot-draw-diff"><option value="easy">易 · 高频小奖</option><option value="medium" selected>中 · 均衡</option><option value="hard">难 · 低频大奖</option></select><input id="lot-draw-num" type="number" min="1" max="49" placeholder="手动特码 1-49"><button id="lot-draw-run" type="button">执行模拟开奖</button></div>
+<div id="lot-draw-result">等待操作 · 保存后写入 Appwrite config 表，前端投注页读取。</div>
+<h3>注单列表 <span class="lot-sub">来自 bets 表</span></h3>
+<div class="lot-scroll"><table class="lot-table"><thead><tr><th>用户名</th><th>彩种</th><th>期号</th><th>选号</th><th>注额</th><th>状态</th></tr></thead><tbody id="lot-bets"></tbody></table></div>
+<h3>彩种开关 <span class="lot-sub">启用 / 周期 / 数据源</span></h3>
+<div class="lot-games" id="lot-games"></div>
+<p class="lot-api">真实接口：<code>GET /v1/tablesdb/lottery/tables/users/rows</code> · <code>PATCH .../users/rows/{rowId}</code> · <code>GET .../bets/rows</code> · <code>PATCH/POST .../config/rows</code></p>
+</div></details></div>
 <div id="guide" style="background:#e8f7ef;border:1px solid #b9e3cd;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;line-height:1.75;color:#0b6b3d">
   <b>3 步完成修改：</b><br>① 在下面粘贴密钥（只需一次） → ② 填号码/资料 → ③ 点底部「保存并发布」
 </div>
@@ -1264,6 +1312,7 @@ setTimeout(loadRevealConfig,2500);
     function catOf(p){
       if(!p) return '';
       if(p.id==='cbw-panel')return 'cbw';
+      if(p.id==='lottery-panel')return 'lottery';
       var s=(p.querySelector('summary')||{}).textContent||'';
       var m=s.match(/^[①②③④⑤⑥⑦⑧⑨]/),n=m?m[0]:'';
       if(/[①②③⑧]/.test(n))return 'entry';
@@ -1277,6 +1326,85 @@ setTimeout(loadRevealConfig,2500);
     tabs.forEach(function(b){b.onclick=function(){activate(b.getAttribute('data-cat'))}});activate('entry');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ready);else ready();
+})();
+</script>
+<script>
+(function(){
+  var CFG={endpoint:'https://sgp.cloud.appwrite.io/v1',project:'6aff4c2f0016ee43abad',db:'lottery',users:'6aff4ea1000cecd6c798',bets:'bets',config:'config'};
+  var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主站'],['hk','香港','每日','主站'],['fast-mark6-1','一分钟六合彩','1分钟','模拟'],['fast-mark6-5','5分钟六合彩','5分钟','模拟'],['fast-race-1','一分钟赛车','1分钟','模拟'],['fast-race-30','30秒赛车','30秒','模拟'],['fast-race-5','5分钟赛车','5分钟','模拟'],['fast-race-10','10分钟赛车','10分钟','模拟'],['fast-k3','大发快三','1分钟','模拟'],['fast-airship','一分飞艇','1分钟','模拟'],['oldmo','老澳','每日','未接入']].map(function(x){return {id:x[0],name:x[1],period:x[2],source:x[3],enabled:x[3]!=='未接入'}});
+  var USERS=[],BETS=[],CONFIGS={};
+  var KEY=localStorage.getItem('lottery-appwrite-key')||'';
+  var $=function(s){return document.querySelector(s)};
+  function headers(){return {'X-Appwrite-Project':CFG.project,'X-Appwrite-Key':KEY,'Content-Type':'application/json'}}
+  async function aw(path,opts){
+    opts=opts||{};
+    var r=await fetch(CFG.endpoint+path,{method:opts.method||'GET',headers:headers(),body:opts.body?JSON.stringify(opts.body):undefined});
+    var txt=await r.text(); var j; try{j=JSON.parse(txt)}catch(e){j={message:txt.slice(0,200)}}
+    if(!r.ok) throw new Error((j.message||('HTTP '+r.status)));
+    return j;
+  }
+  function status(s,err){var el=document.getElementById('lot-status');if(el){el.textContent=s;el.style.color=err?'#c74b4b':'#0b8a4b'}}
+  function renderUsers(){
+    var tb=document.getElementById('lot-users');if(!tb)return;
+    if(!USERS.length){tb.innerHTML='<tr><td colspan="5" style="color:#999">未读取到用户</td></tr>';return}
+    tb.innerHTML=USERS.map(function(u,i){
+      var created=(u.$createdAt||'').slice(0,10);
+      return '<tr><td><b>'+u.username+'</b></td><td class="num">'+Number(u.points||0).toLocaleString()+'</td><td>'+created+'</td><td><span style="color:#0b8a4b;font-weight:700">'+(u.role==='admin'?'管理员':'正常')+'</span></td><td><div class="ops"><button type="button" data-lot-row="'+u.$id+'" data-lot-delta="100">+100</button><button type="button" class="gray" data-lot-row="'+u.$id+'" data-lot-delta="-100">-100</button><button type="button" data-lot-row="'+u.$id+'" data-lot-set="1">设为</button></div></td></tr>';
+    }).join('');
+  }
+  function renderBets(){
+    var tb=document.getElementById('lot-bets');if(!tb)return;
+    if(!BETS.length){tb.innerHTML='<tr><td colspan="6" style="color:#999">暂无注单</td></tr>';return}
+    tb.innerHTML=BETS.slice(0,30).map(function(b){
+      var picks=b.picks||'';try{var p=JSON.parse(picks);if(p&&p.selections)p=p.selections.map(function(x){return x.label||x.key}).join('、');else p=picks}catch(e){}
+      return '<tr><td>'+b.username+'</td><td>'+b.gameId+'</td><td>'+b.issue+'</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">'+p+'</td><td class="num">'+b.stake+'</td><td>'+b.status+'</td></tr>';
+    }).join('');
+  }
+  function renderGames(){
+    var box=document.getElementById('lot-games');if(!box)return;
+    box.innerHTML=GAMES.map(function(g,i){return '<div class="lot-game"><b>'+g.name+'</b><div class="lot-controls"><label><input type="checkbox" data-lot-game="'+i+'" '+(g.enabled?'checked':'')+'>启用</label><select data-lot-period="'+i+'">'+['30秒','1分钟','5分钟','10分钟','每日'].map(function(p){return '<option '+(p===g.period?'selected':'')+'>'+p+'</option>'}).join('')+'</select><select data-lot-source="'+i+'">'+['主站','模拟','未接入'].map(function(s){return '<option '+(s===g.source?'selected':'')+'>'+s+'</option>'}).join('')+'</select></div></div>'}).join('');
+  }
+  function renderDraw(){var sel=document.getElementById('lot-draw-game');if(sel)sel.innerHTML=GAMES.map(function(g,i){return '<option value="'+i+'">'+g.name+'</option>'}).join('')}
+  async function loadAll(){
+    KEY=localStorage.getItem('lottery-appwrite-key')||'';
+    if(!KEY){status('未连接 Appwrite：请先填写 API Key',true);renderUsers();renderBets();return}
+    status('正在连接 Appwrite…');
+    try{
+      var u=await aw('/tablesdb/'+CFG.db+'/tables/'+CFG.users+'/rows');
+      var b=await aw('/tablesdb/'+CFG.db+'/tables/'+CFG.bets+'/rows');
+      var c=await aw('/tablesdb/'+CFG.db+'/tables/'+CFG.config+'/rows');
+      USERS=u.rows||[];BETS=b.rows||[];CONFIGS={};(c.rows||[]).forEach(function(x){CONFIGS[x.gameId]=x});
+      renderUsers();renderBets();status('已连接 Appwrite · 用户 '+USERS.length+' · 注单 '+BETS.length);
+    }catch(e){status('连接失败：'+e.message,true);renderUsers();renderBets()}
+  }
+  document.getElementById('lot-key-save').onclick=function(){
+    var v=document.getElementById('lot-key').value.trim();if(!v){status('请输入 Appwrite API Key',true);return}
+    localStorage.setItem('lottery-appwrite-key',v);loadAll();
+  };
+  document.getElementById('lot-users').onclick=async function(e){
+    var b=e.target.closest('[data-lot-row]');if(!b)return;
+    var row=USERS.find(function(x){return x.$id===b.getAttribute('data-lot-row')});if(!row)return;
+    var nv; if(b.hasAttribute('data-lot-set')){var input=prompt('设置新积分（演示）', String(row.points||0)); if(input===null)return; nv=parseInt(input,10); if(!isFinite(nv)||nv<0){status('积分为非负整数',true);return}} else nv=Math.max(0,Number(row.points||0)+Number(b.getAttribute('data-lot-delta')));b.disabled=true;
+    try{await aw('/tablesdb/'+CFG.db+'/tables/'+CFG.users+'/rows/'+row.$id,{method:'PATCH',body:{data:{points:nv}}});row.points=nv;renderUsers();status('积分已更新为 '+nv)}catch(err){status('积分更新失败：'+err.message,true);b.disabled=false}
+  };
+  document.getElementById('lot-games').onchange=function(e){var t=e.target,i=parseInt(t.getAttribute('data-lot-game')||t.getAttribute('data-lot-period')||t.getAttribute('data-lot-source'),10);if(isNaN(i)||!GAMES[i])return;if(t.hasAttribute('data-lot-game'))GAMES[i].enabled=t.checked;if(t.hasAttribute('data-lot-period'))GAMES[i].period=t.value;if(t.hasAttribute('data-lot-source'))GAMES[i].source=t.value;};
+  document.getElementById('lot-draw-run').onclick=async function(){
+    var i=parseInt(document.getElementById('lot-draw-game').value,10),g=GAMES[i]||GAMES[0],mode=document.getElementById('lot-draw-mode').value,diff=document.getElementById('lot-draw-diff').value,num=parseInt(document.getElementById('lot-draw-num').value,10),out=document.getElementById('lot-draw-result');
+    if(mode==='manual'&&(!num||num<1||num>49)){out.innerHTML='<b style="color:#c74b4b">请输入 1-49 的手动特码</b>';return}
+    if(!KEY){out.innerHTML='<b style="color:#c74b4b">请先填写 Appwrite API Key</b>';return}
+    var data={gameId:g.id,mode:mode,difficulty:diff,forcedResult:mode==='manual'?String(num):''};
+    try{
+      var old=CONFIGS[g.id];
+      if(old)await aw('/tablesdb/'+CFG.db+'/tables/'+CFG.config+'/rows/'+old.$id,{method:'PATCH',body:{data:data}});else await aw('/tablesdb/'+CFG.db+'/tables/'+CFG.config+'/rows',{method:'POST',body:{rowId:'cfg_'+Date.now(),data:data}});
+      CONFIGS[g.id]=Object.assign({},old||{gameId:g.id},data);
+      out.innerHTML='<b>'+g.name+' · 已写入 config 表</b> · '+(mode==='manual'?'手动指定':'随机')+' · 难度 '+(diff==='easy'?'易':diff==='medium'?'中':'难')+'<br><span style="color:#999">'+(mode==='manual'?'特码 '+num+' · ':'')+'前端投注页将读取此配置</span>';
+      status('开奖配置已保存');
+    }catch(err){out.innerHTML='<b style="color:#c74b4b">保存失败：'+err.message+'</b>'}
+  };
+  window.__lotteryReal={get users(){return USERS},get bets(){return BETS},get configs(){return CONFIGS},reload:loadAll};
+  renderGames();renderDraw();
+  if(KEY)document.getElementById('lot-key').value=KEY;
+  loadAll();
 })();
 </script>
 </body></html>
