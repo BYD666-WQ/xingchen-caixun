@@ -1,11 +1,66 @@
 {
  "name": "新香港",
- "issue": 324,
  "drawTime": "每天 21:34",
  "dailyTime": "21:34",
  "status": "sample",
- "nums": [],
+ "updated": "2026-11-20T13:22:43.736Z",
+ "current": {
+  "issue": 325,
+  "nums": [],
+  "numsEnc": "",
+  "visibleFrom": "2026-11-21T21:34:00+08:00",
+  "publishedAt": null
+ },
  "history": [
+  {
+   "issue": 324,
+   "nums": [
+    {
+     "c": "01",
+     "z": "马",
+     "color": "红",
+     "wuxing": "水"
+    },
+    {
+     "c": "44",
+     "z": "猪",
+     "color": "绿",
+     "wuxing": "水"
+    },
+    {
+     "c": "10",
+     "z": "鸡",
+     "color": "蓝",
+     "wuxing": "火"
+    },
+    {
+     "c": "49",
+     "z": "马",
+     "color": "绿",
+     "wuxing": "火"
+    },
+    {
+     "c": "12",
+     "z": "羊",
+     "color": "红",
+     "wuxing": "金"
+    },
+    {
+     "c": "05",
+     "z": "虎",
+     "color": "绿",
+     "wuxing": "金"
+    },
+    {
+     "c": "24",
+     "z": "羊",
+     "color": "红",
+     "wuxing": "木"
+    }
+   ],
+   "visibleFrom": "2026-11-20T13:34:00.000Z",
+   "publishedAt": "2026-11-20T13:34:01.595Z"
+  },
   {
    "issue": 323,
    "nums": [
@@ -994,8 +1049,5 @@
    ]
   }
  ],
- "updated": "2026-11-20T13:22:43.736Z",
- "visibleFrom": "2026-11-20T13:34:00.000Z",
- "publishedAt": "",
- "numsEnc": "AxgbFWQIEgIHek8bDGQIEtuf9EEVVCVdXF1EelkbkfyQEh4ULxZBHyhVEggUvtONVDseSxBVelkbQnIQHBBMelkbkcqYEh4UOwxVGTQQChDR49wbWmRFRUpfNgQbTGTUgIYUJU9CVCUQChAHaEEVVDwQChDf4MIbWmRRX15ZKkEDVK6hrRAaehRMDi9cVxAMeoS43WRPHEkUO0EDVHILEh4UIkEDVK+bnBAaegBWGilAEggUv9iGVGoQR0dOMQ1eVHwQ17Odeh4VDWRREggUaVEbWmRIEggUv92zVGoQU11aNxEbTGTVipAUdEFOAz5bXlUUYkHQ8dcQTR5NegAbTGQCBRAaehkbTGTaqbwUdEFaGSpdQhAMeoSCyWQeEkVDIApXEWQIEtuxyUFEWj0QUxAMelENVGoQShAMeoSH/GQeElFZNAxLVHwQ14iUek8bATNKWVxRelkbkNqaEk9r"
+ "publishedAt": null
 }
