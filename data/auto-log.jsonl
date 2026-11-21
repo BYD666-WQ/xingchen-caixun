@@ -6,3 +6,4 @@
 {"at":"2026-11-20T13:34:01.595Z","bj":"2026-11-20 21:34","action":"roll","fromIssue":324,"toIssue":325,"nums":7,"history":22,"historyLimit":40,"dueAt":"2026-11-20T13:34:00.000Z"}
 {"at":"2026-11-21T13:34:01.490Z","bj":"2026-11-21 21:34","action":"roll","fromIssue":325,"toIssue":326,"nums":7,"history":23,"historyLimit":40,"dueAt":"2026-11-21T13:34:00.000Z"}
 {"at":"2026-11-21T18:46:46.632Z","bj":"2026-11-22 02:46:46","action":"error","error":"Macau: Macau: draw date too old (2026-11-20)"}
+{"at":"2026-11-21T18:47:27.576Z","bj":"2026-11-22 02:47:27","action":"backfill","rule":"Macau","fromIssue":2026323,"toIssue":2026325,"nums":7,"history":12,"historyLimit":40}
