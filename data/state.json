@@ -1,9 +1,9 @@
 {
- "ok": false,
- "status": "partial",
+ "ok": true,
+ "status": "success",
  "message": "云端 Worker 检查完成，无更新",
- "updated": "2026-11-22 02:48:33",
- "updatedAt": "2026-11-22T02:48:33.570+08:00",
+ "updated": "2026-11-22 02:49:38",
+ "updatedAt": "2026-11-22T02:49:38.968+08:00",
  "lastSuccess": "2026-11-22 02:47:27",
  "newest_seen_ts": "2026325",
  "newest_seen_ids": [
@@ -27,11 +27,9 @@
   "MacauOld": 2026316,
   "Happy8": 2026302
  },
- "error": "Macau: Macau: issue not increasing (2026325<=2026325)",
- "alerts": [
-  "Macau: Macau: issue not increasing (2026325<=2026325)"
- ],
+ "error": "",
+ "alerts": [],
  "gaps": [],
  "backfill": false,
- "lastRun": "2026-11-22 02:48:33"
+ "lastRun": "2026-11-22 02:49:38"
 }
