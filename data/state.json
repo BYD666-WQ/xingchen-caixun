@@ -1,9 +1,9 @@
 {
- "ok": true,
- "status": "success",
- "message": "云端 Worker 已更新（实时 2 彩种）",
- "updated": "2026-11-19 21:35:05",
- "updatedAt": "2026-11-19T21:35:05.277+08:00",
+ "ok": false,
+ "status": "partial",
+ "message": "云端 Worker 检查完成，无更新",
+ "updated": "2026-11-22 02:46:46",
+ "updatedAt": "2026-11-22T02:46:46.632+08:00",
  "lastSuccess": "2026-11-19 21:35:05",
  "newest_seen_ts": "319",
  "newest_seen_ids": [
@@ -20,7 +20,16 @@
   "HongKong"
  ],
  "latest_by_rule": {
-  "Macau": 323,
-  "HongKong": 123
- }
+  "Macau": 2026323,
+  "HongKong": 2026123,
+  "MacauOld": 2026316,
+  "Happy8": 2026302
+ },
+ "error": "Macau: Macau: draw date too old (2026-11-20)",
+ "alerts": [
+  "Macau: Macau: draw date too old (2026-11-20)"
+ ],
+ "gaps": [],
+ "backfill": true,
+ "lastRun": "2026-11-22 02:46:46"
 }
