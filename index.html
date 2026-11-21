@@ -392,6 +392,12 @@ details.mini>summary::-webkit-details-marker{display:none}
     return null;
   }
   window.__xcActualResult=actualResult;
+  window.__xcSpOf=function(r){
+    var sp=(r&&r.special)||{};
+    if(!sp.z&&window.__xcActualResult){var ar=window.__xcActualResult(r.issue);if(ar)sp={z:ar.z,c:ar.c}}
+    if(!sp.z&&window.__xcMDR){var ns=window.__xcMDR[String(r.issue==null?'':r.issue).slice(-3)];if(ns&&ns.length===7&&ns[6]&&ns[6].z)sp={z:ns[6].z,c:ns[6].c}}
+    return sp;
+  };
   function buildCards(){
     var base=document.querySelector('.card');if(!base)return;base.id='blk-newhk';
     var parent=base.parentNode;
@@ -515,7 +521,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     if(!shown||!t)return vfGrayTile();
     return '<div class="tile '+numCls(parseInt(t.c,10))+(hl===i?' vf-in':'')+'"><div class="num">'+t.c+'</div><div class="zod">'+(t.z||'')+'</div></div>';
   }
-  function vfBalls(nums,count,hl){var h='';for(var i=0;i<6;i++)h+=vfTile(i,nums,count,hl);h+='<span class="plus">+</span>';h+=vfTile(6,nums,count,hl);return h}
+  function vfBalls(nums,count,hl){if(!count||!nums||!nums.length)return '<div class="tile gray" style="width:auto;min-width:112px;padding:0 14px"><div class="num" style="font-size:15px;letter-spacing:2px">待开</div></div>';var h='';for(var i=0;i<6;i++)h+=vfTile(i,nums,count,hl);h+='<span class="plus">+</span>';h+=vfTile(6,nums,count,hl);return h}
   function vfRender(nums,count,hl){
     vfEnsureUI();
     var ob=document.getElementById('xc-ob-balls');if(ob)ob.innerHTML=vfBalls(nums,count,hl);
@@ -887,11 +893,11 @@ details.mini>summary::-webkit-details-marker{display:none}
     var run=function(){
     var rows=(w&&w.rows||[]);if(!rows.length)return;
     var html=rows.map(function(r){
-      var sp=r.special||{};if(!sp.z){var _ar=window.__xcActualResult?window.__xcActualResult(r.issue):null;if(_ar)sp={z:_ar.z,c:_ar.c}}var wait=!sp.z;
+      var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});if(!sp.z){var _ar=window.__xcActualResult?window.__xcActualResult(r.issue):null;if(_ar)sp={z:_ar.z,c:_ar.c}}var wait=!sp.z;
       var hit=!wait&&(r.list||[]).some(function(x){return x.z===sp.z});
       var res=wait?'待开':(hit?'对':'错');
       var tag=wait?'<span class="wx-tag wait">待开</span>':'<span class="wx-tag '+(hit?'ok':'no')+'">'+res+'</span>';
-      var l1='<b>'+r.issue+'期</b>：<span class="wx-title">五肖五码</span>'+(hit?' <span class="wx-hit">中</span>':'')+' 特开：<span class="wx-special">'+(wait?'?':(sp.z+sp.c))+'</span>'+tag;
+      var l1='<b>'+r.issue+'期</b>：<span class="wx-title">五肖五码</span>'+(hit?' <span class="wx-hit">中</span>':'')+' 特开：<span class="wx-special">'+(wait?'待开':(sp.z+sp.c))+'</span>'+tag;
       var items=(r.list||[]).map(function(x){var on=!wait&&(x.z===sp.z||('0'+x.c).slice(-2)===('0'+sp.c).slice(-2));return '<span class="wx-item'+(on?' hit':'')+'">'+x.z+x.c+'</span>'}).join('');
       return '<div class="wx-row" data-issue="'+r.issue+'" data-result="'+res+'"><div class="wx-l1">'+l1+'</div><div class="wx-l2">【'+items+'】</div></div>';
     }).join('');
@@ -914,39 +920,39 @@ details.mini>summary::-webkit-details-marker{display:none}
   Promise.all([get('data/santou.json'),get('data/shuangbo.json'),get('data/danshuang.json'),get('data/liuxiao.json'),get('data/manual-draw.json').catch(function(){return {}})]).then(function(rs){
     var st=rs[0],sb=rs[1],ds=rs[2],lx=rs[3],md=rs[4]||{};
     function mdMap(md){var out={};function dec(enc){try{var b=atob(String(enc||'')),a=new Uint8Array(b.length),k='Xc9vF2026';for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i)^k.charCodeAt(i%k.length);return JSON.parse(new TextDecoder('utf-8').decode(a))}catch(e){return []}}function add(issue,nums){if(issue===undefined||issue===null)return;out[String(issue).slice(-3)]=nums||[]}if(md.current){add(md.current.issue,md.current.numsEnc?dec(md.current.numsEnc):md.current.nums)}else{add(md.issue,md.numsEnc?dec(md.numsEnc):md.nums)}(md.history||[]).forEach(function(h){add(h.issue,h.nums)});return out}
-    var MDR=mdMap(md);
+    var MDR=mdMap(md);window.__xcMDR=MDR;
     var stHtml=(st&&st.rows||[]).map(function(r){
-      var sp=r.special||{};var wait=!sp.z;var num=wait?0:parseInt(sp.c,10);var head=wait?-1:Math.floor(num/10);
+      var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});var wait=!sp.z;var num=wait?0:parseInt(sp.c,10);var head=wait?-1:Math.floor(num/10);
       var hit=!wait&&(r.heads||[]).indexOf(head)>=0;
       var heads=(r.heads||[]).map(function(h){return '<span class="'+(h===head?'hit':'h')+'">'+h+'头</span>'}).join(' ');
       var res=wait?'':(hit?'准':'错');
       var tag=wait?'':'<span class="st-res '+(hit?'ok':'no')+'">'+res+'</span>';
-      return '<div class="st-row" data-issue="'+r.issue+'" data-result="'+(wait?'?':res)+'"><b>'+r.issue+'期</b>：<span class="st-name">三头中特</span><span class="st-heads">【'+heads+'】</span> <span class="st-open">开：'+(wait?'?':(sp.z+sp.c))+'</span> '+tag+'</div>';
+      return '<div class="st-row" data-issue="'+r.issue+'" data-result="'+(wait?'待开':res)+'"><b>'+r.issue+'期</b>：<span class="st-name">三头中特</span><span class="st-heads">【'+heads+'】</span> <span class="st-open">开：'+(wait?'待开':(sp.z+sp.c))+'</span> '+tag+'</div>';
     }).join('');
     var sbHtml=(sb&&sb.rows||[]).map(function(r){
-      var sp=r.special||{};var wait=!sp.z;var num=wait?0:parseInt(sp.c,10);var _arr=MDR[String(r.issue).slice(-3)];var _col=_arr&&_arr[6]&&_arr[6].color;var color=wait?'':( _col || waveOf(num));
+      var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});var wait=!sp.z;var num=wait?0:parseInt(sp.c,10);var _arr=MDR[String(r.issue).slice(-3)];var _col=_arr&&_arr[6]&&_arr[6].color;var color=wait?'':( _col || waveOf(num));
       var hit=!wait&&(r.waves||[]).indexOf(color)>=0;
       var waves=(r.waves||[]).map(function(x){return '<span class="sb-wave '+wcls(x)+(x===color?' hit':'')+'">'+x+'波</span>'}).join('<span style="color:#222;font-weight:900">+</span>');
       var res=wait?'':(hit?'准':'错');
       var resHtml=wait?'':'<span class="sb-res '+(hit?'ok':'no')+'">'+res+'</span>';
-      var open=wait?'<span class="sb-open">开：?</span>':'<span class="sb-open">开：'+(sp.z||'')+'<span class="cnum '+wcls(color)+'">'+sp.c+'</span></span>';
-      return '<div class="sb-row" data-issue="'+r.issue+'" data-result="'+(wait?'?':res)+'"><b>'+r.issue+'期</b>：<span class="sb-name">必赢双波</span><span class="sb-waves">【'+waves+'】</span> '+open+' '+resHtml+'</div>';
+      var open=wait?'<span class="sb-open">开：待开</span>':'<span class="sb-open">开：'+(sp.z||'')+'<span class="cnum '+wcls(color)+'">'+sp.c+'</span></span>';
+      return '<div class="sb-row" data-issue="'+r.issue+'" data-result="'+(wait?'待开':res)+'"><b>'+r.issue+'期</b>：<span class="sb-name">必赢双波</span><span class="sb-waves">【'+waves+'】</span> '+open+' '+resHtml+'</div>';
     }).join('')+'<div class="sb-slogan">层层筛选，精准锁定，只为你赢！</div><div class="sb-slogan">每一次命中，都是长期沉淀后的爆发！</div>';
     var dsHtml=(ds&&ds.rows||[]).map(function(r){
-      var sp=r.special||{};var wait=!sp.z;var num=wait?0:parseInt(sp.c,10);
+      var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});var wait=!sp.z;var num=wait?0:parseInt(sp.c,10);
       var oddHit=!wait&&(r.oddEven===(num%2===1?'单数':'双数'));var zodHit=!wait&&(r.zodiacs||[]).indexOf(sp.z)>=0;
       var hit=!wait&&(oddHit||zodHit);
       var oe='<span class="ds-oe'+(oddHit?' hit':'')+'">'+r.oddEven+'</span>';
       var zods=(r.zodiacs||[]).map(function(z){return '<span class="ds-zod'+(zodHit&&z===sp.z?' hit':'')+'">'+z+'</span>'}).join('');
       var res=wait?'':(hit?'中':'错');var resHtml=wait?'':'<span class="ds-res '+(hit?'ok':'no')+'">'+res+'</span>';
-      return '<div class="ds-row" data-issue="'+r.issue+'" data-result="'+(wait?'?':res)+'"><b>'+r.issue+'期</b>：<span class="ds-name">单双</span><span class="ds-heads">【'+oe+'<span class="ds-plus">+</span>'+zods+'】</span> <span class="ds-open">开：'+(wait?'?':(sp.z+sp.c))+'</span> '+resHtml+'</div>';
+      return '<div class="ds-row" data-issue="'+r.issue+'" data-result="'+(wait?'待开':res)+'"><b>'+r.issue+'期</b>：<span class="ds-name">单双</span><span class="ds-heads">【'+oe+'<span class="ds-plus">+</span>'+zods+'】</span> <span class="ds-open">开：'+(wait?'待开':(sp.z+sp.c))+'</span> '+resHtml+'</div>';
     }).join('')+'<div class="ds-slogan">料好不用说，五湖四海有传说！</div>';
     var lxHtml='<div class="lx-hd"><b>新港摇钱树【六肖六码】</b><span>作者：小小码神</span></div>'+(lx&&lx.rows||[]).map(function(r){
-      var sp=r.special||{};var wait=!sp.z;var list=r.list||[];var exact=!wait&&list.some(function(x){return x.z===sp.z&&x.c===sp.c});
+      var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});var wait=!sp.z;var list=r.list||[];var exact=!wait&&list.some(function(x){return x.z===sp.z&&x.c===sp.c});
       var hit=!wait&&list.some(function(x){return x.z===sp.z});
       var items=list.map(function(x){var on=!wait&&(x.z===sp.z||('0'+x.c).slice(-2)===('0'+sp.c).slice(-2));return '<span class="lx-item'+(on?' hit':'')+'">'+x.z+x.c+'</span>'}).join('');
       var res=wait?'':(hit?'中':'错');var resHtml=wait?'':'<span class="lx-res '+(hit?'ok':'no')+'">'+res+'</span>';
-      return '<div class="lx-row" data-issue="'+r.issue+'" data-result="'+(wait?'?':res)+'"><span class="lx-issue">'+r.issue+'期</span><span class="lx-list">'+items+'</span><span class="lx-open">开:'+(wait?'?':(sp.z+sp.c))+'</span>'+resHtml+'</div>';
+      return '<div class="lx-row" data-issue="'+r.issue+'" data-result="'+(wait?'待开':res)+'"><span class="lx-issue">'+r.issue+'期</span><span class="lx-list">'+items+'</span><span class="lx-open">开:'+(wait?'待开':(sp.z+sp.c))+'</span>'+resHtml+'</div>';
     }).join('')+'<div class="lx-slogan">家人们：和我一起六合彩，赚到盆满钵满都在掌握之中，多期连升足以证明一切</div>';
     var box=mount();
     box.innerHTML='<section class="xcblk" id="santou">'+stHtml+'</section><section class="xcblk" id="shuangbo">'+sbHtml+'</section><section class="xcblk" id="danshuang">'+dsHtml+'</section><section class="xcblk" id="liuxiao">'+lxHtml+'</section>';
@@ -963,32 +969,32 @@ details.mini>summary::-webkit-details-marker{display:none}
   Promise.all([get('data/qiwei.json'),get('data/sisha.json'),get('data/pingte.json'),get('data/danshuangsixiao.json')]).then(function(rs){
     var qw=rs[0],ss=rs[1],pt=rs[2],ds4=rs[3];
     var qwHtml=(qw&&qw.rows||[]).map(function(r){
-      var sp=r.special||{};var wait=!sp.z;var tail=wait?-1:parseInt(sp.c,10)%10;
+      var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});var wait=!sp.z;var tail=wait?-1:parseInt(sp.c,10)%10;
       var tails=String(r.tails||'').split('').map(function(d){return '<span class="t'+(d===String(tail)?' hit':'')+'">'+d+'</span>'}).join('');
       var hit=!wait&&String(r.tails||'').indexOf(String(tail))>=0;
       var res=wait?'':(hit?'准':'错');var resHtml=wait?'':'<span class="qw-res '+(hit?'ok':'no')+'">'+res+'</span>';
-      return '<div class="qw-row" data-issue="'+r.issue+'" data-result="'+(wait?'?':res)+'"><b>'+r.issue+'期</b>：<span class="qw-name">七尾中特</span><span class="qw-tails">{'+tails+'}</span> <span class="qw-open">特开：'+(wait?'?':(sp.z+sp.c))+'</span> '+resHtml+'</div>';
+      return '<div class="qw-row" data-issue="'+r.issue+'" data-result="'+(wait?'待开':res)+'"><b>'+r.issue+'期</b>：<span class="qw-name">七尾中特</span><span class="qw-tails">{'+tails+'}</span> <span class="qw-open">特开：'+(wait?'待开':(sp.z+sp.c))+'</span> '+resHtml+'</div>';
     }).join('');
     var ssHtml='<div class="ss-hd"><b>新港摇钱树【死杀三肖】</b></div>'+(ss&&ss.rows||[]).map(function(r){
-      var sp=r.special||{};var wait=!sp.z;var hit=!wait&&(r.sisha||[]).indexOf(sp.z)<0;
+      var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});var wait=!sp.z;var hit=!wait&&(r.sisha||[]).indexOf(sp.z)<0;
       var res=wait?'':(hit?'中':'错');var resHtml=wait?'':'<span class="ss-res '+(hit?'ok':'no')+'">'+res+'</span>';
-      return '<div class="ss-row" data-issue="'+r.issue+'" data-result="'+(wait?'?':res)+'"><b>'+r.issue+'期</b>：<span class="ss-name">死杀三肖</span><span class="ss-sisha">【'+(r.sisha||[]).join('')+'】</span> <span class="ss-open">特开：'+(wait?'?':(sp.z+sp.c))+'</span> '+resHtml+'</div>';
+      return '<div class="ss-row" data-issue="'+r.issue+'" data-result="'+(wait?'待开':res)+'"><b>'+r.issue+'期</b>：<span class="ss-name">死杀三肖</span><span class="ss-sisha">【'+(r.sisha||[]).join('')+'】</span> <span class="ss-open">特开：'+(wait?'待开':(sp.z+sp.c))+'</span> '+resHtml+'</div>';
     }).join('');
     var ptHtml=(pt&&pt.rows||[]).map(function(r){
-      var sp=r.special||{};var wait=!sp.z;var hit=!wait&&sp.z===r.zod;
+      var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});var wait=!sp.z;var hit=!wait&&sp.z===r.zod;
       /* 平特①肖：数据错位，待修数据后再启用自动标；当前完全不标（仅保留历史准/错文本） */
       var zodTxt=r.zod?(r.zod+r.zod+r.zod):'待定';
       var res=wait?'':(hit?'准':'错');var resHtml=wait?'':'<span class="pt-res '+(hit?'ok':'no')+'">'+res+'</span>';
-      return '<div class="pt-row" data-issue="'+r.issue+'" data-result="'+(wait?'?':res)+'"><b>'+r.issue+'期</b>：<span class="pt-name">平特①肖</span><span class="pt-zod">【'+zodTxt+'】</span> <span class="pt-open">开：'+(wait?'?':(sp.z+sp.c))+'</span> '+resHtml+'</div>';
+      return '<div class="pt-row" data-issue="'+r.issue+'" data-result="'+(wait?'待开':res)+'"><b>'+r.issue+'期</b>：<span class="pt-name">平特①肖</span><span class="pt-zod">【'+zodTxt+'】</span> <span class="pt-open">开：'+(wait?'待开':(sp.z+sp.c))+'</span> '+resHtml+'</div>';
     }).join('');
     var ds4Html='<div class="ds4-hd">单双四肖</div>'+(ds4&&ds4.rows||[]).map(function(r){
-      var sp=r.special||{};var wait=!sp.z;var num=wait?0:parseInt(sp.c,10);var isDan=!wait&&num%2===1;
+      var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});var wait=!sp.z;var num=wait?0:parseInt(sp.c,10);var isDan=!wait&&num%2===1;
       var grp=wait?[]:(isDan?(r.dan||[]):(r.shuang||[]));var hit=!wait&&grp.indexOf(sp.z)>=0;
       var res=wait?'':(hit?'中':'错');var resHtml=wait?'':'<span class="ds4-res '+(hit?'ok':'no')+'">'+res+'</span>';
       function zs(list){return '<span class="ds4-grp">【'+list.map(function(z){var on=!wait&&z===sp.z&&(isDan?(r.dan||[]):(r.shuang||[])).indexOf(z)>=0;return '<span class="ds4-z'+(on?' hit':'')+'">'+z+'</span>'}).join('')+'】</span>'}
       var l1='<b>'+r.issue+'期</b>：<span class="ds4-name">单双四肖</span> <span class="ds4-open">特开：'+(wait?'?':(sp.z+'<span class="num">'+sp.c+'</span>'))+'</span> '+resHtml;
       var l2='<span class="ds4-lab">单</span>'+zs(r.dan||[])+'<span class="ds4-lab">双</span>'+zs(r.shuang||[]);
-      return '<div class="ds4-row" data-issue="'+r.issue+'" data-result="'+(wait?'?':res)+'"><div class="l1">'+l1+'</div><div class="ds4-l2">'+l2+'</div></div>';
+      return '<div class="ds4-row" data-issue="'+r.issue+'" data-result="'+(wait?'待开':res)+'"><div class="l1">'+l1+'</div><div class="ds4-l2">'+l2+'</div></div>';
     }).join('');
     var box=mount();
     box.innerHTML='<section class="xcblk" id="qiwei">'+qwHtml+'</section><section class="xcblk" id="sisha">'+ssHtml+'</section><section class="xcblk" id="pingte">'+ptHtml+'</section><section class="xcblk" id="ds4">'+ds4Html+'</section>';
