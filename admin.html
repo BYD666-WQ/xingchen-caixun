@@ -129,6 +129,12 @@ body{padding-bottom:76px}
   <div class="lot-man-row"><button id="lot-man-random" type="button">随机填充</button><button id="lot-man-submit" type="button" class="primary">提交开奖</button></div>
   <div id="lot-man-result" class="lot-man-result"></div>
 </div>
+
+<h3>加期号 / 预置结果 <span class="lot-sub">已设置的按期开奖，未设置的到点自动模拟</span></h3>
+<div class="lot-plan">
+  <div class="lot-man-row"><button id="lot-plan-add" type="button">＋ 加期号</button><span id="lot-plan-hint" style="font-size:11px;color:#888"></span></div>
+  <div id="lot-plan-list"></div>
+</div>
 <div class="lot-window"><b>开奖时段</b><input id="lot-win-start" type="time" value="03:00"><span>至</span><input id="lot-win-end" type="time" value="23:59"><label style="display:inline-flex;gap:4px;align-items:center"><input id="lot-win-on" type="checkbox" checked>启用</label><button id="lot-win-save" type="button">保存时段</button><span id="lot-win-status" style="font-size:11px;color:#888"></span></div>
 <h3>注单列表 <span class="lot-sub">来自 bets 表</span></h3>
 <div class="lot-scroll"><table class="lot-table"><thead><tr><th>用户名</th><th>彩种</th><th>期号</th><th>选号</th><th>注额</th><th>状态</th></tr></thead><tbody id="lot-bets"></tbody></table></div>
@@ -1446,7 +1452,7 @@ setTimeout(loadRevealConfig,2500);
       MAN_STATE = d;
       hint.textContent = d.autoAt ? ('到 ' + String(d.autoAt).replace('T', ' ').slice(0, 16) + ' 未手动设置将自动模拟开奖') : '该彩种无自动开奖时间';
       meta.innerHTML = '<span>当前期 <b>' + d.issue + ' 期</b></span><span>可开期 <b>' + d.drawableIssue + ' 期</b></span><span>封盘 ' + (d.closeAt || '—') + '</span><span>' + (d.manualSet ? '已手动设置' : '未设置 · 自动') + '</span>';
-      manFillInputs();
+      manFillInputs(); try { planLoad(); } catch (e) {}
       document.getElementById('lot-man-result').textContent = d.lastResult ? ('上期已开奖：第 ' + d.lastResult.issue + ' 期 · ' + (d.lastResult.nums || []).join(' ')) : '';
     } catch (e) { hint.textContent = '读取失败：' + e.message; }
   }
@@ -1471,6 +1477,56 @@ setTimeout(loadRevealConfig,2500);
       var msg = '已开奖 第 ' + (r.issue || MAN_STATE.drawableIssue) + ' 期 · 派彩 ' + (r.hits != null ? r.hits : (r.settled || 0)) + ' 注 / 合计 ' + (r.payout || 0) + ' 积分';
       await manLoad(); out.textContent = msg;
     } catch (e) { out.textContent = /ALREADY_DRAWN|已开奖/.test(e.message) ? '该期已开奖' : ('提交失败：' + e.message); }
+  };
+  var PLAN_EDIT = null;
+  function planNumsHtml() {
+    var id = document.getElementById('lot-man-game').value, cnt = manCount(id), max = manMax(id), h = '';
+    for (var i = 0; i < cnt; i++) h += '<input type="number" min="1" max="' + max + '" data-plan-num="' + i + '" inputmode="numeric">';
+    return h;
+  }
+  async function planLoad() {
+    var box = document.getElementById('lot-plan-list'); if (!box) return;
+    var id = document.getElementById('lot-man-game').value;
+    box.innerHTML = '<div style="font-size:11px;color:#888">读取中…</div>';
+    try {
+      var d = await wfetch('/admin/issue-plan?gameId=' + encodeURIComponent(id));
+      var plans = d.plans || [];
+      document.getElementById('lot-plan-hint').textContent = plans.length ? ('共 ' + plans.length + ' 期计划') : '暂无计划，点「＋ 加期号」';
+      if (!plans.length) { box.innerHTML = '<div style="font-size:11px;color:#888;padding:8px 0">暂无计划</div>'; return; }
+      box.innerHTML = plans.map(function (p) {
+        var editing = PLAN_EDIT === p.issue;
+        var nums = p.nums ? p.nums.join(' ') : '';
+        return '<div class="lot-plan-row" data-plan-issue="' + p.issue + '"><b>' + p.issue + ' 期</b><span>' + (p.used ? '已开奖' : (p.nums ? '已设结果' : '未设 · 自动')) + '</span><em>' + (nums || '—') + '</em>' +
+          (editing ? '<div class="lot-plan-edit">' + planNumsHtml() + '<button type="button" data-plan-random="' + p.issue + '">随机</button><button type="button" data-plan-save="' + p.issue + '">保存</button><button type="button" data-plan-cancel>取消</button></div>' : '<button type="button" data-plan-set="' + p.issue + '">设置/修改</button>') +
+          '<button type="button" data-plan-del="' + p.issue + '">删除</button></div>';
+      }).join('');
+    } catch (e) { box.innerHTML = '<div style="font-size:11px;color:#c74b4b">读取失败：' + e.message + '</div>'; }
+  }
+  document.getElementById('lot-plan-add').onclick = async function () {
+    var id = document.getElementById('lot-man-game').value;
+    try { await wfetch('/admin/issue-plan', { method: 'POST', body: { gameId: id } }); await planLoad(); }
+    catch (e) { document.getElementById('lot-plan-hint').textContent = '加期号失败：' + e.message; }
+  };
+  document.getElementById('lot-plan-list').onclick = async function (e) {
+    var id = document.getElementById('lot-man-game').value;
+    var set = e.target.closest('[data-plan-set]'), del = e.target.closest('[data-plan-del]'), save = e.target.closest('[data-plan-save]'), rnd = e.target.closest('[data-plan-random]');
+    if (e.target.closest('[data-plan-cancel]')) { PLAN_EDIT = null; planLoad(); return; }
+    if (set) { PLAN_EDIT = Number(set.getAttribute('data-plan-set')); planLoad(); return; }
+    if (rnd) { var max = manMax(id), cnt = manCount(id), used = {}, vals = []; for (var i = 0; i < cnt; i++) { var v; do { v = 1 + Math.floor(Math.random() * max); } while (used[v]); used[v] = 1; vals.push(v); } document.querySelectorAll('[data-plan-num]').forEach(function (inp, i) { inp.value = vals[i]; }); return; }
+    if (save) {
+      var issue = Number(save.getAttribute('data-plan-save')), inputs = document.querySelectorAll('[data-plan-num]'), nums = [];
+      for (var k = 0; k < inputs.length; k++) { var nv = parseInt(inputs[k].value, 10); if (!isFinite(nv) || nv < 1 || nv > manMax(id)) { alert('号码不合法'); return; } nums.push(nv); }
+      if (new Set(nums).size !== nums.length) { alert('号码不能重复'); return; }
+      try { await wfetch('/admin/issue-plan', { method: 'PATCH', body: { gameId: id, issue: issue, nums: nums } }); PLAN_EDIT = null; await planLoad(); }
+      catch (err) { alert('保存失败：' + err.message); }
+      return;
+    }
+    if (del) {
+      var di = Number(del.getAttribute('data-plan-del'));
+      if (!confirm('删除 ' + di + ' 期计划？')) return;
+      try { await wfetch('/admin/issue-plan', { method: 'DELETE', body: { gameId: id, issue: di } }); await planLoad(); }
+      catch (err) { alert('删除失败：' + err.message); }
+    }
   };
   document.getElementById('lot-draw-run').onclick=async function(){
     var i=parseInt(document.getElementById('lot-draw-game').value,10),g=GAMES[i]||GAMES[0],mode=document.getElementById('lot-draw-mode').value,diff=document.getElementById('lot-draw-diff').value,num=parseInt(document.getElementById('lot-draw-num').value,10),out=document.getElementById('lot-draw-result');
