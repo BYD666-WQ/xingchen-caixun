@@ -1,9 +1,9 @@
 {
  "ok": true,
  "status": "success",
- "message": "云端 Worker 已更新 Macau",
- "updated": "2026-11-22 21:40:31",
- "updatedAt": "2026-11-22T21:40:31.257+08:00",
+ "message": "云端 Worker 检查完成，无更新",
+ "updated": "2026-11-22 21:50:31",
+ "updatedAt": "2026-11-22T21:50:31.200+08:00",
  "lastSuccess": "2026-11-22 21:40:31",
  "newest_seen_ts": "2026326",
  "newest_seen_ids": [
@@ -31,5 +31,5 @@
  "alerts": [],
  "gaps": [],
  "backfill": false,
- "lastRun": "2026-11-22 21:40:31"
+ "lastRun": "2026-11-22 21:50:31"
 }
