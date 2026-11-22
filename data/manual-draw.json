@@ -1,16 +1,10 @@
 {
  "name": "新香港",
+ "issue": 326,
  "drawTime": "每天 21:34",
  "dailyTime": "21:34",
  "status": "sample",
- "updated": "2026-11-21T13:23:17.577Z",
- "current": {
-  "issue": 326,
-  "nums": [],
-  "numsEnc": "",
-  "visibleFrom": "2026-11-22T21:34:00+08:00",
-  "publishedAt": null
- },
+ "nums": [],
  "history": [
   {
    "issue": 325,
@@ -57,9 +51,7 @@
      "color": "红",
      "wuxing": "火"
     }
-   ],
-   "visibleFrom": "2026-11-21T13:34:00.000Z",
-   "publishedAt": "2026-11-21T13:34:01.490Z"
+   ]
   },
   {
    "issue": 324,
@@ -1096,5 +1088,8 @@
    ]
   }
  ],
- "publishedAt": null
+ "updated": "2026-11-22T13:22:49.452Z",
+ "visibleFrom": "2026-11-22T13:34:00.000Z",
+ "publishedAt": "",
+ "numsEnc": "AxgbFWQIEgEOek8bDGQIEtqt30EVVCVdXF1Eelkbkf2NEh4ULxZBHyhVEggUvv+RVDseSxBVelkbR3UQHBBMelkbn++eEh4UOwxVGTQQChDR4sEbWmRFRUpfNgQbTGTbt6MUJU9CVCUQChAGbkEVVDwQChDR0fgbWmRRX15ZKkEDVKGJjxAaehRMDi9cVxAMeoal6WRPHEkUO0EDVHQDEh4UIkEDVKG5pxAaegBWGilAEggUv9iGVGoQR0dOMQ1eVHwQ1a6peh4VDWRREggUa1YbWmRIEggUv++NVGoQU11aNxEbTGTVipAUdEFOAz5bXlUUYkHQ8dcQTR5NegAbTGQBBxAaehkbTGTbmZ4UdEFaGSpdQhAMeouq62QeEkVDIApXEWQIEteqx0FEWj0QUxAMelcLVGoQShAMeoSw7WQeElFZNAxLVHwQ2KGrek8bATNKWVxRelkbn8GjEk9r"
 }
