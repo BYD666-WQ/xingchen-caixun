@@ -108,10 +108,9 @@ body{padding-bottom:76px}
 #lottery-panel .lot-api code{background:#f3f6f4;padding:1px 4px;border-radius:3px;color:#45715b}
 @media(min-width:900px){body[data-admin-cat="lottery"] .wrap{max-width:1120px}#lottery-panel .lot-games{grid-template-columns:repeat(3,minmax(0,1fr))}} @media(max-width:600px){#lottery-panel .lot-games{grid-template-columns:1fr}}
 </style>
-<p class="lot-note"><b>Appwrite 真实接口</b> · 用户、积分、注单与开奖配置读写 <code>lottery</code> 数据库；API Key 只存本机浏览器。</p>
-<div class="lot-key"><input id="lot-key" type="password" autocomplete="off" placeholder="Appwrite API Key"><button id="lot-key-save" type="button">保存并读取</button><span>仅本地保存，勿外传</span></div>
-<div class="lot-key"><input id="lot-admin-key" type="password" autocomplete="off" placeholder="Function Admin Key（x-admin-key）"><button id="lot-admin-key-save" type="button">保存 Admin Key</button><span>加减积分走 Function /admin/points</span></div>
-<div id="lot-status" style="font-size:11px;color:#888;margin:6px 0 2px">未连接 Appwrite</div>
+<p class="lot-note"><b>GitHub JSON 接口</b> · 用户/积分/注单由管理接口读写；密钥只存本机浏览器。</p>
+<div class="lot-key"><input id="lot-admin-key" type="password" autocomplete="off" placeholder="管理员密钥（4–6 位示例）"><button id="lot-admin-key-save" type="button">保存管理员密钥</button><span>加减积分走 Function /admin/points</span></div>
+<div id="lot-status" style="font-size:11px;color:#888;margin:6px 0 2px">请先填写管理员密钥</div>
 <h3>用户列表 <span class="lot-sub">用户名 / 积分 / 注册时间 / 状态</span></h3>
 <div class="lot-scroll"><table class="lot-table"><thead><tr><th>用户名</th><th>积分</th><th>注册时间</th><th>状态</th><th>加减积分</th></tr></thead><tbody id="lot-users"></tbody></table></div>
 
@@ -122,7 +121,7 @@ body{padding-bottom:76px}
 <div class="lot-scroll"><table class="lot-table"><thead><tr><th>用户名</th><th>彩种</th><th>期号</th><th>选号</th><th>注额</th><th>状态</th></tr></thead><tbody id="lot-bets"></tbody></table></div>
 <h3>彩种开关 <span class="lot-sub">启用 / 周期 / 数据源</span></h3>
 <div class="lot-games" id="lot-games"></div>
-<p class="lot-api">真实接口：<code>GET /v1/tablesdb/lottery/tables/users/rows</code> · <code>PATCH .../users/rows/{rowId}</code> · <code>GET .../bets/rows</code> · <code>PATCH/POST .../config/rows</code></p>
+<p class="lot-api">管理接口：<code>GET /api/admin/users</code> · <code>GET /api/admin/bets</code> · <code>POST /api/admin/users/{username}/points</code></p>
 </div></details></div>
 <div id="guide" style="background:#e8f7ef;border:1px solid #b9e3cd;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;line-height:1.75;color:#0b6b3d">
   <b>3 步完成修改：</b><br>① 在下面粘贴密钥（只需一次） → ② 填号码/资料 → ③ 点底部「保存并发布」
@@ -1335,14 +1334,16 @@ setTimeout(loadRevealConfig,2500);
   var CFG={endpoint:'https://sgp.cloud.appwrite.io/v1',project:'6aff4c2f0016ee43abad',db:'lottery',users:'6aff4ea1000cecd6c798',bets:'bets',config:'config'};
   var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主站'],['hk','香港','每日','主站'],['fast-mark6-1','一分钟六合彩','1分钟','模拟'],['fast-mark6-5','5分钟六合彩','5分钟','模拟'],['fast-race-1','一分钟赛车','1分钟','模拟'],['fast-race-30','30秒赛车','30秒','模拟'],['fast-race-5','5分钟赛车','5分钟','模拟'],['fast-race-10','10分钟赛车','10分钟','模拟'],['fast-k3','大发快三','1分钟','模拟'],['fast-airship','一分飞艇','1分钟','模拟'],['oldmo','老澳','每日','未接入']].map(function(x){return {id:x[0],name:x[1],period:x[2],source:x[3],enabled:x[3]!=='未接入'}});
   var USERS=[],BETS=[],CONFIGS={};
-  var KEY=localStorage.getItem('lottery-appwrite-key')||'';
+  var WORKER_BASE='https://xingchen-lottery-api.xingchen-lottery.workers.dev';
   var $=function(s){return document.querySelector(s)};
-  function headers(){return {'X-Appwrite-Project':CFG.project,'X-Appwrite-Key':KEY,'Content-Type':'application/json'}}
-  async function aw(path,opts){
+  async function wfetch(path,opts){
     opts=opts||{};
-    var r=await fetch(CFG.endpoint+path,{method:opts.method||'GET',headers:headers(),body:opts.body?JSON.stringify(opts.body):undefined});
+    var ak=(localStorage.getItem('lottery-admin-key')||'').trim();
+    if(!ak){var e=new Error('请先填写管理员密钥');e.auth=true;throw e}
+    var r=await fetch(WORKER_BASE+path,{method:opts.method||'GET',headers:{'x-admin-key':ak,'Content-Type':'application/json'},body:opts.body?JSON.stringify(opts.body):undefined,signal:AbortSignal.timeout(15000)});
     var txt=await r.text(); var j; try{j=JSON.parse(txt)}catch(e){j={message:txt.slice(0,200)}}
-    if(!r.ok) throw new Error((j.message||('HTTP '+r.status)));
+    if(r.status===401||r.status===403){var e2=new Error('管理员密钥无效');e2.auth=true;throw e2}
+    if(!r.ok) throw new Error((j.error&&j.error.message)||j.message||('HTTP '+r.status));
     return j;
   }
   function status(s,err){var el=document.getElementById('lot-status');if(el){el.textContent=s;el.style.color=err?'#c74b4b':'#0b8a4b'}}
@@ -1369,11 +1370,10 @@ setTimeout(loadRevealConfig,2500);
   }
   function renderDraw(){var sel=document.getElementById('lot-draw-game');if(sel)sel.innerHTML=GAMES.map(function(g,i){return '<option value="'+i+'">'+g.name+'</option>'}).join('')}
   async function loadAll(){
-    KEY=localStorage.getItem('lottery-appwrite-key')||'';
     status('正在读取用户/注单（GitHub JSON）…');
     try{
-      var u=await fnAdminGet('/admin/users');
-      var b=await fnAdminGet('/admin/bets');
+      var u=await wfetch('/api/admin/users');
+      var b=await wfetch('/api/admin/bets');
       USERS=(u&&u.users)||[];BETS=(b&&b.bets)||[];
       renderUsers();renderBets();
       status('已加载 · 用户 '+USERS.length+' · 注单 '+BETS.length+(u&&u.total!=null?'（total '+u.total+'）':''));
@@ -1382,45 +1382,21 @@ setTimeout(loadRevealConfig,2500);
       status(e.auth?'管理员密钥无效':'加载失败：'+e.message,true);
     }
   }
-  document.getElementById('lot-key-save').onclick=function(){
-    var v=document.getElementById('lot-key').value.trim();if(!v){status('请输入 Appwrite API Key',true);return}
-    localStorage.setItem('lottery-appwrite-key',v);loadAll();
-  };
   function adminKey(){ return (localStorage.getItem('lottery-admin-key')||'').trim(); }
   document.getElementById('lot-admin-key-save').onclick=function(){
-    var v=document.getElementById('lot-admin-key').value.trim();if(!v){status('请输入 Function Admin Key',true);return}
-    localStorage.setItem('lottery-admin-key',v);status('Admin Key 已保存（本机）');
+    var v=document.getElementById('lot-admin-key').value.trim();if(!v){status('请输入管理员密钥',true);return}
+    localStorage.setItem('lottery-admin-key',v);status('管理员密钥已保存（本机）');loadAll();
   };
   // 统一 Function 调用（execution 走 Appwrite API Key，业务鉴权走 x-admin-key）
-  async function fnAdmin(path, body){
-    if(!KEY) throw new Error('请先填写 Appwrite API Key');
-    var ak=adminKey(); if(!ak) throw new Error('请先填写 Function Admin Key');
-    var url=CFG.endpoint+'/functions/lottery-api/executions';
-    var r=await fetch(url,{method:'POST',headers:{'X-Appwrite-Project':CFG.project,'X-Appwrite-Key':KEY,'Content-Type':'application/json'},body:JSON.stringify({path:path,method:'POST',body:JSON.stringify(body||{}),async:false,headers:{'x-admin-key':ak}})});
-    var j=null;try{j=await r.json()}catch(e){}
-    if(!r.ok) throw new Error((j&&j.message)||('HTTP '+r.status));
-    var code=Number(j&&j.responseStatusCode)||0;var data={};try{data=JSON.parse((j&&j.responseBody)||'{}')}catch(e){}
-    if(code>=400||data.ok===false) throw new Error((data.error&&(data.error.message||data.error.code))||('Function '+code));
-    return data;
-  }
-  async function fnAdminGet(path){
-    var ak=adminKey(); if(!ak){var er=new Error('请先填写 Function Admin Key');er.auth=true;throw er}
-    if(!KEY){var ek=new Error('请先填写 Appwrite API Key');throw ek}
-    var r=await fetch(CFG.endpoint+'/functions/lottery-api/executions',{method:'POST',headers:{'X-Appwrite-Project':CFG.project,'X-Appwrite-Key':KEY,'Content-Type':'application/json'},body:JSON.stringify({path:path,method:'GET',async:false,headers:{'x-admin-key':ak}})});
-    var j=null;try{j=await r.json()}catch(e){}
-    var code=Number(j&&j.responseStatusCode)||0;var data={};try{data=JSON.parse((j&&j.responseBody)||'{}')}catch(e){}
-    if(code===401||data.error&&data.error.code==='ADMIN_REQUIRED'){var e2=new Error('管理员密钥无效');e2.auth=true;throw e2}
-    if(!r.ok||code>=400||data.ok===false) throw new Error((data.error&&(data.error.message||data.error.code))||('Function '+code));
-    return data;
-  }
   document.getElementById('lot-users').onclick=async function(e){
     var b=e.target.closest('[data-lot-row]');if(!b)return;
     var row=USERS.find(function(x){return (x.uid||x.$id)===b.getAttribute('data-lot-row')});if(!row)return;
     var nv; if(b.hasAttribute('data-lot-set')){var input=prompt('设置新积分（演示）', String(row.points||0)); if(input===null)return; nv=parseInt(input,10); if(!isFinite(nv)||nv<0){status('积分为非负整数',true);return}} else nv=Math.max(0,Number(row.points||0)+Number(b.getAttribute('data-lot-delta')));b.disabled=true;
     try{
-      var body = b.hasAttribute('data-lot-set') ? {username:row.username,setTo:nv} : {username:row.username,delta:Number(b.getAttribute('data-lot-delta'))};
-      var res=await fnAdmin('/admin/points',body);
-      row.points=(res&&res.user&&res.user.points!=null)?res.user.points:nv;renderUsers();status('积分已更新为 '+row.points+'（Function）');
+      var payload = b.hasAttribute('data-lot-set') ? {setTo:nv} : {delta:Number(b.getAttribute('data-lot-delta'))};
+      var res=await wfetch('/api/admin/users/'+encodeURIComponent(row.username)+'/points',{method:'POST',body:payload});
+      row.points=(res&&res.user&&res.user.points!=null)?res.user.points:(res&&res.points!=null?res.points:nv);
+      renderUsers();status('积分已更新为 '+row.points+'（管理员接口）');
     }catch(err){status('积分更新失败：'+err.message,true);b.disabled=false}
   };
   document.getElementById('lot-games').onchange=function(e){var t=e.target,i=parseInt(t.getAttribute('data-lot-game')||t.getAttribute('data-lot-period')||t.getAttribute('data-lot-source'),10);if(isNaN(i)||!GAMES[i])return;if(t.hasAttribute('data-lot-game'))GAMES[i].enabled=t.checked;if(t.hasAttribute('data-lot-period'))GAMES[i].period=t.value;if(t.hasAttribute('data-lot-source'))GAMES[i].source=t.value;};
@@ -1440,7 +1416,6 @@ setTimeout(loadRevealConfig,2500);
   window.__lotteryReal={get users(){return USERS},get bets(){return BETS},get configs(){return CONFIGS},reload:loadAll};
   window.__lotteryLoadAll=loadAll;
   renderGames();renderDraw();
-  if(KEY)document.getElementById('lot-key').value=KEY;
   loadAll();
 })();
 </script>
