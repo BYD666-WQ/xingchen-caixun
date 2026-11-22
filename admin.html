@@ -119,6 +119,16 @@ body{padding-bottom:76px}
 <h3>开奖控制 <span class="lot-sub">手动指定 / 随机 · 难度</span></h3>
 <div class="lot-draw"><select id="lot-draw-game"></select><select id="lot-draw-mode"><option value="manual">手动指定</option><option value="random">随机开奖</option></select><select id="lot-draw-diff"><option value="easy">易 · 高频小奖</option><option value="medium" selected>中 · 均衡</option><option value="hard">难 · 低频大奖</option></select><input id="lot-draw-num" type="number" min="1" max="49" placeholder="手动特码 1-49"><button id="lot-draw-run" type="button">执行模拟开奖</button></div>
 <div id="lot-draw-result">等待操作 · 保存后写入 config，前端投注页读取。</div>
+
+<h3>手动开奖 <span class="lot-sub">指定号码 · 立即结算</span></h3>
+<div class="lot-manual">
+  <div class="lot-man-row"><select id="lot-man-game"></select><button id="lot-man-refresh" type="button">刷新状态</button></div>
+  <div id="lot-man-hint" class="lot-man-hint">选择彩种后读取当前期号 / 自动开奖时间</div>
+  <div id="lot-man-meta" class="lot-man-meta"></div>
+  <div id="lot-man-nums" class="lot-man-nums"></div>
+  <div class="lot-man-row"><button id="lot-man-random" type="button">随机填充</button><button id="lot-man-submit" type="button" class="primary">提交开奖</button></div>
+  <div id="lot-man-result" class="lot-man-result"></div>
+</div>
 <div class="lot-window"><b>开奖时段</b><input id="lot-win-start" type="time" value="03:00"><span>至</span><input id="lot-win-end" type="time" value="23:59"><label style="display:inline-flex;gap:4px;align-items:center"><input id="lot-win-on" type="checkbox" checked>启用</label><button id="lot-win-save" type="button">保存时段</button><span id="lot-win-status" style="font-size:11px;color:#888"></span></div>
 <h3>注单列表 <span class="lot-sub">来自 bets 表</span></h3>
 <div class="lot-scroll"><table class="lot-table"><thead><tr><th>用户名</th><th>彩种</th><th>期号</th><th>选号</th><th>注额</th><th>状态</th></tr></thead><tbody id="lot-bets"></tbody></table></div>
@@ -1414,6 +1424,54 @@ setTimeout(loadRevealConfig,2500);
     }catch(e){document.getElementById('lot-win-status').textContent='保存失败：'+e.message;status('时段保存失败：'+e.message,true)}
   };
   document.getElementById('lot-games').onchange=function(e){var t=e.target,i=parseInt(t.getAttribute('data-lot-game')||t.getAttribute('data-lot-period')||t.getAttribute('data-lot-source'),10);if(isNaN(i)||!GAMES[i])return;if(t.hasAttribute('data-lot-game'))GAMES[i].enabled=t.checked;if(t.hasAttribute('data-lot-period'))GAMES[i].period=t.value;if(t.hasAttribute('data-lot-source'))GAMES[i].source=t.value;};
+  var MAN_STATE = null, MAN_GAME = '';
+  function manIsRacing(id) { return /^fast-race/.test(id); }
+  function manIsK3(id) { return id === 'fast-k3'; }
+  function manCount(id) { return manIsRacing(id) ? 10 : (manIsK3(id) ? 3 : 7); }
+  function manMax(id) { return manIsRacing(id) ? 10 : (manIsK3(id) ? 6 : 49); }
+  function manFillInputs() {
+    var box = document.getElementById('lot-man-nums'); if (!box) return;
+    var id = document.getElementById('lot-man-game').value;
+    var cnt = manCount(id), max = manMax(id), html = '';
+    for (var i = 0; i < cnt; i++) html += '<input type="number" min="1" max="' + max + '" data-man-num="' + i + '" inputmode="numeric" placeholder="' + (i + 1) + '">';
+    box.innerHTML = html;
+  }
+  async function manLoad() {
+    var sel = document.getElementById('lot-man-game'); if (!sel) return;
+    var id = sel.value; MAN_GAME = id;
+    var hint = document.getElementById('lot-man-hint'), meta = document.getElementById('lot-man-meta');
+    hint.textContent = '读取中…'; meta.textContent = '';
+    try {
+      var d = await wfetch('/admin/draw-state?gameId=' + encodeURIComponent(id));
+      MAN_STATE = d;
+      hint.textContent = d.autoAt ? ('到 ' + String(d.autoAt).replace('T', ' ').slice(0, 16) + ' 未手动设置将自动模拟开奖') : '该彩种无自动开奖时间';
+      meta.innerHTML = '<span>当前期 <b>' + d.issue + ' 期</b></span><span>可开期 <b>' + d.drawableIssue + ' 期</b></span><span>封盘 ' + (d.closeAt || '—') + '</span><span>' + (d.manualSet ? '已手动设置' : '未设置 · 自动') + '</span>';
+      manFillInputs();
+      document.getElementById('lot-man-result').textContent = d.lastResult ? ('上期已开奖：第 ' + d.lastResult.issue + ' 期 · ' + (d.lastResult.nums || []).join(' ')) : '';
+    } catch (e) { hint.textContent = '读取失败：' + e.message; }
+  }
+  document.getElementById('lot-man-game').onchange = manLoad;
+  document.getElementById('lot-man-refresh').onclick = manLoad;
+  document.getElementById('lot-man-random').onclick = function () {
+    var id = MAN_GAME || document.getElementById('lot-man-game').value;
+    var max = manMax(id), cnt = manCount(id), used = {};
+    var vals = [];
+    for (var i = 0; i < cnt; i++) { var v; do { v = 1 + Math.floor(Math.random() * max); } while (used[v]); used[v] = 1; vals.push(v); }
+    document.querySelectorAll('[data-man-num]').forEach(function (inp, i) { inp.value = String(vals[i]).padStart(2, '0'); });
+  };
+  document.getElementById('lot-man-submit').onclick = async function () {
+    var out = document.getElementById('lot-man-result');
+    if (!MAN_STATE) { out.textContent = '请先刷新状态'; return; }
+    var inputs = document.querySelectorAll('[data-man-num]');
+    var nums = [];
+    for (var i = 0; i < inputs.length; i++) { var v = parseInt(inputs[i].value, 10); if (!isFinite(v) || v < 1 || v > manMax(MAN_GAME)) { out.textContent = '第 ' + (i + 1) + ' 个号码不合法'; return; } nums.push(v); }
+    if (new Set(nums).size !== nums.length) { out.textContent = '号码不能重复'; return; }
+    try {
+      var r = await wfetch('/admin/draw-result', { method: 'POST', body: { gameId: MAN_GAME, issue: MAN_STATE.drawableIssue, nums: nums } });
+      var msg = '已开奖 第 ' + (r.issue || MAN_STATE.drawableIssue) + ' 期 · 派彩 ' + (r.hits != null ? r.hits : (r.settled || 0)) + ' 注 / 合计 ' + (r.payout || 0) + ' 积分';
+      await manLoad(); out.textContent = msg;
+    } catch (e) { out.textContent = /ALREADY_DRAWN|已开奖/.test(e.message) ? '该期已开奖' : ('提交失败：' + e.message); }
+  };
   document.getElementById('lot-draw-run').onclick=async function(){
     var i=parseInt(document.getElementById('lot-draw-game').value,10),g=GAMES[i]||GAMES[0],mode=document.getElementById('lot-draw-mode').value,diff=document.getElementById('lot-draw-diff').value,num=parseInt(document.getElementById('lot-draw-num').value,10),out=document.getElementById('lot-draw-result');
     if(mode==='manual'&&(!num||num<1||num>49)){out.innerHTML='<b style="color:#c74b4b">请输入 1-49 的手动特码</b>';return}
@@ -1427,7 +1485,8 @@ setTimeout(loadRevealConfig,2500);
   };
   window.__lotteryReal={get users(){return USERS},get bets(){return BETS},get configs(){return CONFIGS},reload:loadAll};
   window.__lotteryLoadAll=loadAll;
-  renderGames();renderDraw();
+  function initManualDraw(){var sel=document.getElementById('lot-man-game');if(!sel)return;sel.innerHTML=GAMES.map(function(g){return '<option value="'+g.id+'">'+g.name+'</option>'}).join('');MAN_GAME=sel.value;manLoad();}
+  initManualDraw();renderGames();renderDraw();
   loadAll();
 })();
 </script>
