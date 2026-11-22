@@ -1334,17 +1334,18 @@ setTimeout(loadRevealConfig,2500);
   var CFG={endpoint:'https://sgp.cloud.appwrite.io/v1',project:'6aff4c2f0016ee43abad',db:'lottery',users:'6aff4ea1000cecd6c798',bets:'bets',config:'config'};
   var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主站'],['hk','香港','每日','主站'],['fast-mark6-1','一分钟六合彩','1分钟','模拟'],['fast-mark6-5','5分钟六合彩','5分钟','模拟'],['fast-race-1','一分钟赛车','1分钟','模拟'],['fast-race-30','30秒赛车','30秒','模拟'],['fast-race-5','5分钟赛车','5分钟','模拟'],['fast-race-10','10分钟赛车','10分钟','模拟'],['fast-k3','大发快三','1分钟','模拟'],['fast-airship','一分飞艇','1分钟','模拟'],['oldmo','老澳','每日','未接入']].map(function(x){return {id:x[0],name:x[1],period:x[2],source:x[3],enabled:x[3]!=='未接入'}});
   var USERS=[],BETS=[],CONFIGS={};
-  var WORKER_BASE='https://xingchen-lottery-api.xingchen-lottery.workers.dev';
+  var FN_URL='https://sgp.cloud.appwrite.io/v1/functions/lottery-api/executions', PROJECT_ID='6aff4c2f0016ee43abad';
   var $=function(s){return document.querySelector(s)};
   async function wfetch(path,opts){
     opts=opts||{};
     var ak=(localStorage.getItem('lottery-admin-key')||'').trim();
     if(!ak){var e=new Error('请先填写管理员密钥');e.auth=true;throw e}
-    var r=await fetch(WORKER_BASE+path,{method:opts.method||'GET',headers:{'x-admin-key':ak,'Content-Type':'application/json'},body:opts.body?JSON.stringify(opts.body):undefined,signal:AbortSignal.timeout(15000)});
-    var txt=await r.text(); var j; try{j=JSON.parse(txt)}catch(e){j={message:txt.slice(0,200)}}
-    if(r.status===401||r.status===403){var e2=new Error('管理员密钥无效');e2.auth=true;throw e2}
-    if(!r.ok) throw new Error((j.error&&j.error.message)||j.message||('HTTP '+r.status));
-    return j;
+    var r=await fetch(FN_URL,{method:'POST',headers:{'X-Appwrite-Project':PROJECT_ID,'Content-Type':'application/json'},body:JSON.stringify({path:path,method:opts.method||'GET',body:opts.body?JSON.stringify(opts.body):undefined,async:false,headers:{'x-admin-key':ak}}),signal:AbortSignal.timeout(20000)});
+    var j=null;try{j=await r.json()}catch(e){}
+    var code=Number(j&&j.responseStatusCode)||0;var data={};try{data=JSON.parse((j&&j.responseBody)||'{}')}catch(e){}
+    if(code===401||code===403||(data.error&&data.error.code==='ADMIN_REQUIRED')){var e2=new Error('管理员密钥无效');e2.auth=true;throw e2}
+    if(!r.ok||code>=400||data.ok===false) throw new Error((data.error&&(data.error.message||data.error.code))||('HTTP '+r.status+' / '+code));
+    return data;
   }
   function status(s,err){var el=document.getElementById('lot-status');if(el){el.textContent=s;el.style.color=err?'#c74b4b':'#0b8a4b'}}
   function renderUsers(){
@@ -1372,8 +1373,8 @@ setTimeout(loadRevealConfig,2500);
   async function loadAll(){
     status('正在读取用户/注单（GitHub JSON）…');
     try{
-      var u=await wfetch('/api/admin/users');
-      var b=await wfetch('/api/admin/bets');
+      var u=await wfetch('/admin/users');
+      var b=await wfetch('/admin/bets');
       USERS=(u&&u.users)||[];BETS=(b&&b.bets)||[];
       renderUsers();renderBets();
       status('已加载 · 用户 '+USERS.length+' · 注单 '+BETS.length+(u&&u.total!=null?'（total '+u.total+'）':''));
@@ -1387,14 +1388,14 @@ setTimeout(loadRevealConfig,2500);
     var v=document.getElementById('lot-admin-key').value.trim();if(!v){status('请输入管理员密钥',true);return}
     localStorage.setItem('lottery-admin-key',v);status('管理员密钥已保存（本机）');loadAll();
   };
-  // 统一 Function 调用（execution 走 Appwrite API Key，业务鉴权走 x-admin-key）
+  // 统一管理接口调用（Function execution，业务鉴权仅 x-admin-key）
   document.getElementById('lot-users').onclick=async function(e){
     var b=e.target.closest('[data-lot-row]');if(!b)return;
     var row=USERS.find(function(x){return (x.uid||x.$id)===b.getAttribute('data-lot-row')});if(!row)return;
     var nv; if(b.hasAttribute('data-lot-set')){var input=prompt('设置新积分（演示）', String(row.points||0)); if(input===null)return; nv=parseInt(input,10); if(!isFinite(nv)||nv<0){status('积分为非负整数',true);return}} else nv=Math.max(0,Number(row.points||0)+Number(b.getAttribute('data-lot-delta')));b.disabled=true;
     try{
       var payload = b.hasAttribute('data-lot-set') ? {setTo:nv} : {delta:Number(b.getAttribute('data-lot-delta'))};
-      var res=await wfetch('/api/admin/users/'+encodeURIComponent(row.username)+'/points',{method:'POST',body:payload});
+      var res=await wfetch('/admin/points',{method:'POST',body:Object.assign({username:row.username},payload)});
       row.points=(res&&res.user&&res.user.points!=null)?res.user.points:(res&&res.points!=null?res.points:nv);
       renderUsers();status('积分已更新为 '+row.points+'（管理员接口）');
     }catch(err){status('积分更新失败：'+err.message,true);b.disabled=false}
@@ -1403,12 +1404,10 @@ setTimeout(loadRevealConfig,2500);
   document.getElementById('lot-draw-run').onclick=async function(){
     var i=parseInt(document.getElementById('lot-draw-game').value,10),g=GAMES[i]||GAMES[0],mode=document.getElementById('lot-draw-mode').value,diff=document.getElementById('lot-draw-diff').value,num=parseInt(document.getElementById('lot-draw-num').value,10),out=document.getElementById('lot-draw-result');
     if(mode==='manual'&&(!num||num<1||num>49)){out.innerHTML='<b style="color:#c74b4b">请输入 1-49 的手动特码</b>';return}
-    if(!KEY){out.innerHTML='<b style="color:#c74b4b">请先填写 Appwrite API Key</b>';return}
     var data={gameId:g.id,mode:mode,difficulty:diff,forcedResult:mode==='manual'?String(num):''};
     try{
-      var old=CONFIGS[g.id];
-      if(old)await aw('/tablesdb/'+CFG.db+'/tables/'+CFG.config+'/rows/'+old.$id,{method:'PATCH',body:{data:data}});else await aw('/tablesdb/'+CFG.db+'/tables/'+CFG.config+'/rows',{method:'POST',body:{rowId:'cfg_'+Date.now(),data:data}});
-      CONFIGS[g.id]=Object.assign({},old||{gameId:g.id},data);
+      await wfetch('/draw/'+g.id,{method:'POST',body:{mode:mode,difficulty:diff,forcedResult:mode==='manual'?String(num):''}});
+      CONFIGS[g.id]=Object.assign({},CONFIGS[g.id]||{gameId:g.id},data);
       out.innerHTML='<b>'+g.name+' · 已写入 config 表</b> · '+(mode==='manual'?'手动指定':'随机')+' · 难度 '+(diff==='easy'?'易':diff==='medium'?'中':'难')+'<br><span style="color:#999">'+(mode==='manual'?'特码 '+num+' · ':'')+'前端投注页将读取此配置</span>';
       status('开奖配置已保存');
     }catch(err){out.innerHTML='<b style="color:#c74b4b">保存失败：'+err.message+'</b>'}
