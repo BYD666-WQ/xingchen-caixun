@@ -1324,7 +1324,7 @@ setTimeout(loadRevealConfig,2500);
     }
     panels.forEach(function(p){p.setAttribute('data-cat',catOf(p));p.hidden=true;var d=p.querySelector('details');if(d)d.open=false});
     function activate(cat){tabs.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-cat')===cat)});panels.forEach(function(p){var ok=p.getAttribute('data-cat')===cat;p.hidden=!ok;if(ok){var d=p.querySelector('details');if(d)d.open=true}});window.__adminCat=cat;document.body.setAttribute('data-admin-cat',cat)}
-    tabs.forEach(function(b){b.onclick=function(){activate(b.getAttribute('data-cat'))}});activate('entry');
+    tabs.forEach(function(b){b.onclick=function(){activate(b.getAttribute('data-cat'));if(b.getAttribute('data-cat')==='lottery'&&window.__lotteryLoadAll)window.__lotteryLoadAll()}});activate('entry');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ready);else ready();
 })();
@@ -1438,6 +1438,7 @@ setTimeout(loadRevealConfig,2500);
     }catch(err){out.innerHTML='<b style="color:#c74b4b">保存失败：'+err.message+'</b>'}
   };
   window.__lotteryReal={get users(){return USERS},get bets(){return BETS},get configs(){return CONFIGS},reload:loadAll};
+  window.__lotteryLoadAll=loadAll;
   renderGames();renderDraw();
   if(KEY)document.getElementById('lot-key').value=KEY;
   loadAll();
