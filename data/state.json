@@ -1,19 +1,19 @@
 {
  "ok": true,
  "status": "success",
- "message": "云端 Worker 检查完成，无更新",
- "updated": "2026-11-23 21:30:32",
- "updatedAt": "2026-11-23T21:30:32.190+08:00",
- "lastSuccess": "2026-11-22 21:40:31",
- "newest_seen_ts": "2026326",
+ "message": "云端 Worker 已更新 Macau",
+ "updated": "2026-11-23 21:40:30",
+ "updatedAt": "2026-11-23T21:40:30.577+08:00",
+ "lastSuccess": "2026-11-23 21:40:30",
+ "newest_seen_ts": "2026327",
  "newest_seen_ids": [
-  "Macau:2026326",
+  "Macau:2026327",
   "HongKong:2026123",
   "MacauOld:2026316",
   "Happy8:2026302"
  ],
  "read_count": 2,
- "new_count": 3,
+ "new_count": 4,
  "probe_ok": true,
  "receipt_gap_alert": false,
  "digest_frozen_alert": false,
@@ -22,7 +22,7 @@
   "HongKong"
  ],
  "latest_by_rule": {
-  "Macau": 2026326,
+  "Macau": 2026327,
   "HongKong": 2026123,
   "MacauOld": 2026316,
   "Happy8": 2026302
@@ -31,5 +31,5 @@
  "alerts": [],
  "gaps": [],
  "backfill": false,
- "lastRun": "2026-11-23 21:30:32"
+ "lastRun": "2026-11-23 21:40:30"
 }
