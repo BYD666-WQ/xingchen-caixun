@@ -386,7 +386,15 @@ details.mini>summary::-webkit-details-marker{display:none}
     return out.filter(function(h){var iss=String(h.issue);if(cur&&iss===cur)return false;if(seen[iss])return false;seen[iss]=1;return true}).sort(function(a,b){return (parseInt(a.issue,10)||0)-(parseInt(b.issue,10)||0)})}
   function histHtml(k){var out='';histArr(k).forEach(function(h){var nums=h.nums||[];if(!nums.length){out+='<div class="hr"><i>'+shortIssue(h.issue)+'期</i><span class="hballs" style="color:#999">待开</span><span class="hz"></span></div>';return}var balls='';for(var i=0;i<nums.length;i++){if(i===6)balls+='<span class="hb plus">+</span>';balls+='<span class="hb '+numCls(parseInt(nums[i].c,10))+'" data-c="'+nums[i].c+'">'+nums[i].c+'</span>'}out+='<div class="hr"><i>'+shortIssue(h.issue)+'期</i><span class="hballs">'+balls+'</span><span class="hz">'+nums.map(function(x){return x.z||''}).join('')+'</span></div>'});return out}
   var D={},KEYS=['newhk','newmo','hk'],LABEL={newhk:'新港',newmo:'新澳彩',hk:'香港彩'};
+  function currentMaxIssue(){
+    var d=D.newhk||{};var n=parseInt(d.issue,10)||0;
+    if(n)return n;
+    var mx=0;KEYS.forEach(function(k){var x=D[k]||{};var m=parseInt(x.issue,10)||0;if(m>mx)mx=m;});
+    return mx;
+  }
   function actualResult(issue){
+    var cur=currentMaxIssue();
+    if(cur&&(parseInt(issue,10)||0)>=cur)return null;
     var want=String(issue==null?'':issue).slice(-3);
     for(var i=0;i<KEYS.length;i++){var d=D[KEYS[i]];if(!d)continue;var cs=[{issue:d.issue,nums:d.nums}].concat(d.history||[]);for(var j=0;j<cs.length;j++){var c=cs[j];if(String(c.issue==null?'':c.issue).slice(-3)!==want)continue;var ns=c.nums||[];if(ns.length===7&&ns[6]&&ns[6].z)return {z:ns[6].z,c:ns[6].c}}}
     return null;
@@ -394,8 +402,10 @@ details.mini>summary::-webkit-details-marker{display:none}
   window.__xcActualResult=actualResult;
   window.__xcSpOf=function(r){
     var sp=(r&&r.special)||{};
-    if(!sp.z&&window.__xcActualResult){var ar=window.__xcActualResult(r.issue);if(ar)sp={z:ar.z,c:ar.c}}
-    if(!sp.z&&window.__xcMDR){var ns=window.__xcMDR[String(r.issue==null?'':r.issue).slice(-3)];if(ns&&ns.length===7&&ns[6]&&ns[6].z)sp={z:ns[6].z,c:ns[6].c}}
+    var cur=currentMaxIssue();
+    var historical=cur?(parseInt(r&&r.issue,10)||0)<cur:false;
+    if(historical&&!sp.z&&window.__xcActualResult){var ar=window.__xcActualResult(r.issue);if(ar)sp={z:ar.z,c:ar.c}}
+    if(historical&&!sp.z&&window.__xcMDR){var ns=window.__xcMDR[String(r.issue==null?'':r.issue).slice(-3)];if(ns&&ns.length===7&&ns[6]&&ns[6].z)sp={z:ns[6].z,c:ns[6].c}}
     return sp;
   };
   function buildCards(){
@@ -893,7 +903,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     var run=function(){
     var rows=(w&&w.rows||[]);if(!rows.length)return;
     var html=rows.map(function(r){
-      var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});if(!sp.z){var _ar=window.__xcActualResult?window.__xcActualResult(r.issue):null;if(_ar)sp={z:_ar.z,c:_ar.c}}var wait=!sp.z;
+      var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});var wait=!sp.z;
       var hit=!wait&&(r.list||[]).some(function(x){return x.z===sp.z});
       var res=wait?'待开':(hit?'对':'错');
       var tag=wait?'<span class="wx-tag wait">待开</span>':'<span class="wx-tag '+(hit?'ok':'no')+'">'+res+'</span>';
