@@ -378,8 +378,23 @@ async function putFile(path,obj,msg){"use strict";
   var want=SHA_CACHE[path];
   if (want && cur && want !== cur) { var ce = new Error('CONFLICT ' + path); ce.code = 'CONFLICT'; throw ce; }
   var sha = want || cur;
-  var payload={message:msg,content:content,branch:BRANCH};if(sha)payload.sha=sha;
+  var branches=[];
+  var payload={message:msg,content:content,branch:'gh-pages'};if(sha)payload.sha=sha;
   await api('https://api.github.com/repos/'+REPO+'/contents/'+path,{method:'PUT',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'}});
+  branches.push({branch:'gh-pages',ok:true});
+  // 镜像 main：读 main 独立 sha，再写同一内容
+  try{
+    var msha=null;
+    try{var mj=await api('https://api.github.com/repos/'+REPO+'/contents/'+path+'?ref=main');msha=mj.sha}catch(me){if(me.status!==404)throw me}
+    var mp={message:msg,content:content,branch:'main'};if(msha)mp.sha=msha;
+    await api('https://api.github.com/repos/'+REPO+'/contents/'+path,{method:'PUT',body:JSON.stringify(mp),headers:{'Content-Type':'application/json'}});
+    branches.push({branch:'main',ok:true});
+  }catch(e2){
+    branches.push({branch:'main',ok:false,error:String(e2&&e2.message||e2)});
+    var er=new Error('已保存到 gh-pages，main 镜像失败：'+String(e2&&e2.message||e2));
+    er.branches=branches;er.mirrorFailed=true;throw er;
+  }
+  return {branches:branches};
 }
 async function wfetch(path, opt) {
   opt = opt || {}; opt.credentials = 'include';
@@ -1593,7 +1608,7 @@ setTimeout(loadRevealConfig,2500);
       await fetch(api,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},headers),body:JSON.stringify(body)});
     }catch(e){try{console.warn('[admin-log]',e.message)}catch(x){}}
   }
-  document.addEventListener('click',function(e){try{var id=e.target&&e.target.id;var map={'btn-save':'开奖录入','da-save':'资料录入','btn-save-reveal':'开奖节奏','btn-save-times':'开奖时段','lot-win-save':'开奖时段'};if(map[id]&&id!=='btn-save-bar'){setTimeout(function(){appendAdminLog({at:new Date().toISOString(),bj:new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}),button:'board',board:map[id],fields:[],changes:[],targetIssue:null,result:'ok',error:''})},1200)}}catch(x){}},false);
+  document.addEventListener('click',function(e){try{var id=e.target&&e.target.id;var map={'btn-save':'开奖录入','da-save':'资料录入','btn-save-reveal':'开奖节奏','btn-save-times':'开奖时段','lot-win-save':'开奖时段'};if(map[id]&&id!=='btn-save-bar'){setTimeout(function(){appendAdminLog({at:new Date().toISOString(),bj:new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}),button:'board',board:map[id],branches:['gh-pages','main'],fields:[],changes:[],targetIssue:null,result:'ok',error:''})},1200)}}catch(x){}},false);
   var _origSaveBar=document.getElementById('btn-save-bar');
   _origSaveBar.addEventListener('click',function(e){
     var timeDirty=false;var s=document.getElementById('lot-win-start'),en=document.getElementById('lot-win-end'),on=document.getElementById('lot-win-on');
@@ -1613,7 +1628,7 @@ setTimeout(loadRevealConfig,2500);
       document.getElementById('save-state').textContent='成功 '+ok+' 项 / 失败 '+fail+' 项'+(errs.length?'（'+errs.slice(0,2).join('；')+'）':'');
       if(!fail){ODDS_DIRTY={};TIME_DIRTY=false;DIFF_DIRTY={};PATTERN_DIRTY={};HOT_DIRTY=false;}
     }
-    (async function(){ var okMain=true;if(window.__adminMainDirty){try{await save();}catch(x){okMain=false;}} await lotSave(); await appendAdminLog({at:new Date().toISOString(),bj:new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}),button:'global',board:'全局',fields:Object.keys(ODDS_DIRTY).concat(Object.keys(DIFF_DIRTY)).concat(Object.keys(PATTERN_DIRTY)).concat(HOT_DIRTY?['hot']:[]).concat(TIME_DIRTY?['window']:[]),changes:[],targetIssue:null,result:okMain?'ok':'fail',error:okMain?'':'主表单保存失败'}); })();
+    (async function(){ var okMain=true;if(window.__adminMainDirty){try{await save();}catch(x){okMain=false;}} await lotSave(); await appendAdminLog({at:new Date().toISOString(),bj:new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}),button:'global',board:'全局',branches:['gh-pages','main'],fields:Object.keys(ODDS_DIRTY).concat(Object.keys(DIFF_DIRTY)).concat(Object.keys(PATTERN_DIRTY)).concat(HOT_DIRTY?['hot']:[]).concat(TIME_DIRTY?['window']:[]),changes:[],targetIssue:null,result:okMain?'ok':'fail',error:okMain?'':'主表单保存失败'}); })();
   },true);
   loadAll();
 })();
