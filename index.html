@@ -688,8 +688,8 @@ details.mini>summary::-webkit-details-marker{display:none}
   window.__vfState=function(){return VF?{issue:VF.issue,phase:VF.phase,revealed:VF.revealed,elapsed:Date.now()-VF.vf,played:VF.played}:null};
   /* ===== 新澳/香港：到点灰球 + 到达/增量揭晓（与时间线共用 vfTimeline） ===== */
   var XR={newmo:null,hk:null};
-  function xrLS(k){try{return JSON.parse(localStorage.getItem('xc-xr-'+k+':'+(window.__mdUpdated||''))||'null')}catch(e){return null}}
-  function xrSave(k,st){try{localStorage.setItem('xc-xr-'+k+':'+(window.__mdUpdated||''),JSON.stringify({issue:String(st.issue),start:st.start,phase:st.phase,nums:st.nums,mode:st.mode,revealed:st.revealed}))}catch(e){}}
+  function xrLS(k){try{return JSON.parse(localStorage.getItem('xc-xr-'+k)||'null')}catch(e){return null}}
+  function xrSave(k,st){try{localStorage.setItem('xc-xr-'+k,JSON.stringify({issue:String(st.issue),start:st.start,phase:st.phase,nums:st.nums,mode:st.mode,revealed:st.revealed}))}catch(e){}}
   function xrDue(k){var hm=TIME_TABLE[kindOf(k)],days=DAYS[kindOf(k)];if(!hm||!days||days.indexOf(new Date().getDay())<0)return null;var q=String(hm).split(':');var n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate(),parseInt(q[0],10)||0,parseInt(q[1],10)||0,0,0)}
   function xrBalls(nums,count,hl){var h='';for(var i=0;i<6;i++)h+=vfTile(i,nums,count,hl);h+='<span class="plus">+</span>';return h+vfTile(6,nums,count,hl)}
   function xrRender(k,count,hl,ptext){
@@ -1227,5 +1227,18 @@ section.card{border-radius:14px!important;border:1px solid #E0B94A!important;bor
     b.addEventListener('click',run);
     b.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();run()}});
   });
+})();</script>
+<script>(function(){
+  var BASE='https://xingchen-live.xingchen-lottery.workers.dev';
+  var scene=(new URLSearchParams(location.search).get('livetest')==='1')?'test':'prod';
+  var q=scene==='test'?'?scene=test':'';
+  var es=null,timer=null,last='';
+  function refresh(){try{if(window.__xcRefreshData)window.__xcRefreshData();else if(typeof window.load==='function')window.load();else if(window.__xcRefresh)window.__xcRefresh();else location.reload()}catch(e){location.reload()}}
+  function onDraw(ev){try{var d=JSON.parse(ev.data||'{}');if(!d||!d.issue)return;if(last&&String(d.issue)===last)return;last=String(d.issue);refresh()}catch(e){}}
+  function fallback(){if(timer)return;timer=setInterval(function(){fetch(BASE+'/latest'+q,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(d&&d.issue&&(!last||String(d.issue)!==last)){last=String(d.issue);refresh()}}).catch(function(){})},10000)}
+  function connect(){if(document.hidden||es)return;try{es=new EventSource(BASE+'/sse'+q);es.addEventListener('draw',onDraw);es.onerror=function(){try{es.close()}catch(e){}es=null;fallback()}}catch(e){fallback()}}
+  function stop(){if(es){try{es.close()}catch(e){}es=null}if(timer){clearInterval(timer);timer=null}}
+  document.addEventListener('visibilitychange',function(){if(document.hidden)stop();else connect()});
+  connect();setTimeout(connect,1500);
 })();</script>
 </body></html>
