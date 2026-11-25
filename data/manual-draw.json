@@ -1,10 +1,16 @@
 {
  "name": "新香港",
- "issue": 330,
  "drawTime": "每天 21:34",
  "dailyTime": "21:34",
  "status": "sample",
- "nums": [],
+ "updated": "2026-11-25T13:52:10.757Z",
+ "current": {
+  "issue": 330,
+  "nums": [],
+  "numsEnc": "",
+  "visibleFrom": "2026-11-25T13:52:10.757Z",
+  "publishedAt": null
+ },
  "history": [
   {
    "issue": 329,
@@ -98,7 +104,9 @@
      "color": "绿",
      "wuxing": "火"
     }
-   ]
+   ],
+   "visibleFrom": "2026-11-24T13:34:00.000Z",
+   "publishedAt": "2026-11-24T13:34:01.656Z"
   },
   {
    "issue": 327,
@@ -1276,7 +1284,5 @@
    ]
   }
  ],
- "updated": "2026-11-25T13:48:56.878Z",
- "visibleFrom": "2026-11-25T13:48:56.878Z",
- "publishedAt": "2026-11-25T13:48:56.878Z"
+ "publishedAt": "2026-11-25T13:52:10.757Z"
 }
