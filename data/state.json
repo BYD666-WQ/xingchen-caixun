@@ -1,35 +1,7 @@
 {
- "ok": true,
- "status": "success",
- "message": "云端 Worker 检查完成，无更新",
- "updated": "2026-11-25 23:40:31",
- "updatedAt": "2026-11-25T23:40:31.742+08:00",
- "lastSuccess": "2026-11-25 21:40:30",
- "newest_seen_ts": "2026329",
- "newest_seen_ids": [
-  "Macau:2026329",
-  "HongKong:2026123",
-  "MacauOld:2026316",
-  "Happy8:2026302"
- ],
- "read_count": 2,
- "new_count": 6,
- "probe_ok": true,
- "receipt_gap_alert": false,
- "digest_frozen_alert": false,
- "liveRules": [
-  "Macau",
-  "HongKong"
- ],
- "latest_by_rule": {
-  "Macau": 2026329,
-  "HongKong": 2026123,
-  "MacauOld": 2026316,
-  "Happy8": 2026302
- },
- "error": "",
- "alerts": [],
- "gaps": [],
- "backfill": false,
- "lastRun": "2026-11-25 23:40:31"
+ "ok": false,
+ "status": "error",
+ "error": "GitHub write data/state.json HTTP 500 ",
+ "updated": "2026-11-25 23:50:30",
+ "updatedAt": "2026-11-25T23:50:30.859+08:00"
 }
