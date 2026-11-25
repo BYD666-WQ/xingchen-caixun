@@ -1391,7 +1391,8 @@ setTimeout(loadRevealConfig,2500);
   }
   function renderGames(){
     var box=document.getElementById('lot-games');if(!box)return;
-    box.innerHTML=GAMES.map(function(g,i){return '<div class="lot-game"><b>'+g.name+'</b><div class="lot-controls"><label><input type="checkbox" data-lot-game="'+i+'" '+(g.enabled?'checked':'')+'>启用</label><select data-lot-period="'+i+'">'+['30秒','1分钟','5分钟','10分钟','每日'].map(function(p){return '<option '+(p===g.period?'selected':'')+'>'+p+'</option>'}).join('')+'</select><select data-lot-source="'+i+'">'+['主站','模拟','未接入'].map(function(s){return '<option '+(s===g.source?'selected':'')+'>'+s+'</option>'}).join('')+'</select></div></div>'}).join('');
+    var diffOpts=[['easy','简单(易中)'],['mid','中等(随机)'],['hard','困难(大注难中)'],['brutal','极难(大注几乎全杀)']];
+    box.innerHTML=GAMES.map(function(g,i){var dv='mid';try{dv=localStorage.getItem('lotDiff:'+g.id)||'mid'}catch(e){}return '<div class="lot-game"><b>'+g.name+'</b><div class="lot-controls"><label><input type="checkbox" data-lot-game="'+i+'" '+(g.enabled?'checked':'')+'>启用</label><select data-lot-period="'+i+'">'+['30秒','1分钟','5分钟','10分钟','每日'].map(function(p){return '<option '+(p===g.period?'selected':'')+'>'+p+'</option>'}).join('')+'</select><select data-lot-source="'+i+'">'+['主站','模拟','未接入'].map(function(s){return '<option '+(s===g.source?'selected':'')+'>'+s+'</option>'}).join('')+'</select><select data-lot-diff="'+g.id+'">'+diffOpts.map(function(o){return '<option value="'+o[0]+'" '+(o[0]===dv?'selected':'')+'>'+o[1]+'</option>'}).join('')+'</select></div><small style="display:block;font-size:10px;color:#888;margin-top:2px">演示站点配置，影响开奖结果分布</small></div>'}).join('');
   }
   function renderDraw(){var sel=document.getElementById('lot-draw-game');if(sel)sel.innerHTML=GAMES.map(function(g,i){return '<option value="'+i+'">'+g.name+'</option>'}).join('')}
   async function loadAll(){
@@ -1548,7 +1549,7 @@ setTimeout(loadRevealConfig,2500);
   window.__lotteryLoadAll=loadAll;
   function initManualDraw(){var sel=document.getElementById('lot-man-game');if(!sel)return;sel.innerHTML=GAMES.map(function(g){return '<option value="'+g.id+'">'+g.name+'</option>'}).join('');MAN_GAME=sel.value;manLoad();}
   initManualDraw();renderGames();renderDraw();
-  var ODDS_DIRTY = {}; var TIME_DIRTY = false;
+  var ODDS_DIRTY = {}; var TIME_DIRTY = false; var DIFF_DIRTY = {};
   function oddsLabel(k){return ({special:'特码',regular:'正码',zhengte:'正特',tail:'平特尾',colorWave:'色波',oneZodiac:'一肖/平特肖',horse:'马',specialZodiac:'特肖',flatZodiac:'平特肖',triAll:'快三全骰',triExact:'快三围骰'})[k]||k;}
   function collectOdds(o,prefix,out){Object.keys(o||{}).forEach(function(k){var v=o[k];if(v&&typeof v==='object'){collectOdds(v,prefix?prefix+'.'+k:k,out);}else if(k!=='colorWaveByGame'){out.push({path:prefix?prefix+'.'+k:k,val:v,label:oddsLabel(prefix?prefix+'.'+k:k)});}});}
   async function loadOdds(){var body=document.getElementById('lot-odds-body');if(!body)return;body.textContent='读取中…';
@@ -1559,12 +1560,12 @@ setTimeout(loadRevealConfig,2500);
     }catch(e){body.textContent='读取失败：'+e.message}}
   document.getElementById('lot-odds-reload').onclick=loadOdds;loadOdds();
   document.addEventListener('input',function(e){var t=e.target;if(t&&t.getAttribute&&t.getAttribute('data-odds-path')){ODDS_DIRTY[t.getAttribute('data-odds-path')]=t.value;}});
-  document.addEventListener('change',function(e){var t=e.target;if(t&&t.getAttribute&&t.getAttribute('data-odds-path')){ODDS_DIRTY[t.getAttribute('data-odds-path')]=t.value;}
+  document.addEventListener('change',function(e){var t=e.target;if(t&&t.getAttribute&&t.getAttribute('data-lot-diff')){DIFF_DIRTY[t.getAttribute('data-lot-diff')]=t.value;try{localStorage.setItem('lotDiff:'+t.getAttribute('data-lot-diff'),t.value)}catch(x){}}if(t&&t.getAttribute&&t.getAttribute('data-odds-path')){ODDS_DIRTY[t.getAttribute('data-odds-path')]=t.value;}
     if(t&&/^(lot-win-start|lot-win-end|lot-win-on)$/.test(t.id))TIME_DIRTY=true;});
   var _origSaveBar=document.getElementById('btn-save-bar');
   _origSaveBar.addEventListener('click',function(e){
     var timeDirty=false;var s=document.getElementById('lot-win-start'),en=document.getElementById('lot-win-end'),on=document.getElementById('lot-win-on');
-    var has=Object.keys(ODDS_DIRTY).length>0||TIME_DIRTY;
+    var has=Object.keys(ODDS_DIRTY).length>0||TIME_DIRTY||Object.keys(DIFF_DIRTY).length>0;
     if(!has){e.stopImmediatePropagation();e.preventDefault();document.getElementById('save-state').textContent='没有需要保存的改动';return;}
     e.stopImmediatePropagation();e.preventDefault();
     (async function(){var ok=0,fail=0,errs=[];function oddsPatch(path,val){var parts=path.split('.');var root={};if(path.indexOf('game:')===0){var pp=path.split(':');var gid=pp[1],rest=pp.slice(2).join('.').split('.');var g={};var cur=g;for(var i=0;i<rest.length-1;i++){cur[rest[i]]=cur[rest[i]]||{};cur=cur[rest[i]];}cur[rest[rest.length-1]]=Number(val);g={};g[rest[0]]=undefined;var obj={};var c=obj;for(var j=0;j<rest.length-1;j++){c[rest[j]]=c[rest[j]]||{};c=c[rest[j]];}c[rest[rest.length-1]]=Number(val);return {colorWaveByGame:{}};}
@@ -1573,8 +1574,9 @@ setTimeout(loadRevealConfig,2500);
         c[last]=Number(val);return out;}
       for(var path in ODDS_DIRTY){try{var body={oddsByPlay:oddsPatch(path,ODDS_DIRTY[path])};if(path.indexOf('game:')===0){var pp=path.split(':');var gid=pp[1],rest=pp.slice(2).join('.');var gparts=rest.split('.');var leaf=gparts.pop();var gobj={};var gc=gobj;for(var i=0;i<gparts.length;i++){gc[gparts[i]]=gc[gparts[i]]||{};gc=gc[gparts[i]];}gc[leaf]=Number(ODDS_DIRTY[path]);body={oddsByPlay:{colorWaveByGame:{}}};body.oddsByPlay.colorWaveByGame[gid]=gobj;}await wfetch('/admin/odds',{method:'POST',body:body});ok++;}catch(x){fail++;errs.push(path+'：'+x.message)}}
       if(TIME_DIRTY){try{await wfetch('/admin/config',{method:'POST',body:{window:{start:document.getElementById('lot-win-start').value,end:document.getElementById('lot-win-end').value}}});ok++;}catch(x){fail++;errs.push('开奖时段：'+x.message)}}
+      for(var dg in DIFF_DIRTY){try{await wfetch('/admin/config',{method:'POST',body:{gameId:dg,difficulty:DIFF_DIRTY[dg]}});ok++;}catch(x){fail++;errs.push('档位 '+dg+'：'+x.message)}}
       document.getElementById('save-state').textContent='成功 '+ok+' 项 / 失败 '+fail+' 项'+(errs.length?'（'+errs.slice(0,2).join('；')+'）':'');
-      if(!fail){ODDS_DIRTY={};TIME_DIRTY=false;}
+      if(!fail){ODDS_DIRTY={};TIME_DIRTY=false;DIFF_DIRTY={};}
     })();
   },true);
   loadAll();
