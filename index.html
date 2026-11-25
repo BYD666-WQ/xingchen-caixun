@@ -1228,17 +1228,23 @@ section.card{border-radius:14px!important;border:1px solid #E0B94A!important;bor
     b.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();run()}});
   });
 })();</script>
+<script src="assets/appwrite.js"></script>
 <script>(function(){
-  var BASE='https://xingchen-live.xingchen-lottery.workers.dev';
-  var scene=(new URLSearchParams(location.search).get('livetest')==='1')?'test':'prod';
-  var q=scene==='test'?'?scene=test':'';
-  var es=null,timer=null,last='',primed=false;
+  var CFG={endpoint:'https://sgp.cloud.appwrite.io/v1',project:'6aff4c2f0016ee43abad',database:'lottery',collection:'live_state',prodDoc:'state',testDoc:'state_test',fn:'https://sgp.cloud.appwrite.io/v1/functions/lottery-api/executions'};
+  var test=new URLSearchParams(location.search).get('livetest')==='1';
+  var docId=test?CFG.testDoc:CFG.prodDoc;
+  var client=null,unsub=null,last='',primed=false,timer=null;
   function refresh(){try{if(window.__xcRefreshData)window.__xcRefreshData();else if(typeof window.load==='function')window.load();else if(window.__xcRefresh)window.__xcRefresh();else location.reload()}catch(e){location.reload()}}
-  function onDraw(ev){try{var d=JSON.parse(ev.data||'{}');if(!d||!d.issue)return;if(last&&String(d.issue)===last)return;last=String(d.issue);refresh()}catch(e){}}
-  function fallback(){if(timer)return;timer=setInterval(function(){fetch(BASE+'/latest'+q,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){if(d&&d.issue){if(!primed){primed=true;last=String(d.issue);return;}if(String(d.issue)!==last){last=String(d.issue);refresh()}}}).catch(function(){})},10000)}
-  function connect(){if(document.hidden||es)return;try{es=new EventSource(BASE+'/sse'+q);es.addEventListener('draw',onDraw);es.onerror=function(){try{es.close()}catch(e){}es=null;fallback()}}catch(e){fallback()}}
-  function stop(){if(es){try{es.close()}catch(e){}es=null}if(timer){clearInterval(timer);timer=null}}
-  document.addEventListener('visibilitychange',function(){if(document.hidden)stop();else connect()});
+  function onDoc(p){try{var d=p&&(p.payload||p);if(!d||!d.issue)return;if(!primed){primed=true;last=String(d.issue);return;}if(String(d.issue)===last)return;last=String(d.issue);refresh()}catch(e){}}
+  function connect(){
+    if(document.hidden||client)return;
+    if(!window.Appwrite){return;}
+    try{client=new window.Appwrite.Client().setEndpoint(CFG.endpoint).setProject(CFG.project);unsub=client.subscribe('databases.'+CFG.database+'.collections.'+CFG.collection+'.documents.'+docId,onDoc);}catch(e){client=null}
+  }
+  function disconnect(){try{if(unsub)unsub()}catch(e){}try{if(client)client.disconnect()}catch(e){}unsub=null;client=null}
+  document.addEventListener('visibilitychange',function(){if(document.hidden)disconnect();else connect()});
   connect();setTimeout(connect,1500);
+  // 兜底：30s 拉一次（后端接口未就绪时静默失败）
+  timer=setInterval(function(){try{fetch(CFG.fn,{method:'POST',headers:{'X-Appwrite-Project':CFG.project,'Content-Type':'application/json'},body:JSON.stringify({path:'/live/latest?doc='+docId,method:'GET',async:false})}).then(function(r){return r.json()}).then(function(j){var d=null;try{d=JSON.parse(j.responseBody||'null')}catch(e){}if(d&&d.issue){if(!primed){primed=true;last=String(d.issue);return;}if(String(d.issue)!==last){last=String(d.issue);refresh()}}}).catch(function(){})}catch(e){}},30000);
 })();</script>
 </body></html>

@@ -433,7 +433,7 @@ function fillTimesUI(){
     renderDayChecks(k,dt[k].days);
   });
 }
-async function publishLive(issue,nums){try{var k=localStorage.getItem('xc-live-key')||'';if(!k){console.warn('[live] no key');return;}var r=await fetch('https://xingchen-live.xingchen-lottery.workers.dev/publish',{method:'POST',headers:{'content-type':'application/json','x-live-key':k},body:JSON.stringify({issue:issue,nums:(nums||[]).slice(0,7),site:'newhk',mode:'live'})});if(!r.ok)console.warn('[live] publish '+r.status);}catch(e){console.warn('[live] '+e.message)}}
+async function publishLive(issue,nums){try{var r=await wfetch('/live/publish',{method:'POST',body:{issue:issue,nums:(nums||[]).slice(0,7),scene:'prod'}});if(r&&r.ok===false)console.warn('[live] publish fail');}catch(e){console.warn('[live] '+e.message)}}
 function autoIssueInfo(){
   var cur=draw&&draw.issue?parseInt(draw.issue,10):1;
   var published=!!(draw&&draw.publishedAt);
