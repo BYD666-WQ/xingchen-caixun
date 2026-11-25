@@ -135,6 +135,11 @@ body{padding-bottom:76px}
   <div class="lot-man-row"><button id="lot-plan-add" type="button">＋ 加期号</button><span id="lot-plan-hint" style="font-size:11px;color:#888"></span></div>
   <div id="lot-plan-list"></div>
 </div>
+<h3>玩法赔率 <span class="lot-sub">改完进 dirty，统一「保存并发布」</span></h3>
+<div class="lot-odds" id="lot-odds">
+  <div class="lot-man-row"><select id="lot-odds-game"></select><button id="lot-odds-reload" type="button">刷新赔率</button><span id="lot-odds-state" style="font-size:11px;color:#888"></span></div>
+  <div id="lot-odds-body" class="lot-odds-body">读取中…</div>
+</div>
 <div class="lot-window"><b>开奖时段</b><input id="lot-win-start" type="time" value="03:00"><span>至</span><input id="lot-win-end" type="time" value="23:59"><label style="display:inline-flex;gap:4px;align-items:center"><input id="lot-win-on" type="checkbox" checked>启用</label><button id="lot-win-save" type="button">保存时段</button><span id="lot-win-status" style="font-size:11px;color:#888"></span></div>
 <h3>注单列表 <span class="lot-sub">来自 bets 表</span></h3>
 <div class="lot-scroll"><table class="lot-table"><thead><tr><th>用户名</th><th>彩种</th><th>期号</th><th>选号</th><th>注额</th><th>状态</th></tr></thead><tbody id="lot-bets"></tbody></table></div>
@@ -1543,6 +1548,35 @@ setTimeout(loadRevealConfig,2500);
   window.__lotteryLoadAll=loadAll;
   function initManualDraw(){var sel=document.getElementById('lot-man-game');if(!sel)return;sel.innerHTML=GAMES.map(function(g){return '<option value="'+g.id+'">'+g.name+'</option>'}).join('');MAN_GAME=sel.value;manLoad();}
   initManualDraw();renderGames();renderDraw();
+  var ODDS_DIRTY = {}; var TIME_DIRTY = false;
+  function oddsLabel(k){return ({special:'特码',regular:'正码',zhengte:'正特',tail:'平特尾',colorWave:'色波',oneZodiac:'一肖/平特肖',horse:'马',specialZodiac:'特肖',flatZodiac:'平特肖',triAll:'快三全骰',triExact:'快三围骰'})[k]||k;}
+  function collectOdds(o,prefix,out){Object.keys(o||{}).forEach(function(k){var v=o[k];if(v&&typeof v==='object'){collectOdds(v,prefix?prefix+'.'+k:k,out);}else if(k!=='colorWaveByGame'){out.push({path:prefix?prefix+'.'+k:k,val:v,label:oddsLabel(prefix?prefix+'.'+k:k)});}});}
+  async function loadOdds(){var body=document.getElementById('lot-odds-body');if(!body)return;body.textContent='读取中…';
+    try{var g=await wfetch('/games');var rows=[];collectOdds(g.oddsByPlay||{},'',rows);var by=(g.oddsByPlay&&g.oddsByPlay.colorWaveByGame)||{};Object.keys(by).forEach(function(gid){Object.keys(by[gid]||{}).forEach(function(k){rows.push({path:'game:'+gid+':colorWave.'+k,val:by[gid][k],label:gid+' 色波'+k});});});
+      if(!rows.length){body.textContent='暂无赔率数据';return;}
+      body.innerHTML=rows.map(function(r){return '<label class="lot-odds-row"><span>'+r.label+'</span><input type="number" step="0.01" data-odds-path="'+r.path+'" value="'+r.val+'"></label>';}).join('');
+      document.getElementById('lot-odds-state').textContent='共 '+rows.length+' 项';
+    }catch(e){body.textContent='读取失败：'+e.message}}
+  document.getElementById('lot-odds-reload').onclick=loadOdds;loadOdds();
+  document.addEventListener('input',function(e){var t=e.target;if(t&&t.getAttribute&&t.getAttribute('data-odds-path')){ODDS_DIRTY[t.getAttribute('data-odds-path')]=t.value;}});
+  document.addEventListener('change',function(e){var t=e.target;if(t&&t.getAttribute&&t.getAttribute('data-odds-path')){ODDS_DIRTY[t.getAttribute('data-odds-path')]=t.value;}
+    if(t&&/^(lot-win-start|lot-win-end|lot-win-on)$/.test(t.id))TIME_DIRTY=true;});
+  var _origSaveBar=document.getElementById('btn-save-bar');
+  _origSaveBar.addEventListener('click',function(e){
+    var timeDirty=false;var s=document.getElementById('lot-win-start'),en=document.getElementById('lot-win-end'),on=document.getElementById('lot-win-on');
+    var has=Object.keys(ODDS_DIRTY).length>0||TIME_DIRTY;
+    if(!has){e.stopImmediatePropagation();e.preventDefault();document.getElementById('save-state').textContent='没有需要保存的改动';return;}
+    e.stopImmediatePropagation();e.preventDefault();
+    (async function(){var ok=0,fail=0,errs=[];function oddsPatch(path,val){var parts=path.split('.');var root={};if(path.indexOf('game:')===0){var pp=path.split(':');var gid=pp[1],rest=pp.slice(2).join('.').split('.');var g={};var cur=g;for(var i=0;i<rest.length-1;i++){cur[rest[i]]=cur[rest[i]]||{};cur=cur[rest[i]];}cur[rest[rest.length-1]]=Number(val);g={};g[rest[0]]=undefined;var obj={};var c=obj;for(var j=0;j<rest.length-1;j++){c[rest[j]]=c[rest[j]]||{};c=c[rest[j]];}c[rest[rest.length-1]]=Number(val);return {colorWaveByGame:{}};}
+        var out={};var c=out;for(var i=0;i<parts.length-1;i++){var k=parts[i];var nk=(k==='tail'&&/^\d$/.test(parts[i+1]))?'tail':k;c[nk]=c[nk]||{};c=c[nk];if(nk==='tail'){c['0']=c['0']||{};}}
+        var last=parts[parts.length-1];if(parts[0]==='tail'){out.tail=out.tail||{};out.tail[last]=Number(val);return out;}
+        c[last]=Number(val);return out;}
+      for(var path in ODDS_DIRTY){try{var body={oddsByPlay:oddsPatch(path,ODDS_DIRTY[path])};if(path.indexOf('game:')===0){var pp=path.split(':');var gid=pp[1],rest=pp.slice(2).join('.');var gparts=rest.split('.');var leaf=gparts.pop();var gobj={};var gc=gobj;for(var i=0;i<gparts.length;i++){gc[gparts[i]]=gc[gparts[i]]||{};gc=gc[gparts[i]];}gc[leaf]=Number(ODDS_DIRTY[path]);body={oddsByPlay:{colorWaveByGame:{}}};body.oddsByPlay.colorWaveByGame[gid]=gobj;}await wfetch('/admin/odds',{method:'POST',body:body});ok++;}catch(x){fail++;errs.push(path+'：'+x.message)}}
+      if(TIME_DIRTY){try{await wfetch('/admin/config',{method:'POST',body:{window:{start:document.getElementById('lot-win-start').value,end:document.getElementById('lot-win-end').value}}});ok++;}catch(x){fail++;errs.push('开奖时段：'+x.message)}}
+      document.getElementById('save-state').textContent='成功 '+ok+' 项 / 失败 '+fail+' 项'+(errs.length?'（'+errs.slice(0,2).join('；')+'）':'');
+      if(!fail){ODDS_DIRTY={};TIME_DIRTY=false;}
+    })();
+  },true);
   loadAll();
 })();
 </script>
