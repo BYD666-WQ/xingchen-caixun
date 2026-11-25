@@ -2,8 +2,8 @@
  "ok": true,
  "status": "success",
  "message": "云端 Worker 检查完成，无更新",
- "updated": "2026-11-25 16:50:31",
- "updatedAt": "2026-11-25T16:50:31.411+08:00",
+ "updated": "2026-11-25 17:00:31",
+ "updatedAt": "2026-11-25T17:00:31.672+08:00",
  "lastSuccess": "2026-11-24 21:40:30",
  "newest_seen_ts": "2026328",
  "newest_seen_ids": [
@@ -31,5 +31,5 @@
  "alerts": [],
  "gaps": [],
  "backfill": false,
- "lastRun": "2026-11-25 16:50:31"
+ "lastRun": "2026-11-25 17:00:31"
 }
