@@ -1,25 +1,7 @@
 {
- "ok": true,
- "status": "success",
- "error": "",
- "updated": "2026-11-26 00:00:30",
- "updatedAt": "2026-11-26T00:00:30.455+08:00",
- "message": "云端 Worker 检查完成，无更新",
- "lastSuccess": null,
- "latest_by_rule": {
-  "Macau": 2026329,
-  "HongKong": 2026123,
-  "MacauOld": 2026316,
-  "Happy8": 2026302
- },
- "read_count": 2,
- "liveRules": [
-  "Macau",
-  "HongKong"
- ],
- "alerts": [],
- "gaps": [],
- "receipt_gap_alert": false,
- "backfill": false,
- "lastRun": "2026-11-26 00:00:30"
+ "ok": false,
+ "status": "error",
+ "error": "GitHub write data/auto-log.jsonl HTTP 500 ",
+ "updated": "2026-11-26 00:00:35",
+ "updatedAt": "2026-11-26T00:00:35.456+08:00"
 }
