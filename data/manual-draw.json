@@ -3,15 +3,62 @@
  "drawTime": "每天 21:34",
  "dailyTime": "21:34",
  "status": "sample",
- "updated": "2026-11-24T13:20:59.044Z",
+ "updated": "2026-11-25T13:52:10.757Z",
  "current": {
-  "issue": 329,
+  "issue": 330,
   "nums": [],
   "numsEnc": "",
-  "visibleFrom": "2026-11-25T21:34:00+08:00",
+  "visibleFrom": "2026-11-25T13:52:10.757Z",
   "publishedAt": null
  },
  "history": [
+  {
+   "issue": 329,
+   "nums": [
+    {
+     "c": "44",
+     "z": "猪",
+     "color": "绿",
+     "wuxing": "水"
+    },
+    {
+     "c": "06",
+     "z": "牛",
+     "color": "绿",
+     "wuxing": "土"
+    },
+    {
+     "c": "25",
+     "z": "马",
+     "color": "蓝",
+     "wuxing": "木"
+    },
+    {
+     "c": "10",
+     "z": "鸡",
+     "color": "蓝",
+     "wuxing": "火"
+    },
+    {
+     "c": "42",
+     "z": "牛",
+     "color": "蓝",
+     "wuxing": "金"
+    },
+    {
+     "c": "36",
+     "z": "羊",
+     "color": "蓝",
+     "wuxing": "土"
+    },
+    {
+     "c": "35",
+     "z": "猴",
+     "color": "红",
+     "wuxing": "金"
+    }
+   ]
+  },
   {
    "issue": 328,
    "nums": [
@@ -1237,5 +1284,5 @@
    ]
   }
  ],
- "publishedAt": null
+ "publishedAt": "2026-11-25T13:52:10.757Z"
 }
