@@ -145,6 +145,14 @@ body{padding-bottom:76px}
 <div class="lot-scroll"><table class="lot-table"><thead><tr><th>用户名</th><th>彩种</th><th>期号</th><th>选号</th><th>注额</th><th>状态</th></tr></thead><tbody id="lot-bets"></tbody></table></div>
 <h3>彩种开关 <span class="lot-sub">启用 / 周期 / 数据源</span></h3>
 <div class="lot-games" id="lot-games"></div>
+<h3>用户连赢管控 <span class="lot-sub">演示配置 · 只影响开奖分布</span></h3>
+<div class="lot-hotctl" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px;border:1px solid #eee;border-radius:6px;background:#fafafa">
+  <label style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="lot-hot-on">开启</label>
+  <label>连赢阈值 <input type="number" id="lot-hot-th" value="3" style="width:60px"></label>
+  <label>hotMul <input type="number" step="0.1" id="lot-hot-mul" value="2" style="width:60px"></label>
+  <label>24h盈利阈值 <input type="number" id="lot-hot-profit" value="300" style="width:80px"></label>
+  <small style="flex-basis:100%;font-size:10px;color:#888">演示站点配置，影响开奖分布</small>
+</div>
 <p class="lot-api">管理接口：<code>GET /api/admin/users</code> · <code>GET /api/admin/bets</code> · <code>POST /api/admin/users/{username}/points</code></p>
 </div></details></div>
 <div id="guide" style="background:#e8f7ef;border:1px solid #b9e3cd;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:13px;line-height:1.75;color:#0b6b3d">
@@ -1549,7 +1557,8 @@ setTimeout(loadRevealConfig,2500);
   window.__lotteryLoadAll=loadAll;
   function initManualDraw(){var sel=document.getElementById('lot-man-game');if(!sel)return;sel.innerHTML=GAMES.map(function(g){return '<option value="'+g.id+'">'+g.name+'</option>'}).join('');MAN_GAME=sel.value;manLoad();}
   initManualDraw();renderGames();renderDraw();
-  var ODDS_DIRTY = {}; var TIME_DIRTY = false; var DIFF_DIRTY = {}; var PATTERN_DIRTY = {};
+  try{var _hot=JSON.parse(localStorage.getItem('lotHotCtl')||'null');if(_hot){document.getElementById('lot-hot-on').checked=!!_hot.enabled;document.getElementById('lot-hot-th').value=_hot.threshold||3;document.getElementById('lot-hot-mul').value=_hot.hotMul||2;document.getElementById('lot-hot-profit').value=_hot.profit24h||300;}}catch(e){}
+  var ODDS_DIRTY = {}; var TIME_DIRTY = false; var DIFF_DIRTY = {}; var PATTERN_DIRTY = {}; var HOT_DIRTY = false;
   function oddsLabel(k){return ({special:'特码',regular:'正码',zhengte:'正特',tail:'平特尾',colorWave:'色波',oneZodiac:'一肖/平特肖',horse:'马',specialZodiac:'特肖',flatZodiac:'平特肖',triAll:'快三全骰',triExact:'快三围骰'})[k]||k;}
   function collectOdds(o,prefix,out){Object.keys(o||{}).forEach(function(k){var v=o[k];if(v&&typeof v==='object'){collectOdds(v,prefix?prefix+'.'+k:k,out);}else if(k!=='colorWaveByGame'){out.push({path:prefix?prefix+'.'+k:k,val:v,label:oddsLabel(prefix?prefix+'.'+k:k)});}});}
   async function loadOdds(){var body=document.getElementById('lot-odds-body');if(!body)return;body.textContent='读取中…';
@@ -1560,12 +1569,14 @@ setTimeout(loadRevealConfig,2500);
     }catch(e){body.textContent='读取失败：'+e.message}}
   document.getElementById('lot-odds-reload').onclick=loadOdds;loadOdds();
   document.addEventListener('input',function(e){var t=e.target;if(t&&t.getAttribute&&t.getAttribute('data-odds-path')){ODDS_DIRTY[t.getAttribute('data-odds-path')]=t.value;}});
+  document.addEventListener('input',function(e){if(e.target&&/^lot-hot-(on|th|mul|profit)$/.test(e.target.id))HOT_DIRTY=true;});
+  document.addEventListener('change',function(e){if(e.target&&/^lot-hot-(on|th|mul|profit)$/.test(e.target.id))HOT_DIRTY=true;});
   document.addEventListener('change',function(e){var t=e.target;if(t&&t.getAttribute&&t.getAttribute('data-lot-pattern')){var gid=t.getAttribute('data-lot-pattern');var box=t.parentNode.querySelector('.lot-killbox');if(box)box.style.display=(t.value==='random'?'none':'inline-flex');PATTERN_DIRTY[gid]={pattern:t.value,rate:Number((t.parentNode.querySelector('[data-lot-kill-rate]')||{}).value||0.85),max:Number((t.parentNode.querySelector('[data-lot-kill-max]')||{}).value||5000)};try{localStorage.setItem('lotPattern:'+gid,t.value)}catch(x){}}if(t&&t.getAttribute&&(t.getAttribute('data-lot-kill-rate')||t.getAttribute('data-lot-kill-max'))){var pg=t.closest('.lot-game').querySelector('[data-lot-pattern]').getAttribute('data-lot-pattern');PATTERN_DIRTY[pg]={pattern:t.closest('.lot-game').querySelector('[data-lot-pattern]').value,rate:Number(t.closest('.lot-game').querySelector('[data-lot-kill-rate]').value||0.85),max:Number(t.closest('.lot-game').querySelector('[data-lot-kill-max]').value||5000)};}if(t&&t.getAttribute&&t.getAttribute('data-lot-diff')){DIFF_DIRTY[t.getAttribute('data-lot-diff')]=t.value;try{localStorage.setItem('lotDiff:'+t.getAttribute('data-lot-diff'),t.value)}catch(x){}}if(t&&t.getAttribute&&t.getAttribute('data-odds-path')){ODDS_DIRTY[t.getAttribute('data-odds-path')]=t.value;}
     if(t&&/^(lot-win-start|lot-win-end|lot-win-on)$/.test(t.id))TIME_DIRTY=true;});
   var _origSaveBar=document.getElementById('btn-save-bar');
   _origSaveBar.addEventListener('click',function(e){
     var timeDirty=false;var s=document.getElementById('lot-win-start'),en=document.getElementById('lot-win-end'),on=document.getElementById('lot-win-on');
-    var has=Object.keys(ODDS_DIRTY).length>0||TIME_DIRTY||Object.keys(DIFF_DIRTY).length>0||Object.keys(PATTERN_DIRTY).length>0;
+    var has=Object.keys(ODDS_DIRTY).length>0||TIME_DIRTY||Object.keys(DIFF_DIRTY).length>0||Object.keys(PATTERN_DIRTY).length>0||HOT_DIRTY;
     if(!has){e.stopImmediatePropagation();e.preventDefault();document.getElementById('save-state').textContent='没有需要保存的改动';return;}
     e.stopImmediatePropagation();e.preventDefault();
     (async function(){var ok=0,fail=0,errs=[];function oddsPatch(path,val){var parts=path.split('.');var root={};if(path.indexOf('game:')===0){var pp=path.split(':');var gid=pp[1],rest=pp.slice(2).join('.').split('.');var g={};var cur=g;for(var i=0;i<rest.length-1;i++){cur[rest[i]]=cur[rest[i]]||{};cur=cur[rest[i]];}cur[rest[rest.length-1]]=Number(val);g={};g[rest[0]]=undefined;var obj={};var c=obj;for(var j=0;j<rest.length-1;j++){c[rest[j]]=c[rest[j]]||{};c=c[rest[j]];}c[rest[rest.length-1]]=Number(val);return {colorWaveByGame:{}};}
@@ -1576,8 +1587,9 @@ setTimeout(loadRevealConfig,2500);
       if(TIME_DIRTY){try{await wfetch('/admin/config',{method:'POST',body:{window:{start:document.getElementById('lot-win-start').value,end:document.getElementById('lot-win-end').value}}});ok++;}catch(x){fail++;errs.push('开奖时段：'+x.message)}}
       for(var dg in DIFF_DIRTY){try{await wfetch('/admin/config',{method:'POST',body:{gameId:dg,difficulty:DIFF_DIRTY[dg],pattern:(PATTERN_DIRTY[dg]||{}).pattern||'random',kill:PATTERN_DIRTY[dg]?{rate:PATTERN_DIRTY[dg].rate,maxPayout:PATTERN_DIRTY[dg].max}:undefined}});ok++;}catch(x){fail++;errs.push('档位 '+dg+'：'+x.message)}}
       for(var pg in PATTERN_DIRTY){if(DIFF_DIRTY[pg])continue;try{await wfetch('/admin/config',{method:'POST',body:{gameId:pg,pattern:PATTERN_DIRTY[pg].pattern,kill:{rate:PATTERN_DIRTY[pg].rate,maxPayout:PATTERN_DIRTY[pg].max}}});ok++;}catch(x){fail++;errs.push('策略 '+pg+'：'+x.message)}}
+      if(HOT_DIRTY){try{var hot={enabled:document.getElementById('lot-hot-on').checked,threshold:Number(document.getElementById('lot-hot-th').value||3),hotMul:Number(document.getElementById('lot-hot-mul').value||2),profit24h:Number(document.getElementById('lot-hot-profit').value||300)};localStorage.setItem('lotHotCtl',JSON.stringify(hot));await wfetch('/admin/config',{method:'POST',body:{gameId:'__hot__',hot:hot}});ok++;}catch(x){fail++;errs.push('连赢管控：'+x.message)}}
       document.getElementById('save-state').textContent='成功 '+ok+' 项 / 失败 '+fail+' 项'+(errs.length?'（'+errs.slice(0,2).join('；')+'）':'');
-      if(!fail){ODDS_DIRTY={};TIME_DIRTY=false;DIFF_DIRTY={};PATTERN_DIRTY={};}
+      if(!fail){ODDS_DIRTY={};TIME_DIRTY=false;DIFF_DIRTY={};PATTERN_DIRTY={};HOT_DIRTY=false;}
     })();
   },true);
   loadAll();
