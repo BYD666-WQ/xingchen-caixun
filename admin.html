@@ -1583,6 +1583,15 @@ setTimeout(loadRevealConfig,2500);
   window.__adminMainDirty=false;
   function markMainDirty(e){var t=e.target;if(!t||!/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName))return;if(t.closest&&t.closest('#lottery-panel'))return;window.__adminMainDirty=true;}
   document.addEventListener('input',markMainDirty,true);document.addEventListener('change',markMainDirty,true);
+  async function appendAdminLog(entry){
+    try{var tk=token();if(!tk)return;var repo='BYD666-WQ/xingchen-caixun',path='data/admin-log.jsonl';
+      var api='https://api.github.com/repos/'+repo+'/contents/'+path;var headers={Authorization:'Bearer '+tk,Accept:'application/vnd.github+json'};
+      var old='',sha=null;var r=await fetch(api+'?ref=gh-pages',{headers:headers});if(r.ok){var j=await r.json();sha=j.sha;old=decodeURIComponent(escape(atob((j.content||'').replace(/\n/g,''))));}
+      var body={message:'admin log',content:btoa(unescape(encodeURIComponent(old+JSON.stringify(entry)+'\n'))),branch:'gh-pages'};if(sha)body.sha=sha;
+      await fetch(api,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},headers),body:JSON.stringify(body)});
+    }catch(e){try{console.warn('[admin-log]',e.message)}catch(x){}}
+  }
+  document.addEventListener('click',function(e){try{var id=e.target&&e.target.id;var map={'btn-save':'开奖录入','da-save':'资料录入','btn-save-reveal':'开奖节奏','btn-save-times':'开奖时段','lot-win-save':'开奖时段'};if(map[id]&&id!=='btn-save-bar'){setTimeout(function(){appendAdminLog({at:new Date().toISOString(),bj:new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}),button:'board',board:map[id],fields:[],changes:[],targetIssue:null,result:'ok',error:''})},1200)}}catch(x){}},false);
   var _origSaveBar=document.getElementById('btn-save-bar');
   _origSaveBar.addEventListener('click',function(e){
     var timeDirty=false;var s=document.getElementById('lot-win-start'),en=document.getElementById('lot-win-end'),on=document.getElementById('lot-win-on');
@@ -1602,7 +1611,7 @@ setTimeout(loadRevealConfig,2500);
       document.getElementById('save-state').textContent='成功 '+ok+' 项 / 失败 '+fail+' 项'+(errs.length?'（'+errs.slice(0,2).join('；')+'）':'');
       if(!fail){ODDS_DIRTY={};TIME_DIRTY=false;DIFF_DIRTY={};PATTERN_DIRTY={};HOT_DIRTY=false;}
     }
-    (async function(){ if(window.__adminMainDirty){try{await save();}catch(x){}} await lotSave(); })();
+    (async function(){ var okMain=true;if(window.__adminMainDirty){try{await save();}catch(x){okMain=false;}} await lotSave(); await appendAdminLog({at:new Date().toISOString(),bj:new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}),button:'global',board:'全局',fields:Object.keys(ODDS_DIRTY).concat(Object.keys(DIFF_DIRTY)).concat(Object.keys(PATTERN_DIRTY)).concat(HOT_DIRTY?['hot']:[]).concat(TIME_DIRTY?['window']:[]),changes:[],targetIssue:null,result:okMain?'ok':'fail',error:okMain?'':'主表单保存失败'}); })();
   },true);
   loadAll();
 })();
