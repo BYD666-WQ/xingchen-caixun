@@ -346,9 +346,6 @@ details.mini>summary::-webkit-details-marker{display:none}
 <section class="card"><div class="hd"><b>新港第313期</b><span class="t">19:07</span><span class="h">历史记录</span></div><div class="balls"><div class="tile r"><div class="num">28</div><div class="zod">兔</div></div><div class="tile b"><div class="num">26</div><div class="zod">蛇</div></div><div class="tile r"><div class="num">12</div><div class="zod">羊</div></div><div class="tile g"><div class="num">11</div><div class="zod">猴</div></div><div class="tile r"><div class="num">30</div><div class="zod">牛</div></div><div class="tile r"><div class="num">07</div><div class="zod">鼠</div></div><span class="plus">+</span><div class="tile r"><div class="num">13</div><div class="zod">马</div></div></div><div class="next"><span>明天 21:34 开奖</span><span class="rf">刷新</span></div></section>
 
 <div class="nav"><a class="on" href="index.html">首页</a><a href="ziliao.html">资料大全</a><a href="guilv.html">规律走势</a><a href="more.html">寻宝</a><a href="gallery.html">图库</a></div><script>
-window.__getRetry=function(p,S){return new Promise(function(resolve,reject){var i=0,attempt=0;function go(){if(i>=S.length)return reject(new Error('all sources failed'));var k=i,u=S[i]+p+'?t='+Date.now();var AC=(typeof AbortController!=='undefined')?new AbortController():null;var TO=AC?setTimeout(function(){try{AC.abort()}catch(e){}},2500):null;fetch(u,{cache:'no-store',signal:AC?AC.signal:undefined}).then(function(r){if(TO)clearTimeout(TO);if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(j){attempt=0;resolve(j)}).catch(function(err){if(TO)clearTimeout(TO);attempt++;try{console.warn('[data-fail] '+p+' 第'+(k+1)+'路 第'+attempt+'次 '+(err&&err.message||err))}catch(e){}if(attempt<3)setTimeout(go,attempt===1?800:1600);else{attempt=0;i++;go()}})}go()})};
-</script>
-<script>
 (function(){
   var tabsImgs=['assets/theme/tabs/xianggang.webp','assets/theme/tabs/xin-aocai.webp','assets/theme/tabs/xianggang.webp'];
   function addBadge(a,i){var old=a.querySelector('svg,img');if(old)old.remove();var im=document.createElement('img');im.className='badge-img';im.alt='';im.src=tabsImgs[i];im.style.cssText='width:20px;height:20px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid #F6C65B;margin-right:5px;vertical-align:middle';a.insertBefore(im,a.firstChild)}
@@ -364,7 +361,7 @@ window.__getRetry=function(p,S){return new Promise(function(resolve,reject){var 
 (function(){
   var TIME_TABLE={'新港':'21:34','新澳':'21:30','香港':'21:30'};window.__TIME_TABLE=TIME_TABLE;
   var SRC=['','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/'];
-  function get(p){return window.__getRetry(p,(typeof SRC!=='undefined'?SRC:S))}
+  function get(p){var i=0,NAMES=['raw','jsdelivr','local'];function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var k=i;var u=SRC[i++]+p+'?t='+Date.now();var AC=(typeof AbortController!=='undefined')?new AbortController():null;var TO=AC?setTimeout(function(){try{AC.abort()}catch(e){}},2500):null;try{window.__dataOrder=window.__dataOrder||[];window.__dataOrder.push({try:NAMES[k]||String(k),path:p});console.log('[data-order] try '+(NAMES[k]||k)+' '+p)}catch(e){}return fetch(u,{cache:'no-store',signal:AC?AC.signal:undefined}).then(function(r){if(TO)clearTimeout(TO);if(!r.ok)throw 0;return r.json().then(function(j){try{window.__dataOrder.push({hit:NAMES[k]||String(k),path:p});console.log('[data-order] hit '+(NAMES[k]||k)+' '+p)}catch(e){}return j})}).catch(function(){if(TO)clearTimeout(TO);try{window.__dataOrder.push({fail:NAMES[k]||String(k),path:p})}catch(e){}return go()})}return go()}
   var WD=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
   function p2(x){return (x<10?'0':'')+x}
   function nextDate(hm,days){var n=new Date();var a=String(hm).split(':');var t=new Date(n.getFullYear(),n.getMonth(),n.getDate(),parseInt(a[0],10),parseInt(a[1],10),0);if(days&&days.length){for(var i=0;i<14;i++){if(days.indexOf(t.getDay())>=0&&t>n)return t;t=new Date(t.getTime()+864e5)}return t}if(t<=n)t=new Date(t.getTime()+864e5);return t}
@@ -820,7 +817,7 @@ window.__getRetry=function(p,S){return new Promise(function(resolve,reject){var 
 </script><script>
 (function(){
   var SRC=['','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/'];
-  function get(p){return window.__getRetry(p,(typeof SRC!=='undefined'?SRC:S))}
+  function get(p){var i=0,NAMES=['raw','jsdelivr','local'];function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var k=i;var u=SRC[i++]+p+'?t='+Date.now();var AC=(typeof AbortController!=='undefined')?new AbortController():null;var TO=AC?setTimeout(function(){try{AC.abort()}catch(e){}},2500):null;try{window.__dataOrder=window.__dataOrder||[];window.__dataOrder.push({try:NAMES[k]||String(k),path:p})}catch(e){}return fetch(u,{cache:'no-store',signal:AC?AC.signal:undefined}).then(function(r){if(TO)clearTimeout(TO);if(!r.ok)throw 0;return r.json()}).catch(function(){if(TO)clearTimeout(TO);return go()})}return go()}
   var RED=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46],BLUE=[3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
   function cw(n){n=parseInt(n,10);return RED.indexOf(n)>=0?'pkr':(BLUE.indexOf(n)>=0?'pkb':'pkg')}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -892,7 +889,7 @@ window.__getRetry=function(p,S){return new Promise(function(resolve,reject){var 
 </script><script>
 (function(){
   var SRC=['','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/'];
-  function get(p){return window.__getRetry(p,(typeof SRC!=='undefined'?SRC:S))}
+  function get(p){var i=0,NAMES=['raw','jsdelivr','local'];function go(){if(i>=SRC.length)return Promise.reject(new Error('x'));var k=i;var u=SRC[i++]+p+'?t='+Date.now();var AC=(typeof AbortController!=='undefined')?new AbortController():null;var TO=AC?setTimeout(function(){try{AC.abort()}catch(e){}},2500):null;try{window.__dataOrder=window.__dataOrder||[];window.__dataOrder.push({try:NAMES[k]||String(k),path:p});console.log('[data-order] try '+(NAMES[k]||k)+' '+p)}catch(e){}return fetch(u,{cache:'no-store',signal:AC?AC.signal:undefined}).then(function(r){if(TO)clearTimeout(TO);if(!r.ok)throw 0;return r.json().then(function(j){try{window.__dataOrder.push({hit:NAMES[k]||String(k),path:p});console.log('[data-order] hit '+(NAMES[k]||k)+' '+p)}catch(e){}return j})}).catch(function(){if(TO)clearTimeout(TO);try{window.__dataOrder.push({fail:NAMES[k]||String(k),path:p})}catch(e){}return go()})}return go()}
   function mount(){
     var host=document.querySelector('.nav');if(!host)return null;
     var ex=document.getElementById('xc-extra');if(!ex){ex=document.createElement('div');ex.id='xc-extra';host.parentNode.insertBefore(ex,host)}return ex;
@@ -912,7 +909,7 @@ window.__getRetry=function(p,S){return new Promise(function(resolve,reject){var 
 </script><script>
 (function(){
   var S=['','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/'];
-  function get(p){return window.__getRetry(p,(typeof SRC!=='undefined'?SRC:S))}
+  function get(p){var i=0;function go(){if(i>=S.length)return Promise.reject(new Error('x'));var u=S[i++]+p+'?t='+Date.now();var AC=(typeof AbortController!=='undefined')?new AbortController():null;var TO=AC?setTimeout(function(){try{AC.abort()}catch(e){}},2500):null;try{window.__dataOrder=window.__dataOrder||[];window.__dataOrder.push({try:String(i),path:p})}catch(e){}return fetch(u,{cache:'no-store',signal:AC?AC.signal:undefined}).then(function(r){if(TO)clearTimeout(TO);if(!r.ok)throw 0;return r.json()}).catch(function(){if(TO)clearTimeout(TO);return go()})}return go()}
   function place(){var sec=document.getElementById('wuxiao');if(!sec)return;var nm=document.getElementById('nm-final');if(nm&&nm.parentNode){if(nm.nextSibling!==sec)nm.parentNode.insertBefore(sec,nm.nextSibling);return}var nav=document.querySelector('.nav');if(nav&&nav.parentNode&&sec.parentNode!==nav.parentNode)nav.parentNode.insertBefore(sec,nav)}
   function mount(){var sec=document.getElementById('wuxiao');if(!sec){sec=document.createElement('section');sec.className='mini';sec.id='wuxiao';var nm=document.getElementById('nm-final');if(nm&&nm.parentNode){nm.parentNode.insertBefore(sec,nm.nextSibling)}else{var nav=document.querySelector('.nav');if(nav)nav.parentNode.insertBefore(sec,nav)}}return sec}
   get('data/wuxiao.json').then(function(w){
@@ -937,7 +934,7 @@ window.__getRetry=function(p,S){return new Promise(function(resolve,reject){var 
 </script><script>
 (function(){
   var S=['','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/'];
-  function get(p){return window.__getRetry(p,(typeof SRC!=='undefined'?SRC:S))}
+  function get(p){var i=0;function go(){if(i>=S.length)return Promise.reject(new Error('x'));var u=S[i++]+p+'?t='+Date.now();var AC=(typeof AbortController!=='undefined')?new AbortController():null;var TO=AC?setTimeout(function(){try{AC.abort()}catch(e){}},2500):null;return fetch(u,{cache:'no-store',signal:AC?AC.signal:undefined}).then(function(r){if(TO)clearTimeout(TO);if(!r.ok)throw 0;return r.json()}).catch(function(){if(TO)clearTimeout(TO);return go()})}return go()}
   var RED=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46],BLUE=[3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48];
   function waveOf(n){if(RED.indexOf(n)>=0)return '红';if(BLUE.indexOf(n)>=0)return '蓝';return '绿'}
   function wcls(w){return w==='红'?'w-red':(w==='蓝'?'w-blue':'w-green')}
@@ -989,7 +986,7 @@ window.__getRetry=function(p,S){return new Promise(function(resolve,reject){var 
 </script><script>
 (function(){
   var S=['','https://cdn.jsdelivr.net/gh/BYD666-WQ/xingchen-caixun@main/','https://raw.githubusercontent.com/BYD666-WQ/xingchen-caixun/main/'];
-  function get(p){return window.__getRetry(p,(typeof SRC!=='undefined'?SRC:S))}
+  function get(p){var i=0;function go(){if(i>=S.length)return Promise.reject(new Error('x'));var u=S[i++]+p+'?t='+Date.now();var AC=(typeof AbortController!=='undefined')?new AbortController():null;var TO=AC?setTimeout(function(){try{AC.abort()}catch(e){}},2500):null;return fetch(u,{cache:'no-store',signal:AC?AC.signal:undefined}).then(function(r){if(TO)clearTimeout(TO);if(!r.ok)throw 0;return r.json()}).catch(function(){if(TO)clearTimeout(TO);return go()})}return go()}
   function place(){var box=document.getElementById('xc-blocks3');if(!box)return;var anchor=document.getElementById('xc-blocks2')||document.getElementById('wuxiao')||document.getElementById('nm-final');var nav=document.querySelector('.nav');if(anchor&&anchor.parentNode){if(anchor.nextSibling!==box)anchor.parentNode.insertBefore(box,anchor.nextSibling);return}if(nav&&nav.parentNode&&box.nextSibling!==nav)nav.parentNode.insertBefore(box,nav)}
   function mount(){var box=document.getElementById('xc-blocks3');if(box)return box;box=document.createElement('div');box.id='xc-blocks3';var a=document.getElementById('xc-blocks2')||document.getElementById('wuxiao')||document.getElementById('nm-final');if(a&&a.parentNode)a.parentNode.insertBefore(box,a.nextSibling);else{var nav=document.querySelector('.nav');if(nav)nav.parentNode.insertBefore(box,nav)}return box}
   Promise.all([get('data/qiwei.json'),get('data/sisha.json'),get('data/pingte.json'),get('data/danshuangsixiao.json'),get('data/manual-draw.json').catch(function(){return {}})]).then(function(rs){
