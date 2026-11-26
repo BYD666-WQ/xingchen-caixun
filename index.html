@@ -402,7 +402,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   window.__xcActualResult=actualResult;
   function specialHidden(issue){
     try{
-      var cur=parseInt(window.__xcCurrentIssue,10)||0,t=parseInt(issue,10)||0;
+      var cur=parseInt(window.__xcCurrentIssue,10)||((parseInt(D.newhk&&D.newhk.issue,10)||0)+1)||0,t=parseInt(issue,10)||0;
       if(!cur||!t)return false;
       if(t>=cur)return true;
       if(t===cur-1){
@@ -416,7 +416,6 @@ details.mini>summary::-webkit-details-marker{display:none}
 
   window.__xcSpOf=function(r){
     try{if(r&&r.issue!=null&&specialHidden(r.issue))return {}}catch(e){}
-    var sp=(r&&r.special)||{};
     var sp=(r&&r.special)||{};
     var cur=currentMaxIssue();
     var historical=cur?(parseInt(r&&r.issue,10)||0)<cur:false;
