@@ -688,8 +688,8 @@ details.mini>summary::-webkit-details-marker{display:none}
   window.__vfState=function(){return VF?{issue:VF.issue,phase:VF.phase,revealed:VF.revealed,elapsed:Date.now()-VF.vf,played:VF.played}:null};
   /* ===== 新澳/香港：到点灰球 + 到达/增量揭晓（与时间线共用 vfTimeline） ===== */
   var XR={newmo:null,hk:null};
-  function xrLS(k){try{return JSON.parse(localStorage.getItem('xc-xr-'+k)||'null')}catch(e){return null}}
-  function xrSave(k,st){try{localStorage.setItem('xc-xr-'+k,JSON.stringify({issue:String(st.issue),start:st.start,phase:st.phase,nums:st.nums,mode:st.mode,revealed:st.revealed}))}catch(e){}}
+  function xrLS(k){try{return JSON.parse(localStorage.getItem('xc-xr4-'+(window.__mdUpdated||'')+'-'+k)||'null')}catch(e){return null}}
+  function xrSave(k,st){try{localStorage.setItem('xc-xr4-'+(window.__mdUpdated||'')+'-'+k,JSON.stringify({issue:String(st.issue),start:st.start,phase:st.phase,nums:st.nums,mode:st.mode,revealed:st.revealed}))}catch(e){}}
   function xrDue(k){var hm=TIME_TABLE[kindOf(k)],days=DAYS[kindOf(k)];if(!hm||!days||days.indexOf(new Date().getDay())<0)return null;var q=String(hm).split(':');var n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate(),parseInt(q[0],10)||0,parseInt(q[1],10)||0,0,0)}
   function xrBalls(nums,count,hl){var h='';for(var i=0;i<6;i++)h+=vfTile(i,nums,count,hl);h+='<span class="plus">+</span>';return h+vfTile(6,nums,count,hl)}
   function xrRender(k,count,hl,ptext){
