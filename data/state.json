@@ -2,8 +2,8 @@
  "ok": true,
  "status": "success",
  "error": "",
- "updated": "2026-11-26 17:40:30",
- "updatedAt": "2026-11-26T17:40:30.188+08:00",
+ "updated": "2026-11-26 17:50:31",
+ "updatedAt": "2026-11-26T17:50:31.534+08:00",
  "message": "云端 Worker 检查完成，无更新",
  "lastSuccess": null,
  "latest_by_rule": {
@@ -21,5 +21,5 @@
  "gaps": [],
  "receipt_gap_alert": false,
  "backfill": false,
- "lastRun": "2026-11-26 17:40:30"
+ "lastRun": "2026-11-26 17:50:31"
 }
