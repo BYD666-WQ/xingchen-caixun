@@ -2,13 +2,13 @@
  "ok": true,
  "status": "success",
  "error": "",
- "updated": "2026-11-26 21:30:30",
- "updatedAt": "2026-11-26T21:30:30.584+08:00",
- "message": "云端 Worker 检查完成，无更新",
- "lastSuccess": null,
+ "updated": "2026-11-26 21:31:02",
+ "updatedAt": "2026-11-26T21:31:02.299+08:00",
+ "message": "云端 Worker 已更新（实时 1 彩种）",
+ "lastSuccess": "2026-11-26 21:31:02",
  "latest_by_rule": {
   "Macau": 2026329,
-  "HongKong": 2026123,
+  "HongKong": 124,
   "MacauOld": 2026316,
   "Happy8": 2026302
  },
