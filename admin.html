@@ -449,18 +449,24 @@ function fillTimesUI(){
   });
 }
 async function publishLive(issue,nums){try{var r=await wfetch('/live/publish',{method:'POST',body:{issue:issue,nums:(nums||[]).slice(0,7),scene:'prod'}});if(r&&r.ok===false)console.warn('[live] publish fail');}catch(e){console.warn('[live] '+e.message)}}
+function issueDrawAt(targetIssue){
+  var t=parseInt(targetIssue,10)||0;
+  var cur=draw&&(draw.current||draw);
+  var baseIssue=parseInt(cur&&cur.issue,10)||parseInt(draw&&draw.issue,10)||0;
+  var baseRaw=(cur&&cur.visibleFrom)||(draw&&draw.visibleFrom)||(draw&&draw.history&&draw.history[0]&&draw.history[0].visibleFrom)||'';
+  var h0=draw&&draw.history&&draw.history[0];
+  if(h0&&String(h0.issue)===String(t)&&h0.visibleFrom)return new Date(h0.visibleFrom);
+  var base=baseRaw?new Date(baseRaw):nextDrawDate(SITE_CFG.drawTimes);
+  if(!baseIssue||!t)return base;
+  return new Date(base.getTime()+(t-baseIssue)*86400000);
+}
 function autoIssueInfo(){
   var cur=draw&&draw.issue?parseInt(draw.issue,10):1;
   var published=!!(draw&&draw.publishedAt);
-  var _dt=normDrawTimes(SITE_CFG.drawTimes).newhk;var hm=_dt.time,days=_dt.days;
-  var q=String(hm).split(':');var now=new Date();
-  var todayAt=new Date(now.getFullYear(),now.getMonth(),now.getDate(),parseInt(q[0],10)||21,parseInt(q[1],10)||34,0,0);
-  var closePassed=now.getTime()>=todayAt.getTime();
-  var issue=published?cur+1:cur;
-  var t=new Date(todayAt.getTime());
-  for(var _i=0;_i<14;_i++){if(t.getTime()>now.getTime()&&days.indexOf(t.getDay())>=0)break;t.setDate(t.getDate()+1)}
-  var immediate=!published&&closePassed;
-  return {issue:issue,vf:immediate?now:t,cur:cur,published:published,hm:hm,immediate:immediate,closePassed:closePassed};
+  var _dt=normDrawTimes(SITE_CFG.drawTimes).newhk;var hm=_dt.time;
+  var now=new Date();var issue=published?cur+1:cur;
+  var at=issueDrawAt(issue);var immediate=!published&&now.getTime()>=at.getTime();
+  return {issue:issue,vf:immediate?now:at,cur:cur,published:published,hm:hm,immediate:immediate,closePassed:immediate};
 }
 function vfLocalStr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
 function fmtVfStr(d){return d.getFullYear()+'/'+pad(d.getMonth()+1)+'/'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
@@ -817,10 +823,9 @@ async function saveImpl(){
   else{_useTimes=_newTimes;_timeSrc='ui-fallback'}
   SITE_CFG.drawTimes=_useTimes;
   var _forceNow=!!(document.getElementById('auto-publish-now')&&document.getElementById('auto-publish-now').checked);
-  var _immediate=!!(_ai&&_ai.immediate&&!_ai.published)||_forceNow;
-  var _autoVf;
-  try{_autoVf=calcAutoVf(newIssueVal,_useTimes)}catch(ve){return Msg('保存失败（drawTimes 非法/缺失）：'+ve.message+'；未写入',false)}
-  var vfMs=_immediate?Date.now():_autoVf.getTime();
+  var _issueAt=issueDrawAt(newIssueVal);
+  var _immediate=_forceNow||(Date.now()>=_issueAt.getTime());
+  var vfMs=_immediate?Date.now():_issueAt.getTime();
    var _vfInput=$('g-visiblefrom');if(window.__vfTouched&&_vfInput&&_vfInput.value){var _mv=new Date(_vfInput.value);if(!isNaN(_mv.getTime()))vfMs=_mv.getTime()}
   var _diag='src='+_timeSrc+' drawTimes.newhk='+_useTimes.newhk.time+' days=['+_useTimes.newhk.days.join(',')+'] now='+fmtVfStr(new Date())+' → vf='+fmtVfStr(new Date(vfMs));
   try{console.log('[vf-diag] '+_diag)}catch(e){}
@@ -833,7 +838,7 @@ async function saveImpl(){
   if(!_immediate&&vfMs>Date.now()){newDraw.numsEnc=vfEnc(newDraw.nums);newDraw.nums=[]}
   var _drawnIssue=newDraw.issue;
   var _histEntry={issue:_drawnIssue,nums:newDraw.nums,numsEnc:newDraw.numsEnc||'',visibleFrom:newDraw.visibleFrom,publishedAt:newDraw.publishedAt||null};
-  var _nextVf=nextDrawDate(_useTimes);
+  var _nextVf=new Date(_issueAt.getTime()+86400000);
   var _newCurrent={issue:_drawnIssue+1,nums:[],numsEnc:'',visibleFrom:new Date(_nextVf).toISOString(),publishedAt:null};
   newDraw.history=[_histEntry].concat((hb.history||[]).filter(function(h){return String(h.issue)!==String(_drawnIssue)}));
   newDraw.current=_newCurrent;
