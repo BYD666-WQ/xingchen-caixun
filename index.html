@@ -389,10 +389,11 @@ details.mini>summary::-webkit-details-marker{display:none}
   function specialVisibleAt(issue){
     try{
       var cur=(D.newhk&&D.newhk.current)||D.newhk||{};
-      var baseIssue=parseInt(cur.issue,10)||0;
-      var baseRaw=cur.visibleFrom||cur.publishedAt||'';
-      if(!baseIssue||!baseRaw)return new Date(0);
-      var base=new Date(baseRaw);if(isNaN(base.getTime()))return new Date(0);
+      var h0=cur.history&&cur.history[0];
+      var baseIssue=parseInt((h0&&h0.issue)||cur.issue,10)||0;
+      var baseRaw=(h0&&h0.visibleFrom)||cur.visibleFrom||cur.publishedAt||'';
+      if(!baseIssue||!baseRaw){var ci=parseInt((D.newhk&&D.newhk.issue)||0,10);return (parseInt(issue,10)||0)<ci?new Date(0):new Date(Date.now()+86400000);}
+      var base=new Date(baseRaw);if(isNaN(base.getTime())){var ci2=parseInt((D.newhk&&D.newhk.issue)||0,10);return (parseInt(issue,10)||0)<ci2?new Date(0):new Date(Date.now()+86400000);}
       var at=new Date(base.getTime()+((parseInt(issue,10)||baseIssue)-baseIssue)*86400000);
       return new Date(at.getTime()+3600000);
     }catch(e){return new Date(0)}
