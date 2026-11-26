@@ -3,7 +3,7 @@
  "drawTime": "每天 21:34",
  "dailyTime": "21:34",
  "status": "sample",
- "updated": "2026-11-26T13:36:53.255Z",
+ "updated": "2026-11-26T15:04:37.856Z",
  "current": {
   "issue": 331,
   "nums": [],
@@ -1336,7 +1336,7 @@
    "publishedAt": "2026-11-01T13:34:00.000Z"
   }
  ],
- "publishedAt": null,
+ "publishedAt": "2026-11-26T13:34:00.000Z",
  "issue": 330,
  "nums": [
   {
