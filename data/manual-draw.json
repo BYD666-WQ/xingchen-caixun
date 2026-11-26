@@ -3,15 +3,63 @@
  "drawTime": "每天 21:34",
  "dailyTime": "21:34",
  "status": "sample",
- "updated": "2026-11-26T15:09:49.466Z",
  "current": {
   "issue": 331,
   "nums": [],
   "numsEnc": "",
-  "visibleFrom": "2026-11-27T21:34:00+08:00",
+  "visibleFrom": "2026-11-27T13:34:00.000Z",
   "publishedAt": null
  },
  "history": [
+  {
+   "issue": 330,
+   "nums": [
+    {
+     "c": "20",
+     "z": "猪",
+     "color": "蓝",
+     "wuxing": "土"
+    },
+    {
+     "c": "04",
+     "z": "兔",
+     "color": "蓝",
+     "wuxing": "金"
+    },
+    {
+     "c": "25",
+     "z": "马",
+     "color": "蓝",
+     "wuxing": "木"
+    },
+    {
+     "c": "34",
+     "z": "鸡",
+     "color": "红",
+     "wuxing": "金"
+    },
+    {
+     "c": "17",
+     "z": "虎",
+     "color": "绿",
+     "wuxing": "木"
+    },
+    {
+     "c": "37",
+     "z": "马",
+     "color": "蓝",
+     "wuxing": "土"
+    },
+    {
+     "c": "03",
+     "z": "龙",
+     "color": "蓝",
+     "wuxing": "火"
+    }
+   ],
+   "visibleFrom": "2026-11-26T13:34:00.000Z",
+   "publishedAt": "2026-11-26T13:34:00.000Z"
+  },
   {
    "issue": 329,
    "nums": [
@@ -1336,52 +1384,5 @@
    "publishedAt": "2026-11-25T13:34:00.000Z"
   }
  ],
- "publishedAt": null,
- "issue": 330,
- "nums": [
-  {
-   "c": "20",
-   "z": "猪",
-   "color": "蓝",
-   "wuxing": "土"
-  },
-  {
-   "c": "04",
-   "z": "兔",
-   "color": "蓝",
-   "wuxing": "金"
-  },
-  {
-   "c": "25",
-   "z": "马",
-   "color": "蓝",
-   "wuxing": "木"
-  },
-  {
-   "c": "34",
-   "z": "鸡",
-   "color": "红",
-   "wuxing": "金"
-  },
-  {
-   "c": "17",
-   "z": "虎",
-   "color": "绿",
-   "wuxing": "木"
-  },
-  {
-   "c": "37",
-   "z": "马",
-   "color": "蓝",
-   "wuxing": "土"
-  },
-  {
-   "c": "03",
-   "z": "龙",
-   "color": "蓝",
-   "wuxing": "火"
-  }
- ],
- "numsEnc": "",
- "visibleFrom": "2026-11-26T13:34:00.000Z"
+ "updated": "2026-11-26T15:11:30.541Z"
 }
