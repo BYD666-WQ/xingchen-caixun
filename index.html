@@ -433,6 +433,18 @@ details.mini>summary::-webkit-details-marker{display:none}
       parent.insertBefore(c,base.nextSibling);
     });
   }
+  function nextInfo(k){
+    var d=D[k]||{},hm=TIME_TABLE[LABEL[k]==='新澳彩'?'新澳':(LABEL[k]==='香港彩'?'香港':'新港')];
+    var cur=parseInt(d.issue,10)||0,shown=cur;
+    if(k==='newhk'){if(VF&&VF.issue)shown=VF.issue;else if(d.nums&&d.nums.length===7)shown=cur;else if(cur)shown=cur-1}
+    var next=shown+1,cand=[];
+    if(d.visibleFrom&&cur===next){var x=new Date(d.visibleFrom);if(!isNaN(x))cand.push(x)}
+    var h=(d.history||[])[0];if(h&&h.visibleFrom){var y=new Date(new Date(h.visibleFrom).getTime()+864e5);if(!isNaN(y))cand.push(y)}
+    if(!cand.length){var nd=nextDate(hm,DAYS[kindOf(k)]);cand.push(nd)}
+    var now=Date.now(),best=null;
+    cand.forEach(function(t){var ms=t.getTime();while(ms<=now)ms+=864e5;if(!best||ms<best)best=ms});
+    return {issue:next,date:new Date(best),hm:hm};
+  }
   function fill(){
     KEYS.forEach(function(k){
       var c=document.getElementById('blk-'+k);if(!c)return;var d=D[k]||{};var hm=TIME_TABLE[LABEL[k]==='新澳彩'?'新澳':(LABEL[k]==='香港彩'?'香港':'新港')];
@@ -440,7 +452,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       var b=c.querySelector('.hd b');if(b&&d.issue)b.textContent=LABEL[k]+'第'+String(d.issue).slice(-3)+'期';
       var bb=c.querySelector('.balls');if(bb&&d.nums)bb.innerHTML=ballHtml(d.nums);
       var t=c.querySelector('.hd .t');if(t){var _u=(d.updated||window.__drawUpdated)?new Date(d.updated||window.__drawUpdated):null;if(_u&&!isNaN(_u.getTime())){t.textContent='数据更新 '+p2(_u.getMonth()+1)+'-'+p2(_u.getDate())+' '+p2(_u.getHours())+':'+p2(_u.getMinutes())}else t.textContent='数据更新 --'}
-      var nx=c.querySelector('.next span');if(nx){var nd=nextDate(hm,DAYS[kindOf(k)]);var _nxt='第'+((parseInt(String(d.issue).slice(-3),10)||0)+1)+'期 · '+(nd.getMonth()+1)+'月'+nd.getDate()+'日 '+WD[nd.getDay()]+' '+hm;nx.textContent=_nxt}
+      var nx=c.querySelector('.next span');if(nx){var ni=nextInfo(k);nx.textContent='第'+ni.issue+'期 · '+(ni.date.getMonth()+1)+'月'+ni.date.getDate()+'日 '+WD[ni.date.getDay()]+' '+ni.hm}
       var cd=c.querySelector('.xc-cd');if(!cd){cd=document.createElement('span');cd.className='xc-cd';c.querySelector('.hd').appendChild(cd)}
       cd.id='xc-cd-'+k;
       var hd=c.querySelector('.hd .h');
@@ -449,6 +461,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       if(!hp&&d.nums){hp=document.createElement('div');hp.className='xc-hist';hp.hidden=true;hp.innerHTML='<div class="xc-hist-inner">'+histHtml(k)+'</div>';c.appendChild(hp)}
     });
   }
+  window.__xcRefreshNext=function(){try{fill()}catch(e){}};
   function tick(){
     try{if(window.__xcEnsureWaiting)window.__xcEnsureWaiting();if(VF&&VF.phase==='revealing')vfRestore();xrWaitingTick()}catch(e){}
     KEYS.forEach(function(k){
@@ -459,7 +472,7 @@ details.mini>summary::-webkit-details-marker{display:none}
         if(!_has7&&((_d&&_d._xcWaiting)||window.__xcWaiting)){e.textContent='待开';return}
       }
       if(k!=='newhk'&&D[k]&&D[k]._xrWaiting){e.textContent='待开';return}var hm=TIME_TABLE[LABEL[k]==='新澳彩'?'新澳':(LABEL[k]==='香港彩'?'香港':'新港')];
-      var n=new Date();var t=nextDate(hm,DAYS[kindOf(k)]);var left=Math.floor((t-n)/1000);
+      var n=new Date();var t=nextInfo(k).date;var left=Math.floor((t-n)/1000);
       e.textContent='距开奖 '+p2(Math.floor(left/3600))+':'+p2(Math.floor(left%3600/60))+':'+p2(left%60);
     });
   }
@@ -516,6 +529,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     VF={vf:Date.now(),issue:issue,enc:'',md:md,phase:'done',revealed:7,nums:nums,played:true,timer:null,timeline:[]};
     vfSaveState();
     try{vfRender(nums,7,-1);vfHideProgress()}catch(e){}
+    try{if(window.__xcRefreshNext)window.__xcRefreshNext()}catch(e){}
     return true;
   }
   function vfScheduleHist(md){
