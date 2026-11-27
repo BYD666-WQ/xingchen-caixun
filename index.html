@@ -483,7 +483,24 @@ details.mini>summary::-webkit-details-marker{display:none}
   /* ===== 新港 visibleFrom：定时公布 + 到点揭晓（2026-11-13 改：每球 10s，可中断恢复） ===== */
   var VF_KEY='Xc9vF2026';
   var FIRST_DELAY_MS=1500, SETTLE_MS=10000, FLIP_MS=400;
-  function mdCompat(md){if(md&&md.current&&md.current.issue!==undefined){var c=md.current;return {name:md.name,issue:c.issue,nums:c.nums||[],numsEnc:c.numsEnc,visibleFrom:c.visibleFrom,publishedAt:c.publishedAt||md.publishedAt,history:md.history||[],updated:md.updated,drawTime:md.drawTime,dailyTime:md.dailyTime}}return md}
+  function mdCompat(md){
+    if(!(md&&md.current&&md.current.issue!==undefined))return md;
+    var c=md.current;
+    var hist=(md.history||[]).map(function(h){
+      if(!h)return h;var x={issue:h.issue,nums:(h.nums||[]).slice(),numsEnc:h.numsEnc||'',visibleFrom:h.visibleFrom,publishedAt:h.publishedAt||null};
+      if((!x.nums||!x.nums.length)&&x.numsEnc){
+        var vf=Date.parse(x.visibleFrom||'');
+        if(isFinite(vf)&&Date.now()>=vf){
+          try{var d=vfDec(x.numsEnc);if(d&&d.length===7){x.nums=d;if(!x.publishedAt)x.publishedAt=new Date(vf).toISOString();console.info('[vf-reveal] history '+x.issue+' decrypted')}else{console.error('[vf-reveal] history '+x.issue+' decrypt empty')}}
+          catch(e){console.error('[vf-reveal] history '+x.issue+' decrypt failed',e)}
+        }
+      }
+      return x;
+    });
+    var cur={issue:c.issue,nums:c.nums||[],numsEnc:c.numsEnc,visibleFrom:c.visibleFrom,publishedAt:c.publishedAt||md.publishedAt};
+    if((!cur.nums||!cur.nums.length)&&cur.numsEnc){var vf2=Date.parse(cur.visibleFrom||'');if(isFinite(vf2)&&Date.now()>=vf2){try{var d2=vfDec(cur.numsEnc);if(d2&&d2.length===7){cur.nums=d2;if(!cur.publishedAt)cur.publishedAt=new Date(vf2).toISOString();console.info('[vf-reveal] current '+cur.issue+' decrypted')}}catch(e){console.error('[vf-reveal] current '+cur.issue+' decrypt failed',e)}}}
+    return {name:md.name,issue:cur.issue,nums:cur.nums,numsEnc:cur.numsEnc,visibleFrom:cur.visibleFrom,publishedAt:cur.publishedAt,history:hist,updated:md.updated,drawTime:md.drawTime,dailyTime:md.dailyTime};
+  }
   var VF_CFG={mode:'fixed',seconds:10,min:8,max:15,specialExtra:5};
   var VF=null;
   var VF_LS_KEY='xc-vf-newhk';
