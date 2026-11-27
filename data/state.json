@@ -2,15 +2,13 @@
  "ok": true,
  "status": "success",
  "error": "",
- "updated": "2026-11-27 14:20:31",
- "updatedAt": "2026-11-27T14:20:31.227+08:00",
+ "updated": "2026-11-27 14:30:30",
+ "updatedAt": "2026-11-27T14:30:30.394+08:00",
  "message": "云端 Worker 检查完成，无更新",
  "lastSuccess": "2026-11-26 21:40:30",
  "latest_by_rule": {
   "Macau": 2026330,
-  "HongKong": 2026124,
-  "MacauOld": 2026316,
-  "Happy8": 2026302
+  "HongKong": 2026124
  },
  "read_count": 2,
  "liveRules": [
@@ -21,7 +19,7 @@
  "gaps": [],
  "receipt_gap_alert": false,
  "backfill": false,
- "lastRun": "2026-11-27 14:20:31",
+ "lastRun": "2026-11-27 14:30:30",
  "new_count": 1,
  "newest_seen_ids": [
   "Macau:2026330",
