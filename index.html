@@ -402,7 +402,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   window.__xcActualResult=actualResult;
   function specialHidden(issue){
     try{
-      var cur=parseInt(window.__xcCurrentIssue,10)||((parseInt(D.newhk&&D.newhk.issue,10)||0)+1)||0,t=parseInt(issue,10)||0;
+      var cur=Math.max(parseInt(window.__xcCurrentIssue,10)||0,parseInt(D.newhk&&D.newhk.issue,10)||0)||((parseInt(D.newhk&&D.newhk.issue,10)||0)+1)||0,t=parseInt(issue,10)||0;
       if(!cur||!t)return false;
       if(t>=cur)return true;
       if(t===cur-1){
@@ -439,7 +439,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       
       var b=c.querySelector('.hd b');if(b&&d.issue)b.textContent=LABEL[k]+'第'+String(d.issue).slice(-3)+'期';
       var bb=c.querySelector('.balls');if(bb&&d.nums)bb.innerHTML=ballHtml(d.nums);
-      var t=c.querySelector('.hd .t');if(t)t.textContent='数据更新 '+p2(new Date().getHours())+':'+p2(new Date().getMinutes());
+      var t=c.querySelector('.hd .t');if(t){var _u=d.updated?new Date(d.updated):null;if(_u&&!isNaN(_u.getTime())){t.textContent='数据更新 '+p2(_u.getMonth()+1)+'-'+p2(_u.getDate())+' '+p2(_u.getHours())+':'+p2(_u.getMinutes())}else t.textContent='数据更新 --'}
       var nx=c.querySelector('.next span');if(nx){var nd=nextDate(hm,DAYS[kindOf(k)]);var _nxt='第'+((parseInt(String(d.issue).slice(-3),10)||0)+1)+'期 · '+(nd.getMonth()+1)+'月'+nd.getDate()+'日 '+WD[nd.getDay()]+' '+hm;nx.textContent=_nxt}
       var cd=c.querySelector('.xc-cd');if(!cd){cd=document.createElement('span');cd.className='xc-cd';c.querySelector('.hd').appendChild(cd)}
       cd.id='xc-cd-'+k;
@@ -517,6 +517,24 @@ details.mini>summary::-webkit-details-marker{display:none}
     vfSaveState();
     try{vfRender(nums,7,-1);vfHideProgress()}catch(e){}
     return true;
+  }
+  function vfScheduleHist(md){
+    try{
+      var h=(md.history||[])[0];if(!h||!h.numsEnc||(h.nums&&h.nums.length===7))return;
+      var hv=Date.parse(h.visibleFrom||'');if(!isFinite(hv)||hv<=Date.now())return;
+      if(window.__vfHistIssue===String(h.issue))return;window.__vfHistIssue=String(h.issue);
+      console.info('[vf-reveal] schedule history '+h.issue+' in '+(hv-Date.now())+'ms');
+      setTimeout(function(){
+        try{
+          var d=vfDec(h.numsEnc);if(!d||d.length!==7)throw new Error('decrypt empty');
+          h.nums=d;h.publishedAt=h.publishedAt||new Date(hv).toISOString();
+          md.history[0]=h;md.issue=h.issue;md.nums=d;
+          try{vfSetHead(h.issue)}catch(e){}
+          if(!vfDoneState(h.issue,d,md))location.reload();
+          console.info('[vf-reveal] timer revealed history '+h.issue);
+        }catch(e){console.error('[vf-reveal] timer failed',e);location.reload()}
+      },Math.max(0,hv-Date.now()+300));
+    }catch(e){console.error('[vf-reveal] schedule failed',e)}
   }
   function vfNormCfg(c){
     var o={mode:'fixed',seconds:10,min:8,max:15,specialExtra:5};
@@ -661,6 +679,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       return true;
     }
     var prev=(md.history||[])[0]||null;
+    if(prev&&prev.numsEnc&&(!prev.nums||!prev.nums.length)&&prev.visibleFrom)vfScheduleHist(md);
     if(prev&&prev.nums&&prev.nums.length===7){
       var _pIssue=prev.issue,_pNums=prev.nums,_pst=vfLoadState(_pIssue),_ppub=Date.parse(prev.publishedAt||'');
       if((isFinite(_ppub)&&Date.now()>=_ppub)||(_pst&&_pst.phase==='done')){if(vfDoneState(_pIssue,_pNums,md))return false}
