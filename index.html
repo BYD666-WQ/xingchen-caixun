@@ -393,7 +393,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     return mx;
   }
   function actualResult(issue){
-    var cur=currentMaxIssue();
+    var cur=Math.max(currentMaxIssue(),parseInt(window.__xcCurrentIssue,10)||0);
     if(cur&&(parseInt(issue,10)||0)>=cur)return null;
     var want=String(issue==null?'':issue).slice(-3);
     for(var i=0;i<KEYS.length;i++){var d=D[KEYS[i]];if(!d)continue;var cs=[{issue:d.issue,nums:d.nums}].concat(d.history||[]);for(var j=0;j<cs.length;j++){var c=cs[j];if(String(c.issue==null?'':c.issue).slice(-3)!==want)continue;var ns=c.nums||[];if(ns.length===7&&ns[6]&&ns[6].z)return {z:ns[6].z,c:ns[6].c}}}
@@ -417,7 +417,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   window.__xcSpOf=function(r){
     try{if(r&&r.issue!=null&&specialHidden(r.issue))return {}}catch(e){}
     var sp=(r&&r.special)||{};
-    var cur=currentMaxIssue();
+    var cur=Math.max(currentMaxIssue(),parseInt(window.__xcCurrentIssue,10)||0);
     var historical=cur?(parseInt(r&&r.issue,10)||0)<cur:false;
     if(historical&&!sp.z&&window.__xcActualResult){var ar=window.__xcActualResult(r.issue);if(ar)sp={z:ar.z,c:ar.c}}
     if(historical&&!sp.z&&window.__xcMDR){var ns=window.__xcMDR[String(r.issue==null?'':r.issue).slice(-3)];if(ns&&ns.length===7&&ns[6]&&ns[6].z)sp={z:ns[6].z,c:ns[6].c}}
