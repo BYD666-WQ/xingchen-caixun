@@ -857,9 +857,10 @@ details.mini>summary::-webkit-details-marker{display:none}
     return {z:z,n:n};
   }
   function issueHtml(p,res){
-    var seven=pair(p.seven.zodiac||[],p.seven.nums||[],res);
-    var five=pair(p.five.zodiac||[],p.five.nums||[],res);
-    var three=pair(p.three.zodiac||[],p.three.nums||[],res);
+    p=p||{};var _s=p.seven||{},_f=p.five||{},_t=p.three||{};
+    var seven=pair(_s.zodiac||[],_s.nums||[],res);
+    var five=pair(_f.zodiac||[],_f.nums||[],res);
+    var three=pair(_t.zodiac||[],_t.nums||[],res);
     var pick=p.pick||{},hs=hitSets(res);
     var pz=esc(pick.zodiac||''),pn=esc(padN(pick.num||''));
     var pzA=!!(hs.sp&&hs.sp.z&&pick.zodiac===hs.sp.z),pnA=!!(hs.sp&&hs.sp.c&&padN(pick.num||'')===hs.sp.c);
@@ -883,10 +884,10 @@ details.mini>summary::-webkit-details-marker{display:none}
     var list=(rows||[]).slice().sort(function(a,b){return (parseInt(a.issue,10)||0)-(parseInt(b.issue,10)||0)}).slice(-2);
     if(!list.length){sec.innerHTML='';return}
     var html='';
-    for(var i=0;i<list.length;i++){var _is=String(list[i].issue).slice(-3);html+=issueHtml(list[i],(resMap||{})[_is]);if(i<list.length-1)}
+    for(var i=0;i<list.length;i++){var _is=String(list[i].issue).slice(-3);html+=issueHtml(list[i],(resMap||{})[_is]);}
     sec.innerHTML=html;
   }
-  Promise.all([get('data/pick.json'),get('data/manual-draw.json')]).then(function(r){var p=r[0]||{},md=r[1]||{};render(p.rows||[],resultsOf(md))}).catch(function(){});
+  Promise.all([get('data/pick.json'),get('data/manual-draw.json')]).then(function(r){var p=r[0]||{},md=r[1]||{};render(p.rows||[],resultsOf(md))}).catch(function(e){try{console.error('[nm-final]',e)}catch(x){}});
 })();
 </script><script>
 (function(){
@@ -921,7 +922,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});var wait=!sp.z;
       var hit=!wait&&(r.list||[]).some(function(x){return x.z===sp.z});
       var res=wait?'待开':(hit?'对':'错');
-      var tag=wait?'<span class="wx-tag wait">待开</span>':'<span class="wx-tag '+(hit?'ok':'no')+'">'+res+'</span>';
+      var tag=wait?'':'<span class="wx-tag '+(hit?'ok':'no')+'">'+res+'</span>';
       var l1='<b>'+r.issue+'期</b>：<span class="wx-title">五肖五码</span>'+(hit?' <span class="wx-hit">中</span>':'')+' 特开：<span class="wx-special">'+(wait?'待开':(sp.z+sp.c))+'</span>'+tag;
       var items=(r.list||[]).map(function(x){var on=!wait&&(x.z===sp.z||('0'+x.c).slice(-2)===('0'+sp.c).slice(-2));return '<span class="wx-item'+(on?' hit':'')+'">'+x.z+x.c+'</span>'}).join('');
       return '<div class="wx-row" data-issue="'+r.issue+'" data-result="'+res+'"><div class="wx-l1">'+l1+'</div><div class="wx-l2">【'+items+'】</div></div>';
