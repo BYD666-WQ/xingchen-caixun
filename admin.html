@@ -544,7 +544,7 @@ function renderHistory(){
 }
 function commitList(){
   if(!token())return;
-  api('https://api.github.com/repos/'+REPO+'/commits?per_page=10').then(function(list){
+  api('https://api.github.com/repos/'+REPO+'/commits?per_page=10&sha='+BRANCH+').then(function(list){
     $('commits').innerHTML=list.map(function(c){return '<div class="commit"><span>'+esc(c.sha.slice(0,7))+' '+esc(c.commit.message.split('\n')[0].slice(0,26))+'</span><button class="small gray" data-rb="'+c.sha+'">回滚</button></div>'}).join('');
     $('commits').querySelectorAll('button[data-rb]').forEach(function(b){b.addEventListener('click',function(){rollback(b.getAttribute('data-rb'))})});
   }).catch(function(){});
@@ -553,7 +553,7 @@ async function rollback(sha){
   if(!confirm('把 data 文件恢复到 '+sha.slice(0,7)+' 这一版并提交？'))return;
   try{
     for(var f of ['data/manual-draw.json','data/manual-play.json']){
-      var j=await api('https://api.github.com/repos/'+REPO+'/contents/'+f+'?ref='+sha);
+      var j=await api('https://api.github.com/repos/'+REPO+'/contents/'+f+'?ref='+BRANCH);
       var txt=decodeURIComponent(escape(atob(j.content.replace(/\n/g,''))));
       var obj=JSON.parse(txt);var cur=await getFileSha(f);
       var payload={message:'rollback to '+sha.slice(0,7),content:btoa(unescape(encodeURIComponent(JSON.stringify(obj,null,1)))),branch:BRANCH};if(cur)payload.sha=cur;
