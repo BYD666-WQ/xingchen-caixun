@@ -1,35 +1,33 @@
 {
  "ok": true,
  "status": "success",
+ "error": "",
+ "updated": "2026-11-27 14:00:30",
+ "updatedAt": "2026-11-27T14:00:30.537+08:00",
  "message": "云端 Worker 检查完成，无更新",
- "updated": "2026-11-25 21:30:31",
- "updatedAt": "2026-11-25T21:30:31.445+08:00",
- "lastSuccess": "2026-11-24 21:40:30",
- "newest_seen_ts": "2026328",
- "newest_seen_ids": [
-  "Macau:2026328",
-  "HongKong:2026123",
-  "MacauOld:2026316",
-  "Happy8:2026302"
- ],
+ "lastSuccess": "2026-11-26 21:40:30",
+ "latest_by_rule": {
+  "Macau": 2026330,
+  "HongKong": 2026124,
+  "MacauOld": 2026316,
+  "Happy8": 2026302
+ },
  "read_count": 2,
- "new_count": 5,
- "probe_ok": true,
- "receipt_gap_alert": false,
- "digest_frozen_alert": false,
  "liveRules": [
   "Macau",
   "HongKong"
  ],
- "latest_by_rule": {
-  "Macau": 2026328,
-  "HongKong": 2026123,
-  "MacauOld": 2026316,
-  "Happy8": 2026302
- },
- "error": "",
  "alerts": [],
  "gaps": [],
+ "receipt_gap_alert": false,
  "backfill": false,
- "lastRun": "2026-11-25 21:30:31"
+ "lastRun": "2026-11-27 14:00:30",
+ "new_count": 1,
+ "newest_seen_ids": [
+  "Macau:2026330",
+  "HongKong:2026124",
+  "MacauOld:2026316",
+  "Happy8:2026302"
+ ],
+ "newest_seen_ts": "2026330"
 }
