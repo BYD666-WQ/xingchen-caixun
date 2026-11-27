@@ -400,7 +400,22 @@ details.mini>summary::-webkit-details-marker{display:none}
     return null;
   }
   window.__xcActualResult=actualResult;
+  function specialHidden(issue){
+    try{
+      var cur=parseInt(window.__xcCurrentIssue,10)||((parseInt(D.newhk&&D.newhk.issue,10)||0)+1)||0,t=parseInt(issue,10)||0;
+      if(!cur||!t)return false;
+      if(t>=cur)return true;
+      if(t===cur-1){
+        var now=new Date();var at=new Date(now.getFullYear(),now.getMonth(),now.getDate(),21,34,0,0);
+        if(now.getTime()<at.getTime())at=new Date(at.getTime()-86400000);
+        return now.getTime()<at.getTime()+3600000;
+      }
+      return false;
+    }catch(e){return false}
+  }
+
   window.__xcSpOf=function(r){
+    try{if(r&&r.issue!=null&&specialHidden(r.issue))return {}}catch(e){}
     var sp=(r&&r.special)||{};
     var cur=currentMaxIssue();
     var historical=cur?(parseInt(r&&r.issue,10)||0)<cur:false;
@@ -782,7 +797,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   window.__xrState=function(){var o={};['newmo','hk'].forEach(function(k){var s=XR[k];o[k]=s?{issue:s.issue,phase:s.phase,revealed:s.revealed,mode:s.mode,elapsed:Date.now()-s.start}:null});return o};
 
   Promise.all([get('data/manual-draw.json'),get('data/draw.json'),get('data/site-config.json')]).then(function(r){
-    var md=mdCompat(r[0]||{}),dr=r[1]||{},cfg=r[2]||null;var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
+    var _rawMd=r[0]||{};var md=mdCompat(_rawMd),dr=r[1]||{},cfg=r[2]||null;window.__xcCurrentIssue=(_rawMd.current&&parseInt(_rawMd.current.issue,10))||parseInt(md.issue,10)||0;var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
     VF_CFG=vfNormCfg(cfg);window.__vfConfig=function(){return JSON.parse(JSON.stringify(VF_CFG))};
     try{
       var _dt=(cfg&&cfg.drawTimes)||{};
@@ -980,7 +995,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     var qw=rs[0],ss=rs[1],pt=rs[2],ds4=rs[3],md3=rs[4]||{};
     function decM(enc){try{var b=atob(String(enc||'')),a=new Uint8Array(b.length),k='Xc9vF2026';for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i)^k.charCodeAt(i%k.length);return JSON.parse(new TextDecoder('utf-8').decode(a))}catch(e){return []}}
     var MDR3={};(function(){function add(iss,ns){if(iss===undefined||iss===null)return;MDR3[String(iss).slice(-3)]=ns||[]}if(md3.current){add(md3.current.issue,md3.current.numsEnc?decM(md3.current.numsEnc):md3.current.nums)}else{add(md3.issue,md3.issue?md3.nums:[])};(md3.history||[]).forEach(function(h){add(h.issue,h.nums)})})();
-    function spOf3(r){var sp=(r&&r.special)||{};if(!sp.z){var ns=MDR3[String(r.issue==null?'':r.issue).slice(-3)];if(ns&&ns.length===7&&ns[6]&&ns[6].z)sp={z:ns[6].z,c:ns[6].c}}if(!sp.z&&window.__xcActualResult){var ar=window.__xcActualResult(r.issue);if(ar)sp={z:ar.z,c:ar.c}}return sp}
+    function spOf3(r){try{if(r&&r.issue!=null&&specialHidden(r.issue))return {}}catch(e){}var sp=(r&&r.special)||{};if(!sp.z){var ns=MDR3[String(r.issue==null?'':r.issue).slice(-3)];if(ns&&ns.length===7&&ns[6]&&ns[6].z)sp={z:ns[6].z,c:ns[6].c}}if(!sp.z&&window.__xcActualResult){var ar=window.__xcActualResult(r.issue);if(ar)sp={z:ar.z,c:ar.c}}return sp}
     var qwHtml=(qw&&qw.rows||[]).map(function(r){
       var sp=window.__xcSpOf?window.__xcSpOf(r):(r.special||{});var wait=!sp.z;var tail=wait?-1:parseInt(sp.c,10)%10;
       var tails=String(r.tails||'').split('').map(function(d){return '<span class="t'+(d===String(tail)?' hit':'')+'">'+d+'</span>'}).join('');
@@ -1201,6 +1216,24 @@ section.card{border-radius:14px!important;border:1px solid #E0B94A!important;bor
   </span>
   <span class="cbw-ad-cta">点击进入 <b>→</b></span>
 </a>
+
+<style id="friend-links-style">
+.friend-links{width:calc(100% - 16px);margin:12px 8px;box-sizing:border-box;border:1px solid #d8c9a8;border-radius:10px;background:linear-gradient(180deg,#1a000b,#2a0010);padding:8px;position:relative}
+.friend-links .fl-hd{font-size:10px;font-weight:800;color:#ffd8a8;letter-spacing:.08em;margin:0 0 6px 2px}
+.friend-links .fl-hd:before{content:'广告';display:inline-block;font-size:9px;color:#a89a80;border:1px solid #6b5b3a;border-radius:3px;padding:0 3px;margin-right:5px;vertical-align:1px}
+.friend-links .fl-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.friend-links a{display:block;min-width:0;box-sizing:border-box;padding:8px 6px;border:1px solid rgba(255,230,0,.28);border-radius:7px;background:linear-gradient(135deg,rgba(255,46,166,.14),rgba(255,230,0,.08));text-decoration:none}
+.friend-links a b{display:block;font-size:13px;line-height:1.2;color:#ffe600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.friend-links a span{display:block;margin-top:3px;font-size:9px;line-height:1.25;color:#ffd8ec;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+<section class="friend-links" aria-label="友情链接">
+  <div class="fl-hd">友情链接 · 开奖资料站</div>
+  <div class="fl-row">
+    <a href="https://byd666-wq.github.io/xingchen-site1/" target="_blank" rel="noopener"><b>彩霸王</b><span>开奖资料 · 每日更新</span></a>
+    <a href="https://byd666-wq.github.io/xingchen-site2/" target="_blank" rel="noopener"><b>95至尊</b><span>开奖资料 · 每日更新</span></a>
+    <a href="https://byd666-wq.github.io/xingchen-site3/" target="_blank" rel="noopener"><b>新香港论坛</b><span>开奖资料 · 每日更新</span></a>
+  </div>
+</section>
 
 <style id="ref-btn-style">
 .next .rf{min-height:40px;min-width:64px;display:inline-flex!important;align-items:center;justify-content:center;gap:4px;box-sizing:border-box;cursor:pointer;user-select:none;border-radius:5px}
