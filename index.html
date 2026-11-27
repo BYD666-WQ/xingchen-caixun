@@ -439,7 +439,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       
       var b=c.querySelector('.hd b');if(b&&d.issue)b.textContent=LABEL[k]+'第'+String(d.issue).slice(-3)+'期';
       var bb=c.querySelector('.balls');if(bb&&d.nums)bb.innerHTML=ballHtml(d.nums);
-      var t=c.querySelector('.hd .t');if(t){var _u=d.updated?new Date(d.updated):null;if(_u&&!isNaN(_u.getTime())){t.textContent='数据更新 '+p2(_u.getMonth()+1)+'-'+p2(_u.getDate())+' '+p2(_u.getHours())+':'+p2(_u.getMinutes())}else t.textContent='数据更新 --'}
+      var t=c.querySelector('.hd .t');if(t){var _u=(d.updated||window.__drawUpdated)?new Date(d.updated||window.__drawUpdated):null;if(_u&&!isNaN(_u.getTime())){t.textContent='数据更新 '+p2(_u.getMonth()+1)+'-'+p2(_u.getDate())+' '+p2(_u.getHours())+':'+p2(_u.getMinutes())}else t.textContent='数据更新 --'}
       var nx=c.querySelector('.next span');if(nx){var nd=nextDate(hm,DAYS[kindOf(k)]);var _nxt='第'+((parseInt(String(d.issue).slice(-3),10)||0)+1)+'期 · '+(nd.getMonth()+1)+'月'+nd.getDate()+'日 '+WD[nd.getDay()]+' '+hm;nx.textContent=_nxt}
       var cd=c.querySelector('.xc-cd');if(!cd){cd=document.createElement('span');cd.className='xc-cd';c.querySelector('.hd').appendChild(cd)}
       cd.id='xc-cd-'+k;
@@ -833,7 +833,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   window.__xrState=function(){var o={};['newmo','hk'].forEach(function(k){var s=XR[k];o[k]=s?{issue:s.issue,phase:s.phase,revealed:s.revealed,mode:s.mode,elapsed:Date.now()-s.start}:null});return o};
 
   Promise.all([get('data/manual-draw.json'),get('data/draw.json'),get('data/site-config.json')]).then(function(r){
-    var _rawMd=r[0]||{};var md=mdCompat(_rawMd),dr=r[1]||{},cfg=r[2]||null;window.__xcCurrentIssue=(_rawMd.current&&parseInt(_rawMd.current.issue,10))||parseInt(md.issue,10)||0;var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
+    var _rawMd=r[0]||{};var md=mdCompat(_rawMd),dr=r[1]||{},cfg=r[2]||null;window.__drawUpdated=(dr&&(dr.updatedAt||dr.updated))||'';window.__xcCurrentIssue=(_rawMd.current&&parseInt(_rawMd.current.issue,10))||parseInt(md.issue,10)||0;var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
     VF_CFG=vfNormCfg(cfg);window.__vfConfig=function(){return JSON.parse(JSON.stringify(VF_CFG))};
     try{
       var _dt=(cfg&&cfg.drawTimes)||{};
