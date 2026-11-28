@@ -1420,11 +1420,11 @@ setTimeout(loadRevealConfig,2500);
 <script>
 (function(){
 var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主站'],['hk','香港','每日','主站'],['fast-mark6-1','一分钟六合彩','1分钟','模拟'],['fast-mark6-5','5分钟六合彩','5分钟','模拟'],['fast-race-1','一分钟赛车','1分钟','模拟'],['fast-race-30','30秒赛车','30秒','模拟'],['fast-race-5','5分钟赛车','5分钟','模拟'],['fast-race-10','10分钟赛车','10分钟','模拟'],['fast-k3','大发快三','1分钟','模拟'],['fast-airship','一分飞艇','1分钟','模拟'],['oldmo','老澳','每日','未接入']].map(function(x){return {id:x[0],name:x[1],period:x[2],source:x[3],enabled:x[3]!=='未接入'}});
-  var GAME_NAMES={'fast-race-1':'一分钟赛车','fast-race-2':'2分钟赛车','fast-race-5':'5分钟赛车','fast-race-10':'10分钟赛车','fast-race-30':'30秒赛车','fast-mark6-1':'一分钟六合彩','fast-mark6-5':'5分钟六合彩','fast-k3':'大发快三','fast-airship':'一分飞艇','fast-airship-5':'一分飞艇·5分','fast-bjrace':'北京赛车','fast-luckyrace':'幸运赛车','fast-ship10':'极速飞艇','fast-tensc':'极速时时彩','fast-txffc':'极速11选5'};
+  var GAME_NAMES={'fast-race-1':'一分钟赛车','fast-race-2':'2分钟赛车','fast-race-5':'5分钟赛车','fast-race-10':'10分钟赛车','fast-race-30':'30秒赛车','fast-mark6-1':'一分钟六合彩','fast-mark6-5':'5分钟六合彩','fast-k3':'大发快三','fast-airship':'一分飞艇','fast-airship-5':'幸运飞艇·5分','fast-bjrace':'北京赛车','fast-luckyrace':'幸运赛车','fast-ship10':'澳洲幸运10','fast-tensc':'极速时时彩','fast-txffc':'腾讯分分彩'};
   // 前台实际可见彩种白名单：来源 https://byd666-wq.github.io/xingchen-lotteryhall/config/games.js
-  // + HALL18 首页大厅；用户 2026-11-28 明确排除 2/30/5/10分钟赛车、一分飞艇5分、5分钟六合彩、腾讯分分彩。
+  // + HALL18 首页大厅；用户 2026-11-28 确认 10 项可用（除 daily 外）：race-1/mark6-1/k3/txffc/ship10/airship-5/bjrace/luckyrace/tensc/airship。
   // 前台 games.js 增删彩种时，同步改这里或改 games.js 的 enabled。
-  var FRONT_VISIBLE=['fast-race-1','fast-mark6-1','fast-k3','fast-airship','fast-ship10','fast-bjrace','fast-luckyrace','fast-tensc'];
+  var FRONT_VISIBLE=['fast-race-1','fast-mark6-1','fast-k3','fast-txffc','fast-ship10','fast-airship-5','fast-bjrace','fast-luckyrace','fast-tensc','fast-airship'];
   async function loadGameList(){try{
     var ids=[];
     try{var gr=await fetch('https://byd666-wq.github.io/xingchen-lotteryhall/config/games.js');var txt=await gr.text();var bi=txt.indexOf('window.LH_GAMES');if(bi>=0){var seg=txt.slice(bi,txt.indexOf('];',bi));var re=/id\s*:\s*['"]([^'"]+)['"]/g,m;while((m=re.exec(seg)))ids.push(m[1])}}catch(e){}
