@@ -1436,7 +1436,7 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
     var r=await fetch(url,{method:meth,headers:headers,body:meth==='POST'?JSON.stringify(body):undefined});
     var j=null;try{j=await r.json()}catch(e){}
     if(!r.ok){var e=new Error((j&&(j.error||j.message))||('HTTP '+r.status));e.status=r.status;e.auth=r.status===401;throw e}
-    if(path==='/games'){var cfg=(j&&(j.config||j.odds))||{};return {oddsByPlay:cfg,odds:cfg}}
+    if(path==='/games'){var cfg=(j&&(j.config||j.odds))||{};if(cfg&&cfg.odds&&typeof cfg.odds==='object')cfg=cfg.odds;return {oddsByPlay:cfg,odds:cfg}}
     return j;
   }
   function status(s,err){var el=document.getElementById('lot-status');if(el){el.textContent=s;el.style.color=err?'#c74b4b':'#0b8a4b'}}
