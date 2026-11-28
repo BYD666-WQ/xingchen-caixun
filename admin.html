@@ -1430,7 +1430,7 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
     if(path==='/games'){url=LH_BASE+'/api/odds';meth='GET'}
     else if(path==='/admin/odds'){url=LH_BASE+'/api/admin/odds';meth='POST';headers['x-admin-key']=ak;if(!ak){var e0=new Error('请先填写管理员密钥');e0.auth=true;throw e0}}
     else if(path==='/admin/config'&&body&&body.oddsByPlay){url=LH_BASE+'/api/admin/odds';meth='POST';headers['x-admin-key']=ak;if(!ak){var e1=new Error('请先填写管理员密钥');e1.auth=true;throw e1};body={odds:body.oddsByPlay}}
-    else if(path==='/admin/draw-state'){url=LH_BASE+'/api'+path;meth='GET';headers['x-admin-key']=ak;if(!ak){var e2=new Error('请先填写管理员密钥');e2.auth=true;throw e2}}
+    else if(path.indexOf('/admin/draw-state')===0){url=LH_BASE+'/api'+path;meth='GET';headers['x-admin-key']=ak;if(!ak){var e2=new Error('请先填写管理员密钥');e2.auth=true;throw e2}}
     else if(path==='/admin/draw-result'){url=LH_BASE+'/api/admin/draw-result';meth='POST';headers['x-admin-key']=ak;if(!ak){var e3=new Error('请先填写管理员密钥');e3.auth=true;throw e3}}
     else if(path==='/admin/users'){url=LH_BASE+'/api/admin/users';meth='GET';headers['x-admin-key']=ak}
     else if(path==='/admin/bets'){return {bets:[]}}
