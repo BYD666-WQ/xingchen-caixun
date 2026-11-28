@@ -110,8 +110,8 @@ body{padding-bottom:76px}
 #lottery-panel .lot-api code{background:#f3f6f4;padding:1px 4px;border-radius:3px;color:#45715b}
 @media(min-width:900px){body[data-admin-cat="lottery"] .wrap{max-width:1120px}#lottery-panel .lot-games{grid-template-columns:repeat(3,minmax(0,1fr))}} @media(max-width:600px){#lottery-panel .lot-games{grid-template-columns:1fr}}
 </style>
-<p class="lot-note"><b>GitHub JSON 接口</b> · 用户/积分/注单由管理接口读写；密钥只存本机浏览器。</p>
-<div class="lot-key"><input id="lot-admin-key" type="password" autocomplete="off" placeholder="管理员密钥（4–6 位示例）"><button id="lot-admin-key-save" type="button">保存管理员密钥</button><span>加减积分走 Function /admin/points</span></div>
+<p class="lot-note"><b>自建后端</b> · 用户列表/余额与赔率配置；密钥只存本机浏览器。</p>
+<div class="lot-key"><input id="lot-admin-key" type="password" autocomplete="off" placeholder="管理员密钥（4–6 位示例）"><button id="lot-admin-key-save" type="button">保存管理员密钥</button><span>加扣积分走 POST /api/admin/points</span></div>
 <div id="lot-status" style="font-size:11px;color:#888;margin:6px 0 2px">请先填写管理员密钥</div>
 <div class="lot-balance" style="border:1px solid #d8ece1;background:#f7fcf9;border-radius:8px;padding:10px;margin:8px 0">
   <h3 style="margin:0 0 8px">用户管理 <span class="lot-sub">按用户名搜索 / 加扣余额</span></h3>
@@ -126,9 +126,6 @@ body{padding-bottom:76px}
   <div style="font-size:12px;font-weight:700;margin:8px 0 4px">最近 10 条调整</div>
   <div id="lot-bal-log" style="font-size:11px;color:#456253;line-height:1.6"></div>
 </div>
-<h3>用户列表 <span class="lot-sub">用户名 / 积分 / 注册时间 / 状态</span></h3>
-<div class="lot-scroll"><table class="lot-table"><thead><tr><th>用户名</th><th>积分</th><th>注册时间</th><th>状态</th><th>加减积分</th></tr></thead><tbody id="lot-users"></tbody></table></div>
-
 <h3>开奖控制 <span class="lot-sub">手动指定 / 随机 · 难度</span></h3>
 <div class="lot-draw"><select id="lot-draw-game"></select><select id="lot-draw-mode"><option value="manual">手动指定</option><option value="random">随机开奖</option></select><select id="lot-draw-diff"><option value="easy">易 · 高频小奖</option><option value="medium" selected>中 · 均衡</option><option value="hard">难 · 低频大奖</option></select><input id="lot-draw-num" type="number" min="1" max="49" placeholder="手动特码 1-49"><button id="lot-draw-run" type="button">执行模拟开奖</button></div>
 <div id="lot-draw-result">等待操作 · 保存后写入 config，前端投注页读取。</div>
@@ -154,8 +151,6 @@ body{padding-bottom:76px}
   <div id="lot-odds-body" class="lot-odds-body">读取中…</div>
 </div>
 <div class="lot-window"><b>开奖时段</b><input id="lot-win-start" type="time" value="03:00"><span>至</span><input id="lot-win-end" type="time" value="23:59"><label style="display:inline-flex;gap:4px;align-items:center"><input id="lot-win-on" type="checkbox" checked>启用</label><button id="lot-win-save" type="button">保存时段</button><span id="lot-win-status" style="font-size:11px;color:#888"></span></div>
-<h3>注单列表 <span class="lot-sub">来自 bets 表</span></h3>
-<div class="lot-scroll"><table class="lot-table"><thead><tr><th>用户名</th><th>彩种</th><th>期号</th><th>选号</th><th>注额</th><th>状态</th></tr></thead><tbody id="lot-bets"></tbody></table></div>
 <h3>彩种开关 <span class="lot-sub">启用 / 周期 / 数据源</span></h3>
 <div class="lot-games" id="lot-games"></div>
 <h3>用户连赢管控 <span class="lot-sub">演示配置 · 只影响开奖分布</span></h3>
@@ -1426,7 +1421,7 @@ setTimeout(loadRevealConfig,2500);
 <script>
 (function(){
 var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主站'],['hk','香港','每日','主站'],['fast-mark6-1','一分钟六合彩','1分钟','模拟'],['fast-mark6-5','5分钟六合彩','5分钟','模拟'],['fast-race-1','一分钟赛车','1分钟','模拟'],['fast-race-30','30秒赛车','30秒','模拟'],['fast-race-5','5分钟赛车','5分钟','模拟'],['fast-race-10','10分钟赛车','10分钟','模拟'],['fast-k3','大发快三','1分钟','模拟'],['fast-airship','一分飞艇','1分钟','模拟'],['oldmo','老澳','每日','未接入']].map(function(x){return {id:x[0],name:x[1],period:x[2],source:x[3],enabled:x[3]!=='未接入'}});
-  var USERS=[],BETS=[],CONFIGS={};
+  var CONFIGS={};
     var LH_BASE='https://198.13.51.135.sslip.io';
   var $=function(s){return document.querySelector(s)};
   async function wfetch(path,opts){
@@ -1444,23 +1439,6 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
     return j;
   }
   function status(s,err){var el=document.getElementById('lot-status');if(el){el.textContent=s;el.style.color=err?'#c74b4b':'#0b8a4b'}}
-  function renderUsers(){
-    var tb=document.getElementById('lot-users');if(!tb)return;
-    if(!USERS.length){tb.innerHTML='<tr><td colspan="5" style="color:#999">暂无用户</td></tr>';return}
-    tb.innerHTML=USERS.map(function(u,i){
-      var created=String(u.createdAt||u.$createdAt||'').slice(0,10);
-      var rid=u.uid||u.$id||'';
-      return '<tr><td><b>'+u.username+'</b></td><td class="num">'+Number(u.points||0).toLocaleString()+'</td><td>'+created+'</td><td><span style="color:#0b8a4b;font-weight:700">'+(u.role==='admin'?'管理员':'正常')+'</span></td><td><div class="ops"><button type="button" data-lot-row="'+rid+'" data-lot-delta="100">+100</button><button type="button" class="gray" data-lot-row="'+u.$id+'" data-lot-delta="-100">-100</button><button type="button" data-lot-row="'+u.$id+'" data-lot-set="1">设为</button></div></td></tr>';
-    }).join('');
-  }
-  function renderBets(){
-    var tb=document.getElementById('lot-bets');if(!tb)return;
-    if(!BETS.length){tb.innerHTML='<tr><td colspan="6" style="color:#999">暂无注单</td></tr>';return}
-    tb.innerHTML=BETS.slice(0,30).map(function(b){
-      var picks=b.picks||'';try{var p=JSON.parse(picks);if(p&&p.selections)p=p.selections.map(function(x){return x.label||x.key}).join('、');else p=picks}catch(e){}
-      return '<tr><td>'+b.username+'</td><td>'+b.gameId+'</td><td>'+b.issue+'</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">'+p+'</td><td class="num">'+b.stake+'</td><td>'+b.status+'</td></tr>';
-    }).join('');
-  }
   function renderGames(){
     var box=document.getElementById('lot-games');if(!box)return;
     var diffOpts=[['easy','简单(易中)'],['mid','中等(随机)'],['hard','困难(大注难中)'],['brutal','极难(大注几乎全杀)']];
@@ -1469,7 +1447,7 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
   function renderDraw(){var sel=document.getElementById('lot-draw-game');if(sel)sel.innerHTML=GAMES.map(function(g,i){return '<option value="'+i+'">'+g.name+'</option>'}).join('')}
   async function loadAll(){
     status('正在读取配置（自建后端）…');
-    try{USERS=[];BETS=[];renderUsers();renderBets();await loadOdds();status('配置已加载（用户/注单接口暂未提供）')}
+    try{await loadOdds();status('配置已加载')}
     catch(e){status(e.auth?'管理员密钥无效':'加载失败：'+e.message,true)}
   }
   function adminKey(){ return (localStorage.getItem('lottery-admin-key')||'').trim(); }
@@ -1496,17 +1474,6 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
   document.getElementById('lot-bal-cancel').onclick=function(){document.getElementById('lot-bal-edit').style.display='none';BAL_SEL=null};
   document.getElementById('lot-bal-apply').onclick=async function(){if(!BAL_SEL)return;var amt=parseInt(document.getElementById('lot-bal-amount').value,10);if(!isFinite(amt)||amt===0)return balMsg('金额必须是非 0 整数',true);var note=document.getElementById('lot-bal-note').value.trim();balMsg('提交中…');try{var j=await lbFetch('/api/admin/points',{method:'POST',body:{username:BAL_SEL.username,email:BAL_SEL.username,amount:amt,note:note}});var np=(j&&j.user&&j.user.balance!=null)?j.user.balance:(Number(BAL_SEL.balance||0)+amt);BAL_SEL.balance=np;document.getElementById('lot-bal-edit').style.display='none';renderBalList();balMsg('已调整 '+(amt>0?'+':'')+amt+'，'+BAL_SEL.username+' 新余额 '+np);renderBalLog()}catch(e){balMsg(e.auth?'401：管理员密钥无效':(e.status===400?'余额不足或金额非法：'+e.message:'调整失败：'+e.message),true)}};
   renderBalLog();if(adminKey())loadBalList(true);
-  document.getElementById('lot-users').onclick=async function(e){
-    var b=e.target.closest('[data-lot-row]');if(!b)return;
-    var row=USERS.find(function(x){return (x.uid||x.$id)===b.getAttribute('data-lot-row')});if(!row)return;
-    var nv; if(b.hasAttribute('data-lot-set')){var input=prompt('设置新积分（演示）', String(row.points||0)); if(input===null)return; nv=parseInt(input,10); if(!isFinite(nv)||nv<0){status('积分为非负整数',true);return}} else nv=Math.max(0,Number(row.points||0)+Number(b.getAttribute('data-lot-delta')));b.disabled=true;
-    try{
-      var payload = b.hasAttribute('data-lot-set') ? {setTo:nv} : {delta:Number(b.getAttribute('data-lot-delta'))};
-      var res=await wfetch('/admin/points',{method:'POST',body:Object.assign({username:row.username},payload)});
-      row.points=(res&&res.user&&res.user.points!=null)?res.user.points:(res&&res.points!=null?res.points:nv);
-      renderUsers();status('积分已更新为 '+row.points+'（管理员接口）');
-    }catch(err){status('积分更新失败：'+err.message,true);b.disabled=false}
-  };
   document.getElementById('lot-win-save').onclick=async function(){
     var st=document.getElementById('lot-win-start').value, en=document.getElementById('lot-win-end').value, on=document.getElementById('lot-win-on').checked;
     if(!st||!en){status('请填写开始/结束时间',true);return}
@@ -1627,7 +1594,7 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
       status('开奖配置已保存');
     }catch(err){out.innerHTML='<b style="color:#c74b4b">保存失败：'+err.message+'</b>'}
   };
-  window.__lotteryReal={get users(){return USERS},get bets(){return BETS},get configs(){return CONFIGS},reload:loadAll};
+  window.__lotteryReal={get configs(){return CONFIGS},reload:loadAll};
   window.__lotteryLoadAll=loadAll;
   function initManualDraw(){var sel=document.getElementById('lot-man-game');if(!sel)return;sel.innerHTML=GAMES.map(function(g){return '<option value="'+g.id+'">'+g.name+'</option>'}).join('');MAN_GAME=sel.value;try{var _mp=manLoad();if(_mp&&_mp.catch)_mp.catch(function(){})}catch(e){} }
   initManualDraw();renderGames();renderDraw();
