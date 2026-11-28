@@ -131,21 +131,16 @@ body{padding-bottom:76px}
 <div class="lot-interval" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:8px 0;font-size:12px"><b>间隔(秒)</b><input id="lot-draw-interval" type="number" min="5" max="3600" step="1" style="width:90px;height:34px;border:1px solid #dfe8e3;border-radius:5px;padding:0 7px"><span id="lot-draw-interval-label" style="color:#456253">—</span><button id="lot-draw-interval-save" type="button">保存间隔</button><span id="lot-draw-interval-state" style="color:#888"></span></div>
 <div id="lot-draw-result">等待操作 · 保存后写入 config，前端投注页读取。</div>
 
-<h3>手动开奖 <span class="lot-sub">指定号码 · 立即结算</span></h3>
-<div class="lot-manual">
-  <div class="lot-man-row"><select id="lot-man-game"></select><button id="lot-man-refresh" type="button">刷新状态</button></div>
-  <div id="lot-man-hint" class="lot-man-hint">选择彩种后读取当前期号 / 自动开奖时间</div>
-  <div id="lot-man-meta" class="lot-man-meta"></div>
-  <div id="lot-man-nums" class="lot-man-nums"></div>
-  <div class="lot-man-row"><input id="lot-man-special" type="number" min="1" max="49" placeholder="特码 1-49（可选）" style="width:140px;height:34px"><button id="lot-man-random" type="button">随机填充</button><button id="lot-man-submit" type="button" class="primary">立即开奖</button></div>
-  <div id="lot-man-result" class="lot-man-result"></div>
+<h3>当前彩种数据 <span class="lot-sub">切换彩种自动刷新</span></h3>
+<div id="lot-cur" style="font-size:12px;color:#456253;background:#f8fbf9;border:1px solid #e7eee9;border-radius:6px;padding:8px 10px;line-height:1.7;margin:6px 0">读取中…</div>
+<h3>预定开奖 <span class="lot-sub">可指定未来任意期</span></h3>
+<div class="lot-plan-form" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0">
+  <input id="lot-plan-issue" type="text" inputmode="numeric" placeholder="期号（默认当前期）" style="height:34px;min-width:150px;border:1px solid #dfe8e3;border-radius:5px;padding:0 8px">
+  <input id="lot-plan-special" type="number" min="1" max="49" placeholder="特码 1-49" style="height:34px;width:120px;border:1px solid #dfe8e3;border-radius:5px;padding:0 8px">
+  <button id="lot-plan-save" type="button">保存预定</button>
+  <span id="lot-plan-msg" style="font-size:12px;color:#888"></span>
 </div>
-
-<h3>加期号 / 预置结果 <span class="lot-sub">已设置的按期开奖，未设置的到点自动模拟</span></h3>
-<div class="lot-plan">
-  <div class="lot-man-row"><button id="lot-plan-add" type="button">＋ 加期号</button><span id="lot-plan-hint" style="font-size:11px;color:#888"></span></div>
-  <div id="lot-plan-list"></div>
-</div>
+<div id="lot-plan-list-new" style="font-size:12px;color:#456253;line-height:1.7"></div>
 <h3>玩法赔率 <span class="lot-sub">改完进 dirty，统一「保存并发布」</span></h3>
 <div class="lot-odds" id="lot-odds">
   <div class="lot-man-row"><select id="lot-odds-game"></select><button id="lot-odds-reload" type="button">刷新赔率</button><span id="lot-odds-state" style="font-size:11px;color:#888"></span></div>
@@ -1432,7 +1427,7 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
     ids=ids.filter(function(id){return id.indexOf('fast-')===0&&FRONT_VISIBLE.indexOf(id)>=0});
     if(!ids.length)return;var old={};GAMES.forEach(function(g){old[g.id]=g});
     GAMES=ids.map(function(id){var o=old[id]||{};return {id:id,name:GAME_NAMES[id]||o.name||id,period:o.period||'1分钟',source:'模拟',enabled:o.enabled!==false}});
-    renderDraw();initManualDraw();try{loadInterval()}catch(e){}
+    renderDraw();try{loadGameState()}catch(e){}
   }catch(e){console.warn('[lot-games]',e)}}
   var CONFIGS={};
     var LH_BASE='https://198.13.51.135.sslip.io';
@@ -1459,7 +1454,7 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
   function renderDraw(){var sel=document.getElementById('lot-draw-game');if(sel)sel.innerHTML=fastGames().map(function(x){return '<option value="'+x.i+'">'+x.g.name+'</option>'}).join('')}
   function fmtSec(n){n=Number(n)||0;if(n<60)return n+'秒';var m=Math.floor(n/60),s=n%60;return m+'分'+(s?s+'秒':'')}
   async function loadGameConfig(){var sel=document.getElementById('lot-draw-game');if(!sel)return;var g=GAMES[parseInt(sel.value,10)];if(!g)return;try{var j=await lbFetch('/api/admin/config?gameId='+encodeURIComponent(g.id));var c=(j&&j.config)||{};var d=c.difficulty||'medium';var m=c.mode||'random';var ds=document.getElementById('lot-draw-diff');if(ds)ds.value=(d==='easy'||d==='hard')?d:'medium';var ms=document.getElementById('lot-draw-mode');if(ms)ms.value=(m==='manual')?'manual':'random';}catch(e){var ds2=document.getElementById('lot-draw-diff');if(ds2)ds2.value='medium';var ms2=document.getElementById('lot-draw-mode');if(ms2)ms2.value='random'}}
-  async function loadGameState(){loadGameConfig();loadInterval()}async function loadInterval(){var sel=document.getElementById('lot-draw-game');if(!sel)return;var g=GAMES[parseInt(sel.value,10)];if(!g)return;try{var j=await lbFetch('/api/admin/interval?gameId='+encodeURIComponent(g.id));var n=Number(j.intervalSec)||0;var el=document.getElementById('lot-draw-interval');if(el)el.value=n;var lb=document.getElementById('lot-draw-interval-label');if(lb)lb.textContent=n+' 秒 = '+fmtSec(n);var st=document.getElementById('lot-draw-interval-state');if(st)st.textContent='当前 '+(j.source==='custom'?'自定义':'默认')+' · '+n+' 秒'}catch(e){var st2=document.getElementById('lot-draw-interval-state');if(st2)st2.textContent=e.auth?'401 管理员密钥无效':'读取失败：'+e.message}}
+  async function loadGameState(){loadGameConfig();loadInterval();loadCurrentInfo()}async function loadInterval(){var sel=document.getElementById('lot-draw-game');if(!sel)return;var g=GAMES[parseInt(sel.value,10)];if(!g)return;try{var j=await lbFetch('/api/admin/interval?gameId='+encodeURIComponent(g.id));var n=Number(j.intervalSec)||0;var el=document.getElementById('lot-draw-interval');if(el)el.value=n;var lb=document.getElementById('lot-draw-interval-label');if(lb)lb.textContent=n+' 秒 = '+fmtSec(n);var st=document.getElementById('lot-draw-interval-state');if(st)st.textContent='当前 '+(j.source==='custom'?'自定义':'默认')+' · '+n+' 秒'}catch(e){var st2=document.getElementById('lot-draw-interval-state');if(st2)st2.textContent=e.auth?'401 管理员密钥无效':'读取失败：'+e.message}}
   async function loadAll(){
     status('正在读取配置（自建后端）…');
     try{await loadOdds();status('配置已加载')}
@@ -1499,132 +1494,17 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
       status('开奖时段已保存');
     }catch(e){document.getElementById('lot-win-status').textContent='保存失败：'+e.message;status('时段保存失败：'+e.message,true)}
   };
-  var MAN_STATE = null, MAN_GAME = '';
-  function manIsRacing(id) { return /^fast-race/.test(id); }
-  function manIsK3(id) { return id === 'fast-k3'; }
-  function manCount(id) { return manIsRacing(id) ? 10 : (manIsK3(id) ? 3 : 7); }
-  function manMax(id) { return manIsRacing(id) ? 10 : (manIsK3(id) ? 6 : 49); }
-  function manFillInputs() {
-    var box = document.getElementById('lot-man-nums'); if (!box) return;
-    var id = document.getElementById('lot-man-game').value;
-    var cnt = manCount(id), max = manMax(id), html = '';
-    for (var i = 0; i < cnt; i++) html += '<input type="number" min="1" max="' + max + '" data-man-num="' + i + '" inputmode="numeric" placeholder="' + (i + 1) + '">';
-    box.innerHTML = html;
-  }
-  async function manLoad() {
-    var sel = document.getElementById('lot-man-game'); if (!sel) return;
-    var id = sel.value; MAN_GAME = id;
-    var hint = document.getElementById('lot-man-hint'), meta = document.getElementById('lot-man-meta');
-    hint.textContent = '读取中…'; meta.textContent = '';
-    try {
-      var d = await wfetch('/admin/draw-state?gameId=' + encodeURIComponent(id));
-      MAN_STATE = d;
-      hint.textContent = d.closeAt ? ('封盘 ' + String(d.closeAt).replace('T',' ').slice(0,16) + ' · 状态 ' + (d.status||'—')) : ('状态 ' + (d.status||'—'));
-      meta.innerHTML = '<span>当前期 <b>' + d.issue + ' 期</b></span><span>下一期 <b>' + (d.nextIssue||'—') + '</b></span><span>封盘 ' + (d.closeAt || '—') + '</span>';
-      manFillInputs();
-      var lr=d.lastResult; document.getElementById('lot-man-result').textContent = lr ? ('最近结果：第 ' + lr.issue + ' 期 · 特码 ' + (lr.special!=null?lr.special:'—') + (lr.nums&&lr.nums.length?' · '+lr.nums.join(' '):'')) : '暂无最近结果';
-    } catch (e) { hint.textContent = '读取失败：' + e.message; }
-  }
-  document.getElementById('lot-man-game').onchange = manLoad;
-  document.getElementById('lot-man-refresh').onclick = manLoad;
-  document.getElementById('lot-man-random').onclick = function () {
-    var id = MAN_GAME || document.getElementById('lot-man-game').value;
-    var max = manMax(id), cnt = manCount(id), used = {};
-    var vals = [];
-    for (var i = 0; i < cnt; i++) { var v; do { v = 1 + Math.floor(Math.random() * max); } while (used[v]); used[v] = 1; vals.push(v); }
-    document.querySelectorAll('[data-man-num]').forEach(function (inp, i) { inp.value = String(vals[i]).padStart(2, '0'); });
-  };
-  document.getElementById('lot-man-submit').onclick = async function () {
-    var out = document.getElementById('lot-man-result');
-    if (!MAN_STATE) { out.textContent = '请先刷新状态'; return; }
-    var special = parseInt(document.getElementById('lot-man-special').value, 10);
-    var inputs = document.querySelectorAll('[data-man-num]');
-    var nums = [];
-    for (var i = 0; i < inputs.length; i++) { var v = parseInt(inputs[i].value, 10); if (isFinite(v) && v > 0) nums.push(v); }
-    var body = { gameId: MAN_GAME, issue: MAN_STATE.issue };
-    if (isFinite(special) && special >= 1 && special <= 49) body.special = special;
-    else if (nums.length) {
-      if (nums.length !== inputs.length) { out.textContent = '号码未填完整'; return; }
-      if (new Set(nums).size !== nums.length) { out.textContent = '号码不能重复'; return; }
-      body.nums = nums;
-    } else { out.textContent = '请输入特码 1-49 或完整号码'; return; }
-    try {
-      var r = await wfetch('/admin/draw-result', { method: 'POST', body: body });
-      var res=r.result||{};
-      var msg = '已开奖 第 ' + (res.issue || MAN_STATE.issue) + ' 期 · 特码 ' + (res.special!=null?res.special:'—') + ' · 结算 ' + (r.settled!=null?r.settled:0) + ' 注';
-      await manLoad(); out.textContent = msg;
-    } catch (e) { out.textContent = e.status===409 ? '该期已开奖' : (e.auth?'401 管理员密钥无效':'提交失败：'+e.message); }
-  };
-  var PLAN_EDIT = null;
-  function planNumsHtml() {
-    var id = document.getElementById('lot-man-game').value, cnt = manCount(id), max = manMax(id), h = '';
-    for (var i = 0; i < cnt; i++) h += '<input type="number" min="1" max="' + max + '" data-plan-num="' + i + '" inputmode="numeric">';
-    return h;
-  }
-  async function planLoad() {
-    var box = document.getElementById('lot-plan-list'); if (!box) return;
-    var id = document.getElementById('lot-man-game').value;
-    box.innerHTML = '<div style="font-size:11px;color:#888">读取中…</div>';
-    try {
-      var d = await wfetch('/admin/issue-plan?gameId=' + encodeURIComponent(id));
-      var plans = d.plans || [];
-      document.getElementById('lot-plan-hint').textContent = plans.length ? ('共 ' + plans.length + ' 期计划') : '暂无计划，点「＋ 加期号」';
-      if (!plans.length) { box.innerHTML = '<div style="font-size:11px;color:#888;padding:8px 0">暂无计划</div>'; return; }
-      box.innerHTML = plans.map(function (p) {
-        var editing = PLAN_EDIT === p.issue;
-        var nums = p.nums ? p.nums.join(' ') : '';
-        return '<div class="lot-plan-row" data-plan-issue="' + p.issue + '"><b>' + p.issue + ' 期</b><span>' + (p.used ? '已开奖' : (p.nums ? '已设结果' : '未设 · 自动')) + '</span><em>' + (nums || '—') + '</em>' +
-          (editing ? '<div class="lot-plan-edit">' + planNumsHtml() + '<button type="button" data-plan-random="' + p.issue + '">随机</button><button type="button" data-plan-save="' + p.issue + '">保存</button><button type="button" data-plan-cancel>取消</button></div>' : '<button type="button" data-plan-set="' + p.issue + '">设置/修改</button>') +
-          '<button type="button" data-plan-del="' + p.issue + '">删除</button></div>';
-      }).join('');
-    } catch (e) { box.innerHTML = '<div style="font-size:11px;color:#c74b4b">读取失败：' + e.message + '</div>'; }
-  }
-  document.getElementById('lot-plan-add').onclick = async function () {
-    var id = document.getElementById('lot-man-game').value;
-    try { await wfetch('/admin/issue-plan', { method: 'POST', body: { gameId: id } }); await planLoad(); }
-    catch (e) { document.getElementById('lot-plan-hint').textContent = '加期号失败：' + e.message; }
-  };
-  document.getElementById('lot-plan-list').onclick = async function (e) {
-    var id = document.getElementById('lot-man-game').value;
-    var set = e.target.closest('[data-plan-set]'), del = e.target.closest('[data-plan-del]'), save = e.target.closest('[data-plan-save]'), rnd = e.target.closest('[data-plan-random]');
-    if (e.target.closest('[data-plan-cancel]')) { PLAN_EDIT = null; planLoad(); return; }
-    if (set) { PLAN_EDIT = Number(set.getAttribute('data-plan-set')); planLoad(); return; }
-    if (rnd) { var max = manMax(id), cnt = manCount(id), used = {}, vals = []; for (var i = 0; i < cnt; i++) { var v; do { v = 1 + Math.floor(Math.random() * max); } while (used[v]); used[v] = 1; vals.push(v); } document.querySelectorAll('[data-plan-num]').forEach(function (inp, i) { inp.value = vals[i]; }); return; }
-    if (save) {
-      var issue = Number(save.getAttribute('data-plan-save')), inputs = document.querySelectorAll('[data-plan-num]'), nums = [];
-      for (var k = 0; k < inputs.length; k++) { var nv = parseInt(inputs[k].value, 10); if (!isFinite(nv) || nv < 1 || nv > manMax(id)) { alert('号码不合法'); return; } nums.push(nv); }
-      if (new Set(nums).size !== nums.length) { alert('号码不能重复'); return; }
-      try { await wfetch('/admin/issue-plan', { method: 'PATCH', body: { gameId: id, issue: issue, nums: nums } }); PLAN_EDIT = null; await planLoad(); }
-      catch (err) { alert('保存失败：' + err.message); }
-      return;
-    }
-    if (del) {
-      var di = Number(del.getAttribute('data-plan-del'));
-      if (!confirm('删除 ' + di + ' 期计划？')) return;
-      try { await wfetch('/admin/issue-plan', { method: 'DELETE', body: { gameId: id, issue: di } }); await planLoad(); }
-      catch (err) { alert('删除失败：' + err.message); }
-    }
-  };
-  document.getElementById('lot-draw-run').onclick=async function(){
-    var i=parseInt(document.getElementById('lot-draw-game').value,10),g=GAMES[i]||GAMES[0],mode=document.getElementById('lot-draw-mode').value,diff=document.getElementById('lot-draw-diff').value,num=parseInt(document.getElementById('lot-draw-num').value,10),out=document.getElementById('lot-draw-result');
-    if(mode==='manual'&&(!num||num<1||num>49)){out.innerHTML='<b style="color:#c74b4b">请输入 1-49 的手动特码</b>';return}
-    var body={gameId:g.id,mode:mode,difficulty:diff};if(mode==='manual')body.forcedResult=String(num);
-    out.innerHTML='保存中…';
-    try{
-      await lbFetch('/api/admin/config',{method:'POST',body:body});
-      var back=await lbFetch('/api/admin/config?gameId='+encodeURIComponent(g.id));
-      var cfg=(back&&back.config)||{};var got=cfg.difficulty||diff;var gotMode=cfg.mode||mode;
-      var label=got==='easy'?'易':got==='hard'?'难':'中';
-      var ms=document.getElementById('lot-draw-mode');if(ms)ms.value=gotMode==='manual'?'manual':'random';
-      CONFIGS[g.id]=Object.assign({},CONFIGS[g.id]||{gameId:g.id},body);
-      out.innerHTML='<b style="color:#0b8a4b">已保存（难度：'+label+'）</b> · '+(gotMode==='manual'?'手动指定':'随机')+'<br><span style="color:#999">GET /api/admin/config 回读 difficulty='+got+'</span>';
-      status('开奖配置已保存');
-    }catch(err){out.innerHTML='<b style="color:#c74b4b">保存失败：'+(err.status===401?'401 管理员密钥无效':err.message)+'</b>'}
-  };
+  function curMsg(t,bad){var e=document.getElementById('lot-plan-msg');if(e){e.textContent=t||'';e.style.color=bad?'#b00020':'#0b8a4b'}}
+  async function loadCurrentInfo(){var sel=document.getElementById('lot-draw-game');if(!sel)return;var g=GAMES[parseInt(sel.value,10)];if(!g)return;var box=document.getElementById('lot-cur');if(box)box.textContent='读取中…';try{var st=await lbFetch('/api/admin/draw-state?gameId='+encodeURIComponent(g.id));var rs=[];try{var rj=await lbFetch('/api/results?game='+encodeURIComponent(g.id)+'&limit=3');rs=(rj&&rj.results)||[]}catch(e){}
+      var rows=rs.map(function(r){var sp=(r.special!=null?r.special:((r.nums||[]).slice(-1)[0]||'—'));return '<div>'+lbEsc(r.issue)+' 期 · 特码 '+lbEsc(sp)+'</div>'}).join('')||'<div>暂无结果</div>';
+      if(box)box.innerHTML='<div><b>当前期</b> '+lbEsc(st.issue)+' · <b>状态</b> '+lbEsc(st.status||'—')+'</div><div><b>开盘</b> '+lbEsc(String(st.openAt||'—').replace('T',' ').slice(0,19))+' · <b>封盘</b> '+lbEsc(String(st.closeAt||'—').replace('T',' ').slice(0,19))+'</div><div><b>下一期</b> '+lbEsc(st.nextIssue||'—')+'</div><div style="margin-top:4px"><b>最近 3 期</b></div>'+rows;
+      var inp=document.getElementById('lot-plan-issue');if(inp)inp.value=st.issue;
+      loadPlanned(g.id);
+    }catch(e){if(box)box.textContent=e.auth?'401 管理员密钥无效':'读取失败：'+e.message}}
+  async function loadPlanned(gid){var el=document.getElementById('lot-plan-list-new');if(!el)return;el.textContent='读取中…';try{var j=await lbFetch('/api/admin/planned?gameId='+encodeURIComponent(gid));var items=(j&&j.items)||[];el.innerHTML=items.length?items.map(function(x){return '<div style="padding:4px 0;border-top:1px dashed #e7eee9">'+lbEsc(x.issue)+' 期 · 特码 '+lbEsc(x.special)+' <button type="button" data-plan-del="'+lbEsc(x.issue)+'" style="min-height:26px;padding:1px 7px;font-size:11px;margin-left:6px">取消</button></div>'}).join(''):'暂无预定';el.onclick=async function(ev){var b=ev.target.closest('[data-plan-del]');if(!b)return;var issue=b.getAttribute('data-plan-del');try{await lbFetch('/api/admin/planned?gameId='+encodeURIComponent(gid)+'&issue='+encodeURIComponent(issue),{method:'DELETE'});curMsg('已取消 '+issue+' 期');loadPlanned(gid)}catch(e){curMsg(e.auth?'401 管理员密钥无效':'取消失败：'+e.message,true)}}}catch(e){el.textContent=e.auth?'401 管理员密钥无效':'读取失败：'+e.message}}
+  document.getElementById('lot-plan-save').onclick=async function(){var sel=document.getElementById('lot-draw-game'),g=GAMES[parseInt(sel.value,10)];if(!g)return;var issue=document.getElementById('lot-plan-issue').value.trim(),sp=parseInt(document.getElementById('lot-plan-special').value,10);if(!issue||!isFinite(sp)||sp<1||sp>49)return curMsg('请填写期号与 1-49 特码',true);curMsg('保存中…');try{await lbFetch('/api/admin/planned',{method:'POST',body:{gameId:g.id,issue:issue,special:sp}});curMsg('已预定 '+issue+' 期 · 特码 '+sp);loadPlanned(g.id);loadCurrentInfo()}catch(e){var m=e.message||'';curMsg(e.auth?'401 管理员密钥无效':(/PAST_ISSUE/.test(m)?'不能预定已开奖的期':(/DAILY/.test(m)?'该彩种不支持预定':'保存失败：'+m)),true)}};
   window.__lotteryReal={get configs(){return CONFIGS},reload:loadAll};
   window.__lotteryLoadAll=loadAll;
-  function initManualDraw(){var sel=document.getElementById('lot-man-game');if(!sel)return;sel.innerHTML=fastGames().map(function(x){return '<option value="'+x.g.id+'">'+x.g.name+'</option>'}).join('');MAN_GAME=sel.value;try{var _mp=manLoad();if(_mp&&_mp.catch)_mp.catch(function(){})}catch(e){} }
-  initManualDraw();renderDraw();loadGameList();
   document.getElementById('lot-draw-game').onchange=loadGameState;
   document.getElementById('lot-draw-interval-save').onclick=async function(){
     var sel=document.getElementById('lot-draw-game'),g=GAMES[parseInt(sel.value,10)],n=parseInt(document.getElementById('lot-draw-interval').value,10),st=document.getElementById('lot-draw-interval-state');
