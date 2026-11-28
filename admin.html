@@ -127,7 +127,7 @@ body{padding-bottom:76px}
   <div id="lot-bal-log" style="font-size:11px;color:#456253;line-height:1.6"></div>
 </div>
 <h3>开奖控制 <span class="lot-sub">手动指定 / 随机 · 难度</span></h3>
-<div class="lot-draw"><select id="lot-draw-game"></select><select id="lot-draw-mode"><option value="manual">手动指定</option><option value="random">随机开奖</option></select><select id="lot-draw-diff"><option value="easy">易 · 高频小奖</option><option value="medium" selected>中 · 均衡</option><option value="hard">难 · 低频大奖</option></select><input id="lot-draw-num" type="number" min="1" max="49" placeholder="手动特码 1-49"><button id="lot-draw-run" type="button">执行模拟开奖</button></div>
+<div class="lot-draw"><select id="lot-draw-game"></select><select id="lot-draw-mode"><option value="manual">手动指定</option><option value="random">随机开奖</option></select><select id="lot-draw-diff"><option value="easy">易 · 高频小奖</option><option value="medium" selected>中 · 均衡</option><option value="hard">难 · 低频大奖</option></select><input id="lot-draw-num" type="number" min="1" max="49" placeholder="手动特码 1-49"><button id="lot-draw-run" type="button">保存开奖配置</button></div>
 <div id="lot-draw-result">等待操作 · 保存后写入 config，前端投注页读取。</div>
 
 <h3>手动开奖 <span class="lot-sub">指定号码 · 立即结算</span></h3>
@@ -1428,7 +1428,8 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
     opts=opts||{};var ak=(localStorage.getItem('lottery-admin-key')||'').trim();
     var meth=(opts.method||'GET').toUpperCase(),body=opts.body,url=LH_BASE+path,headers={'content-type':'application/json'};
     if(path==='/games'){url=LH_BASE+'/api/odds';meth='GET'}
-    else if(path==='/admin/odds'||(path==='/admin/config'&&body&&body.oddsByPlay)){url=LH_BASE+'/api/admin/odds';meth='POST';headers['x-admin-key']=ak;if(!ak){var e0=new Error('请先填写管理员密钥');e0.auth=true;throw e0};body={odds:(body&&(body.odds||body.oddsByPlay||body))||{}}}
+    else if(path==='/admin/odds'){url=LH_BASE+'/api/admin/odds';meth='POST';headers['x-admin-key']=ak;if(!ak){var e0=new Error('请先填写管理员密钥');e0.auth=true;throw e0}}
+    else if(path==='/admin/config'&&body&&body.oddsByPlay){url=LH_BASE+'/api/admin/odds';meth='POST';headers['x-admin-key']=ak;if(!ak){var e1=new Error('请先填写管理员密钥');e1.auth=true;throw e1};body={odds:body.oddsByPlay}}
     else if(path==='/admin/users'){url=LH_BASE+'/api/admin/users';meth='GET';headers['x-admin-key']=ak}
     else if(path==='/admin/bets'){return {bets:[]}}
     else {throw new Error('新后端暂未提供：'+path)}
@@ -1586,13 +1587,17 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
   document.getElementById('lot-draw-run').onclick=async function(){
     var i=parseInt(document.getElementById('lot-draw-game').value,10),g=GAMES[i]||GAMES[0],mode=document.getElementById('lot-draw-mode').value,diff=document.getElementById('lot-draw-diff').value,num=parseInt(document.getElementById('lot-draw-num').value,10),out=document.getElementById('lot-draw-result');
     if(mode==='manual'&&(!num||num<1||num>49)){out.innerHTML='<b style="color:#c74b4b">请输入 1-49 的手动特码</b>';return}
-    var data={gameId:g.id,mode:mode,difficulty:diff,forcedResult:mode==='manual'?String(num):''};
+    var body={gameId:g.id,mode:mode,difficulty:diff};if(mode==='manual')body.forcedResult=String(num);
+    out.innerHTML='保存中…';
     try{
-      await wfetch('/draw/'+g.id,{method:'POST',body:{mode:mode,difficulty:diff,forcedResult:mode==='manual'?String(num):''}});
-      CONFIGS[g.id]=Object.assign({},CONFIGS[g.id]||{gameId:g.id},data);
-      out.innerHTML='<b>'+g.name+' · 已写入 config 表</b> · '+(mode==='manual'?'手动指定':'随机')+' · 难度 '+(diff==='easy'?'易':diff==='medium'?'中':'难')+'<br><span style="color:#999">'+(mode==='manual'?'特码 '+num+' · ':'')+'前端投注页将读取此配置</span>';
+      await wfetch('/admin/odds',{method:'POST',body:body});
+      var back=await wfetch('/games');
+      var got=(back&&back.oddsByPlay&&back.oddsByPlay.difficulty)||'';
+      var label=got==='easy'?'易':got==='hard'?'难':'中';
+      CONFIGS[g.id]=Object.assign({},CONFIGS[g.id]||{gameId:g.id},body);
+      out.innerHTML='<b style="color:#0b8a4b">已保存（难度：'+label+'）</b> · '+(mode==='manual'?'手动指定 特码 '+num:'随机')+'<br><span style="color:#999">GET /api/odds 回读 difficulty='+got+'</span>';
       status('开奖配置已保存');
-    }catch(err){out.innerHTML='<b style="color:#c74b4b">保存失败：'+err.message+'</b>'}
+    }catch(err){out.innerHTML='<b style="color:#c74b4b">保存失败：'+(err.status===401?'401 管理员密钥无效':err.message)+'</b>'}
   };
   window.__lotteryReal={get configs(){return CONFIGS},reload:loadAll};
   window.__lotteryLoadAll=loadAll;
