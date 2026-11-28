@@ -2,8 +2,8 @@
  "ok": true,
  "status": "success",
  "error": "",
- "updated": "2026-11-28 13:10:29",
- "updatedAt": "2026-11-28T13:10:29.791+08:00",
+ "updated": "2026-11-28 13:20:31",
+ "updatedAt": "2026-11-28T13:20:31.033+08:00",
  "message": "云端 Worker 检查完成，无更新",
  "lastSuccess": "2026-11-27 21:35:02",
  "latest_by_rule": {
@@ -19,7 +19,7 @@
  "gaps": [],
  "receipt_gap_alert": false,
  "backfill": false,
- "lastRun": "2026-11-28 13:10:29",
+ "lastRun": "2026-11-28 13:20:31",
  "new_count": 1,
  "newest_seen_ids": [
   "Macau:2026330",
