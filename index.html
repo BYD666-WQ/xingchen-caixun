@@ -43,7 +43,8 @@ header{display:flex;align-items:center;padding:10px 12px;background:linear-gradi
 .openbar .ol span{font-size:11px!important}
 .openbar .ob{gap:3px!important}
 .openbar .plus{flex:0 0 4px!important;font-size:14px!important}
-</style><style id="b1plus">
+</style>
+<style id="xc-upd-style">.hd .t{display:flex;flex-direction:column;align-items:flex-end;line-height:1.25;font-size:11px;white-space:nowrap}.hd .t .xc-rf{font-style:normal;font-size:10px;color:#8a6b3a;font-weight:600}</style><style id="b1plus">
 /* 1 头部 */
 header{background:linear-gradient(#E60012,#B3000E)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 6px rgba(120,0,0,.35)!important;border-bottom:1px solid #FFD24D!important}
 .logo{color:transparent!important;-webkit-background-clip:text!important;background-clip:text!important;background-image:linear-gradient(#FFF3C0,#FFC93C)!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important;filter:drop-shadow(1px 1px 0 #7A0000) drop-shadow(-1px 1px 0 #7A0000)}
@@ -451,7 +452,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       
       var b=c.querySelector('.hd b');if(b&&d.issue)b.textContent=LABEL[k]+'第'+String(d.issue).slice(-3)+'期';
       var bb=c.querySelector('.balls');if(bb&&d.nums)bb.innerHTML=ballHtml(d.nums);
-      var t=c.querySelector('.hd .t');if(t){var _u=(d.updated||window.__drawUpdated)?new Date(d.updated||window.__drawUpdated):null;if(_u&&!isNaN(_u.getTime())){t.textContent='数据更新 '+p2(_u.getMonth()+1)+'-'+p2(_u.getDate())+' '+p2(_u.getHours())+':'+p2(_u.getMinutes())}else t.textContent='数据更新 --'}
+      var t=c.querySelector('.hd .t');if(t){var _u=(d.updated||window.__drawUpdated)?new Date(d.updated||window.__drawUpdated):null;var _ds='数据更新 --';if(_u&&!isNaN(_u.getTime()))_ds='数据更新 '+p2(_u.getMonth()+1)+'-'+p2(_u.getDate())+' '+p2(_u.getHours())+':'+p2(_u.getMinutes());var _r=window.__lastRefresh?new Date(window.__lastRefresh):null;var _rs=_r?'刚刷新 '+p2(_r.getHours())+':'+p2(_r.getMinutes()):'刚刷新 --';t.innerHTML='<span class="xc-upd">'+_ds+'</span><i class="xc-rf">'+_rs+'</i>'}
       var nx=c.querySelector('.next span');if(nx){var ni=nextInfo(k);nx.textContent='第'+ni.issue+'期 · '+(ni.date.getMonth()+1)+'月'+ni.date.getDate()+'日 '+WD[ni.date.getDay()]+' '+ni.hm}
       var cd=c.querySelector('.xc-cd');if(!cd){cd=document.createElement('span');cd.className='xc-cd';c.querySelector('.hd').appendChild(cd)}
       cd.id='xc-cd-'+k;
@@ -487,7 +488,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,i){t.classList.toggle('on',i===KEYS.indexOf(k))});
   }
   window.__xcShow=show;
-  window.__applyDraw=function(dr,md){md=mdCompat(md);try{vfForceDue(md)}catch(e){}var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});D={newhk:md,newmo:(by.Macau?Object.assign({},by.Macau,{updated:(dr.updatedAt||dr.updated||'')}):by.Macau),hk:(by.HongKong?Object.assign({},by.HongKong,{updated:(dr.updatedAt||dr.updated||'')}):by.HongKong)};window.__xcDrawsReady=true;window.__xcDrawsReady=true;buildCards();tick();var vfActive=false;try{vfActive=vfApply(md)}catch(e){}
+  window.__applyDraw=function(dr,md){md=mdCompat(md);try{vfForceDue(md)}catch(e){}var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});D={newhk:md,newmo:(by.Macau?Object.assign({},by.Macau,{updated:(dr.updatedAt||dr.updated||'')}):by.Macau),hk:(by.HongKong?Object.assign({},by.HongKong,{updated:(dr.updatedAt||dr.updated||'')}):by.HongKong)};window.__xcDrawsReady=true;window.__lastRefresh=Date.now();buildCards();tick();var vfActive=false;try{vfActive=vfApply(md)}catch(e){}
     if(!vfActive&&window.__xcWaiting&&xcHasNums(md)){try{xcEnsureWaiting();vfActive=(window.__xcWaiting===false)}catch(e){}}
     if(vfActive){try{vfRestore()}catch(e){}}else{fill();show(KEYS[window.__pendingTab||0])}try{xcEnsureWaiting()}catch(e){}try{window.__drawUpdatedAt=dr.updatedAt;xrDetectAll();var ct2=KEYS[window.__pendingTab||0];if(ct2!=='newhk')xrShow(ct2)}catch(e){}};
   window.__showTab=function(k){var M={newhk:0,newmo:1,hk:2,'新港':0,'新澳':1,'新澳彩':1,'香港':2,'香港彩':2};var i=(k in M)?M[k]:-1;if(i>=0){if(D[KEYS[i]])show(KEYS[i]);else{window.__pendingTab=i;document.querySelectorAll('.tabs a,.tabs .tab').forEach(function(t,j){t.classList.toggle('on',j===i)});var obi=document.getElementById('xc-ob-issue');if(obi)obi.textContent='--期开'}}return i>=0};
@@ -847,7 +848,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   window.__xrState=function(){var o={};['newmo','hk'].forEach(function(k){var s=XR[k];o[k]=s?{issue:s.issue,phase:s.phase,revealed:s.revealed,mode:s.mode,elapsed:Date.now()-s.start}:null});return o};
 
   Promise.all([get('data/manual-draw.json'),get('data/draw.json'),get('data/site-config.json')]).then(function(r){
-    var _rawMd=r[0]||{};var md=mdCompat(_rawMd),dr=r[1]||{},cfg=r[2]||null;window.__drawUpdated=(dr&&(dr.updatedAt||dr.updated))||'';window.__xcCurrentIssue=(_rawMd.current&&parseInt(_rawMd.current.issue,10))||parseInt(md.issue,10)||0;var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
+    var _rawMd=r[0]||{};var md=mdCompat(_rawMd),dr=r[1]||{},cfg=r[2]||null;window.__drawUpdated=(dr&&(dr.updatedAt||dr.updated))||'';window.__lastRefresh=Date.now();window.__xcCurrentIssue=(_rawMd.current&&parseInt(_rawMd.current.issue,10))||parseInt(md.issue,10)||0;var by={};(dr.games||[]).forEach(function(g){by[g.rule]=g});window.__mdUpdated=(md&&md.updated)||'';window.__mdNums=((md&&md.nums)||[]).map(function(x){return x.c}).join(',');
     VF_CFG=vfNormCfg(cfg);window.__vfConfig=function(){return JSON.parse(JSON.stringify(VF_CFG))};
     try{
       var _dt=(cfg&&cfg.drawTimes)||{};
