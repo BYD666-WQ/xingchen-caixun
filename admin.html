@@ -1421,6 +1421,8 @@ setTimeout(loadRevealConfig,2500);
 <script>
 (function(){
 var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主站'],['hk','香港','每日','主站'],['fast-mark6-1','一分钟六合彩','1分钟','模拟'],['fast-mark6-5','5分钟六合彩','5分钟','模拟'],['fast-race-1','一分钟赛车','1分钟','模拟'],['fast-race-30','30秒赛车','30秒','模拟'],['fast-race-5','5分钟赛车','5分钟','模拟'],['fast-race-10','10分钟赛车','10分钟','模拟'],['fast-k3','大发快三','1分钟','模拟'],['fast-airship','一分飞艇','1分钟','模拟'],['oldmo','老澳','每日','未接入']].map(function(x){return {id:x[0],name:x[1],period:x[2],source:x[3],enabled:x[3]!=='未接入'}});
+  var GAME_NAMES={'fast-race-1':'一分钟赛车','fast-race-2':'2分钟赛车','fast-race-5':'5分钟赛车','fast-race-10':'10分钟赛车','fast-race-30':'30秒赛车','fast-mark6-1':'一分钟六合彩','fast-mark6-5':'5分钟六合彩','fast-k3':'大发快三','fast-airship':'一分飞艇','fast-airship-5':'一分飞艇·5分','fast-bjrace':'北京赛车','fast-luckyrace':'幸运赛车','fast-ship10':'极速飞艇','fast-tensc':'极速时时彩','fast-txffc':'极速11选5'};
+  async function loadGameList(){try{var r=await fetch(LH_BASE+'/api/issues?game=list');var j=await r.json();var ids=(j&&j.games)||[];ids=ids.filter(function(id){return id.indexOf('fast-')===0});if(!ids.length)return;var old={};GAMES.forEach(function(g){old[g.id]=g});var iv=(j&&j.intervals)||{};GAMES=ids.map(function(id){var o=old[id]||{};var sec=Number(iv[id])||0;var per=sec?(sec<60?sec+'秒':Math.round(sec/60)+'分钟'):(o.period||'1分钟');return {id:id,name:GAME_NAMES[id]||o.name||id,period:per,source:'模拟',enabled:o.enabled!==false}});renderGames();renderDraw();initManualDraw();}catch(e){console.warn('[lot-games]',e)}}
   var CONFIGS={};
     var LH_BASE='https://198.13.51.135.sslip.io';
   var $=function(s){return document.querySelector(s)};
@@ -1617,7 +1619,7 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
   window.__lotteryReal={get configs(){return CONFIGS},reload:loadAll};
   window.__lotteryLoadAll=loadAll;
   function initManualDraw(){var sel=document.getElementById('lot-man-game');if(!sel)return;sel.innerHTML=fastGames().map(function(x){return '<option value="'+x.g.id+'">'+x.g.name+'</option>'}).join('');MAN_GAME=sel.value;try{var _mp=manLoad();if(_mp&&_mp.catch)_mp.catch(function(){})}catch(e){} }
-  initManualDraw();renderGames();renderDraw();
+  initManualDraw();renderGames();renderDraw();loadGameList();
   try{var _hot=JSON.parse(localStorage.getItem('lotHotCtl')||'null');if(_hot){document.getElementById('lot-hot-on').checked=!!_hot.enabled;document.getElementById('lot-hot-th').value=_hot.threshold||3;document.getElementById('lot-hot-mul').value=_hot.hotMul||2;document.getElementById('lot-hot-profit').value=_hot.profit24h||300;}}catch(e){}
   var ODDS_DIRTY = {}; var TIME_DIRTY = false; var DIFF_DIRTY = {}; var PATTERN_DIRTY = {}; var HOT_DIRTY = false;
   function oddsLabel(k){return ({special:'特码',regular:'正码',zhengte:'正特',tail:'平特尾',colorWave:'色波',oneZodiac:'一肖/平特肖',horse:'马',specialZodiac:'特肖',flatZodiac:'平特肖',triAll:'快三全骰',triExact:'快三围骰'})[k]||k;}
