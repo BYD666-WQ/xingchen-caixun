@@ -452,7 +452,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       
       var b=c.querySelector('.hd b');if(b&&d.issue)b.textContent=LABEL[k]+'第'+String(d.issue).slice(-3)+'期';
       var bb=c.querySelector('.balls');if(bb&&d.nums)bb.innerHTML=ballHtml(d.nums);
-      var t=c.querySelector('.hd .t');if(t){var _u=(d.updated||window.__drawUpdated)?new Date(d.updated||window.__drawUpdated):null;if(_u&&!isNaN(_u.getTime())){t.textContent='数据更新 '+p2(_u.getMonth()+1)+'-'+p2(_u.getDate())+' '+p2(_u.getHours())+':'+p2(_u.getMinutes())}else t.textContent='数据更新 --'}
+      var t=c.querySelector('.hd .t');if(t){var _ums=Math.max(Date.parse(d.updated||'')||0,Date.parse(window.__drawUpdated||'')||0,window.__dataUpdatedMax||0);var _u=_ums?new Date(_ums):null;if(_u&&!isNaN(_u.getTime())){t.textContent='数据更新 '+p2(_u.getMonth()+1)+'-'+p2(_u.getDate())+' '+p2(_u.getHours())+':'+p2(_u.getMinutes())}else t.textContent='数据更新 --'}
       var nx=c.querySelector('.next span');if(nx){var ni=nextInfo(k);nx.textContent='第'+ni.issue+'期 · '+(ni.date.getMonth()+1)+'月'+ni.date.getDate()+'日 '+WD[ni.date.getDay()]+' '+ni.hm}
       var cd=c.querySelector('.xc-cd');if(!cd){cd=document.createElement('span');cd.className='xc-cd';c.querySelector('.hd').appendChild(cd)}
       cd.id='xc-cd-'+k;
