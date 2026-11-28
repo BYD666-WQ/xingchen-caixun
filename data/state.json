@@ -2,13 +2,13 @@
  "ok": true,
  "status": "success",
  "error": "",
- "updated": "2026-11-28 21:35:02",
- "updatedAt": "2026-11-28T21:35:02.620+08:00",
- "message": "云端 Worker 已更新（实时 2 彩种）",
+ "updated": "2026-11-28 21:40:30",
+ "updatedAt": "2026-11-28T21:40:30.111+08:00",
+ "message": "云端 Worker 检查完成，无更新",
  "lastSuccess": "2026-11-28 21:35:02",
  "latest_by_rule": {
-  "Macau": 332,
-  "HongKong": 125
+  "Macau": 2026332,
+  "HongKong": 2026125
  },
  "read_count": 2,
  "liveRules": [
@@ -19,7 +19,7 @@
  "gaps": [],
  "receipt_gap_alert": false,
  "backfill": false,
- "lastRun": "2026-11-28 21:30:30",
+ "lastRun": "2026-11-28 21:40:30",
  "new_count": 1,
  "newest_seen_ids": [
   "Macau:2026330",
