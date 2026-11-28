@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://cdn.jsdelivr.net https://sgp.cloud.appwrite.io https://198.13.51.135.sslip.io; font-src 'self' data:; object-src 'none'; base-uri 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://cdn.jsdelivr.net https://198.13.51.135.sslip.io; font-src 'self' data:; object-src 'none'; base-uri 'self'">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -77,7 +77,7 @@ body{padding-bottom:76px}
 <header><b>新港摇钱树 · 内容管理</b><span id="who" style="font-size:12px;opacity:.9"></span></header>
 <nav id="admin-cats"><button data-cat="entry" class="on">开奖录入</button><button data-cat="main">资料板块（主站）</button><button data-cat="cbw">彩霸王 · 资料管理</button><button data-cat="config">站点配置</button><button data-cat="logs">日志</button><button data-cat="lottery">彩票大厅</button></nav>
 <div class="wrap">
-<div class="panel" id="lottery-panel" hidden><details open><summary>🎯 彩票大厅 · Appwrite 真接口</summary><div class="body">
+<div class="panel" id="lottery-panel" hidden><details open><summary>🎯 彩票大厅 · 自建后端</summary><div class="body">
 <style>
 #lottery-panel .lot-key{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:8px 0 3px}
 #lottery-panel .lot-key input{flex:1 1 300px;height:34px;font-size:12px;padding:0 8px;border:1px solid #dfe8e3;border-radius:5px;background:#fff}
@@ -1421,21 +1421,21 @@ setTimeout(loadRevealConfig,2500);
 
 <script>
 (function(){
-  var CFG={endpoint:'https://sgp.cloud.appwrite.io/v1',project:'6aff4c2f0016ee43abad',db:'lottery',users:'6aff4ea1000cecd6c798',bets:'bets',config:'config'};
-  var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主站'],['hk','香港','每日','主站'],['fast-mark6-1','一分钟六合彩','1分钟','模拟'],['fast-mark6-5','5分钟六合彩','5分钟','模拟'],['fast-race-1','一分钟赛车','1分钟','模拟'],['fast-race-30','30秒赛车','30秒','模拟'],['fast-race-5','5分钟赛车','5分钟','模拟'],['fast-race-10','10分钟赛车','10分钟','模拟'],['fast-k3','大发快三','1分钟','模拟'],['fast-airship','一分飞艇','1分钟','模拟'],['oldmo','老澳','每日','未接入']].map(function(x){return {id:x[0],name:x[1],period:x[2],source:x[3],enabled:x[3]!=='未接入'}});
-  var USERS=[],BETS=[],CONFIGS={};
-  var FN_URL='https://sgp.cloud.appwrite.io/v1/functions/lottery-api/executions', PROJECT_ID='6aff4c2f0016ee43abad';
+  var LH_BASE='https://198.13.51.135.sslip.io';
   var $=function(s){return document.querySelector(s)};
   async function wfetch(path,opts){
-    opts=opts||{};
-    var ak=(localStorage.getItem('lottery-admin-key')||'').trim();
-    if(!ak){var e=new Error('请先填写管理员密钥');e.auth=true;throw e}
-    var r=await fetch(FN_URL,{method:'POST',headers:{'X-Appwrite-Project':PROJECT_ID,'Content-Type':'application/json'},body:JSON.stringify({path:path,method:opts.method||'GET',body:opts.body?JSON.stringify(opts.body):undefined,async:false,headers:{'x-admin-key':ak}}),signal:AbortSignal.timeout(20000)});
+    opts=opts||{};var ak=(localStorage.getItem('lottery-admin-key')||'').trim();
+    var meth=(opts.method||'GET').toUpperCase(),body=opts.body,url=LH_BASE+path,headers={'content-type':'application/json'};
+    if(path==='/games'){url=LH_BASE+'/api/odds';meth='GET'}
+    else if(path==='/admin/odds'||(path==='/admin/config'&&body&&body.oddsByPlay)){url=LH_BASE+'/api/admin/odds';meth='POST';headers['x-admin-key']=ak;if(!ak){var e0=new Error('请先填写管理员密钥');e0.auth=true;throw e0};body={odds:(body&&(body.odds||body.oddsByPlay||body))||{}}}
+    else if(path==='/admin/users'){url=LH_BASE+'/api/admin/users';meth='GET';headers['x-admin-key']=ak}
+    else if(path==='/admin/bets'){return {bets:[]}}
+    else {throw new Error('新后端暂未提供：'+path)}
+    var r=await fetch(url,{method:meth,headers:headers,body:meth==='POST'?JSON.stringify(body):undefined});
     var j=null;try{j=await r.json()}catch(e){}
-    var code=Number(j&&j.responseStatusCode)||0;var data={};try{data=JSON.parse((j&&j.responseBody)||'{}')}catch(e){}
-    if(code===401||code===403||(data.error&&data.error.code==='ADMIN_REQUIRED')){var e2=new Error('管理员密钥无效');e2.auth=true;throw e2}
-    if(!r.ok||code>=400||data.ok===false) throw new Error((data.error&&(data.error.message||data.error.code))||('HTTP '+r.status+' / '+code));
-    return data;
+    if(!r.ok){var e=new Error((j&&(j.error||j.message))||('HTTP '+r.status));e.status=r.status;e.auth=r.status===401;throw e}
+    if(path==='/games'){var cfg=(j&&(j.config||j.odds))||{};return {oddsByPlay:cfg,odds:cfg}}
+    return j;
   }
   function status(s,err){var el=document.getElementById('lot-status');if(el){el.textContent=s;el.style.color=err?'#c74b4b':'#0b8a4b'}}
   function renderUsers(){
@@ -1462,17 +1462,9 @@ setTimeout(loadRevealConfig,2500);
   }
   function renderDraw(){var sel=document.getElementById('lot-draw-game');if(sel)sel.innerHTML=GAMES.map(function(g,i){return '<option value="'+i+'">'+g.name+'</option>'}).join('')}
   async function loadAll(){
-    status('正在读取用户/注单（GitHub JSON）…');
-    try{
-      var u=await wfetch('/admin/users');
-      var b=await wfetch('/admin/bets');
-      USERS=(u&&u.users)||[];BETS=(b&&b.bets)||[];
-      renderUsers();renderBets();
-      status('已加载 · 用户 '+USERS.length+' · 注单 '+BETS.length+(u&&u.total!=null?'（total '+u.total+'）':''));
-    }catch(e){
-      USERS=[];BETS=[];renderUsers();renderBets();
-      status(e.auth?'管理员密钥无效':'加载失败：'+e.message,true);
-    }
+    status('正在读取配置（自建后端）…');
+    try{USERS=[];BETS=[];renderUsers();renderBets();await loadOdds();status('配置已加载（用户/注单接口暂未提供）')}
+    catch(e){status(e.auth?'管理员密钥无效':'加载失败：'+e.message,true)}
   }
   function adminKey(){ return (localStorage.getItem('lottery-admin-key')||'').trim(); }
   document.getElementById('lot-admin-key-save').onclick=function(){
