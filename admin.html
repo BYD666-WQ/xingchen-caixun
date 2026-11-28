@@ -136,7 +136,7 @@ body{padding-bottom:76px}
   <div id="lot-man-hint" class="lot-man-hint">选择彩种后读取当前期号 / 自动开奖时间</div>
   <div id="lot-man-meta" class="lot-man-meta"></div>
   <div id="lot-man-nums" class="lot-man-nums"></div>
-  <div class="lot-man-row"><button id="lot-man-random" type="button">随机填充</button><button id="lot-man-submit" type="button" class="primary">提交开奖</button></div>
+  <div class="lot-man-row"><input id="lot-man-special" type="number" min="1" max="49" placeholder="特码 1-49（可选）" style="width:140px;height:34px"><button id="lot-man-random" type="button">随机填充</button><button id="lot-man-submit" type="button" class="primary">立即开奖</button></div>
   <div id="lot-man-result" class="lot-man-result"></div>
 </div>
 
@@ -1430,6 +1430,8 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
     if(path==='/games'){url=LH_BASE+'/api/odds';meth='GET'}
     else if(path==='/admin/odds'){url=LH_BASE+'/api/admin/odds';meth='POST';headers['x-admin-key']=ak;if(!ak){var e0=new Error('请先填写管理员密钥');e0.auth=true;throw e0}}
     else if(path==='/admin/config'&&body&&body.oddsByPlay){url=LH_BASE+'/api/admin/odds';meth='POST';headers['x-admin-key']=ak;if(!ak){var e1=new Error('请先填写管理员密钥');e1.auth=true;throw e1};body={odds:body.oddsByPlay}}
+    else if(path==='/admin/draw-state'){url=LH_BASE+'/api'+path;meth='GET';headers['x-admin-key']=ak;if(!ak){var e2=new Error('请先填写管理员密钥');e2.auth=true;throw e2}}
+    else if(path==='/admin/draw-result'){url=LH_BASE+'/api/admin/draw-result';meth='POST';headers['x-admin-key']=ak;if(!ak){var e3=new Error('请先填写管理员密钥');e3.auth=true;throw e3}}
     else if(path==='/admin/users'){url=LH_BASE+'/api/admin/users';meth='GET';headers['x-admin-key']=ak}
     else if(path==='/admin/bets'){return {bets:[]}}
     else {throw new Error('新后端暂未提供：'+path)}
@@ -1506,10 +1508,10 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
     try {
       var d = await wfetch('/admin/draw-state?gameId=' + encodeURIComponent(id));
       MAN_STATE = d;
-      hint.textContent = d.autoAt ? ('到 ' + String(d.autoAt).replace('T', ' ').slice(0, 16) + ' 未手动设置将自动模拟开奖') : '该彩种无自动开奖时间';
-      meta.innerHTML = '<span>当前期 <b>' + d.issue + ' 期</b></span><span>可开期 <b>' + d.drawableIssue + ' 期</b></span><span>封盘 ' + (d.closeAt || '—') + '</span><span>' + (d.manualSet ? '已手动设置' : '未设置 · 自动') + '</span>';
-      manFillInputs(); try { planLoad(); } catch (e) {}
-      document.getElementById('lot-man-result').textContent = d.lastResult ? ('上期已开奖：第 ' + d.lastResult.issue + ' 期 · ' + (d.lastResult.nums || []).join(' ')) : '';
+      hint.textContent = d.closeAt ? ('封盘 ' + String(d.closeAt).replace('T',' ').slice(0,16) + ' · 状态 ' + (d.status||'—')) : ('状态 ' + (d.status||'—'));
+      meta.innerHTML = '<span>当前期 <b>' + d.issue + ' 期</b></span><span>下一期 <b>' + (d.nextIssue||'—') + '</b></span><span>封盘 ' + (d.closeAt || '—') + '</span>';
+      manFillInputs();
+      var lr=d.lastResult; document.getElementById('lot-man-result').textContent = lr ? ('最近结果：第 ' + lr.issue + ' 期 · 特码 ' + (lr.special!=null?lr.special:'—') + (lr.nums&&lr.nums.length?' · '+lr.nums.join(' '):'')) : '暂无最近结果';
     } catch (e) { hint.textContent = '读取失败：' + e.message; }
   }
   document.getElementById('lot-man-game').onchange = manLoad;
@@ -1524,15 +1526,23 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
   document.getElementById('lot-man-submit').onclick = async function () {
     var out = document.getElementById('lot-man-result');
     if (!MAN_STATE) { out.textContent = '请先刷新状态'; return; }
+    var special = parseInt(document.getElementById('lot-man-special').value, 10);
     var inputs = document.querySelectorAll('[data-man-num]');
     var nums = [];
-    for (var i = 0; i < inputs.length; i++) { var v = parseInt(inputs[i].value, 10); if (!isFinite(v) || v < 1 || v > manMax(MAN_GAME)) { out.textContent = '第 ' + (i + 1) + ' 个号码不合法'; return; } nums.push(v); }
-    if (new Set(nums).size !== nums.length) { out.textContent = '号码不能重复'; return; }
+    for (var i = 0; i < inputs.length; i++) { var v = parseInt(inputs[i].value, 10); if (isFinite(v) && v > 0) nums.push(v); }
+    var body = { gameId: MAN_GAME, issue: MAN_STATE.issue };
+    if (isFinite(special) && special >= 1 && special <= 49) body.special = special;
+    else if (nums.length) {
+      if (nums.length !== inputs.length) { out.textContent = '号码未填完整'; return; }
+      if (new Set(nums).size !== nums.length) { out.textContent = '号码不能重复'; return; }
+      body.nums = nums;
+    } else { out.textContent = '请输入特码 1-49 或完整号码'; return; }
     try {
-      var r = await wfetch('/admin/draw-result', { method: 'POST', body: { gameId: MAN_GAME, issue: MAN_STATE.drawableIssue, nums: nums } });
-      var msg = '已开奖 第 ' + (r.issue || MAN_STATE.drawableIssue) + ' 期 · 派彩 ' + (r.hits != null ? r.hits : (r.settled || 0)) + ' 注 / 合计 ' + (r.payout || 0) + ' 积分';
+      var r = await wfetch('/admin/draw-result', { method: 'POST', body: body });
+      var res=r.result||{};
+      var msg = '已开奖 第 ' + (res.issue || MAN_STATE.issue) + ' 期 · 特码 ' + (res.special!=null?res.special:'—') + ' · 结算 ' + (r.settled!=null?r.settled:0) + ' 注';
       await manLoad(); out.textContent = msg;
-    } catch (e) { out.textContent = /ALREADY_DRAWN|已开奖/.test(e.message) ? '该期已开奖' : ('提交失败：' + e.message); }
+    } catch (e) { out.textContent = e.status===409 ? '该期已开奖' : (e.auth?'401 管理员密钥无效':'提交失败：'+e.message); }
   };
   var PLAN_EDIT = null;
   function planNumsHtml() {
