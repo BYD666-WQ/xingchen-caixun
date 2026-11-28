@@ -1200,7 +1200,7 @@ function daRender(){renderTabs();var b=BOARDS[state.cur];$d('da-note').textConte
   function newIssueRow(){var rows=rowsNow();if(rows.length>=10){topToast('已满 10 条，请先删除一条再加',false,true);return}if(rows.length>=boardLimit(BOARDS[state.cur])){topToast(limitMsg(BOARDS[state.cur]),false,true);return}var max=0;rows.forEach(function(r){var n=parseInt(r.issue,10);if(n>max)max=n});var r=blankRow();r.issue=String(max+1);rows.unshift(r);if(window.__daUndoDelete)window.__daUndoDelete(BOARDS[state.cur].id,r.issue);daRender()}
   function saveBoard(){if(window.__boardBusy)return;sortBoard(true);var b=BOARDS[state.cur];if(rowsNow().length>boardLimit(b)){var lm=limitMsg(b);setState('da-state',lm,'da-warn');topToast(lm,false,true);return}if(!token()){setState('da-state','请先在页面顶部保存密钥（PAT）','da-warn');return}window.__boardBusy=true;busySet(['da-save'],true);
     var badRows=rowsNow().filter(function(x){return !parseInt(x.issue,10)}).length;
-    var obj=SAVE[b.id](rowsNow(),state.raw[b.id]||{});var bfile=b.file;
+    var obj=SAVE[b.id](rowsNow(),state.raw[b.id]||{});if(!obj.updated)obj.updated=new Date().toISOString();var bfile=b.file;
     setState('da-state','提交中…（'+b.name+'）','da-ok');
     (async function(){
       try{
