@@ -378,7 +378,10 @@ details.mini>summary::-webkit-details-marker{display:none}
   function hmOf(kind){return TIME_TABLE[kind]}
   function kindOf(k){return k==='hk'?'香港':(k==='newmo'?'新澳':'新港')}
   var R=[1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46];
-  function tiles(arr){return (arr||[]).map(function(x){var n=parseInt(x.c,10);var cls=R.indexOf(n)>=0?'r':([3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48].indexOf(n)>=0?'b':'g');return '<div class="tile '+cls+'"><div class="num">'+x.c+'</div><div class="zod">'+(x.z||'')+'</div></div>';}).join('')}
+  function xcZodiacOf(n){var z=['马','蛇','龙','兔','虎','牛','鼠','猪','狗','鸡','猴','羊'];var m=(parseInt(n,10)||0)%12;if(m===0)m=12;return z[m-1]||''}
+  function xcColorOf(n){var x=parseInt(n,10);if([1,2,7,8,12,13,18,19,23,24,29,30,34,35,40,45,46].indexOf(x)>=0)return '红';if([3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48].indexOf(x)>=0)return '蓝';return '绿'}
+  function xcNumNorm(x){if(!x)return {c:'',z:'',color:''};var n=parseInt(x.c,10);return {c:x.c,z:x.z||xcZodiacOf(n),color:x.color||xcColorOf(n),wuxing:x.wuxing||''}}
+  function tiles(arr){return (arr||[]).map(function(x){x=xcNumNorm(x);var n=parseInt(x.c,10);var cls=R.indexOf(n)>=0?'r':([3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48].indexOf(n)>=0?'b':'g');return '<div class="tile '+cls+'"><div class="num">'+x.c+'</div><div class="zod">'+(x.z||'')+'</div></div>';}).join('')}
   function ballHtml(arr){return tiles((arr||[]).slice(0,6))+'<span class="plus">+</span>'+tiles((arr||[]).slice(6))}
   function numCls(n){return R.indexOf(n)>=0?'r':([3,4,9,10,14,15,20,25,26,31,36,37,41,42,47,48].indexOf(n)>=0?'b':'g')}
   function shortIssue(x){return String(x).slice(-3)}
@@ -474,6 +477,7 @@ details.mini>summary::-webkit-details-marker{display:none}
       }
       if(k!=='newhk'&&D[k]&&D[k]._xrWaiting){e.textContent='待开';return}var hm=TIME_TABLE[LABEL[k]==='新澳彩'?'新澳':(LABEL[k]==='香港彩'?'香港':'新港')];
       var n=new Date();var t=nextInfo(k).date;var left=Math.floor((t-n)/1000);
+      if(k==='newhk'&&left<=0&&(!window.__zeroRefreshAt||Date.now()-window.__zeroRefreshAt>5000)){window.__zeroRefreshAt=Date.now();try{if(window.__xcRefreshData)window.__xcRefreshData()}catch(x){}}
       e.textContent='距开奖 '+p2(Math.floor(left/3600))+':'+p2(Math.floor(left%3600/60))+':'+p2(left%60);
     });
   }
@@ -594,6 +598,7 @@ details.mini>summary::-webkit-details-marker{display:none}
   function vfTile(i,nums,count,hl){
     var shown=i<count,t=nums&&nums[i];
     if(!shown||!t)return vfGrayTile();
+    t=xcNumNorm(t);
     return '<div class="tile '+numCls(parseInt(t.c,10))+(hl===i?' vf-in':'')+'"><div class="num">'+t.c+'</div><div class="zod">'+(t.z||'')+'</div></div>';
   }
   function vfBalls(nums,count,hl){if(!count||!nums||!nums.length)return '<div class="tile gray" style="width:auto;min-width:112px;padding:0 14px"><div class="num" style="font-size:15px;letter-spacing:2px">待开</div></div>';var h='';for(var i=0;i<6;i++)h+=vfTile(i,nums,count,hl);h+='<span class="plus">+</span>';h+=vfTile(6,nums,count,hl);return h}
@@ -663,6 +668,14 @@ details.mini>summary::-webkit-details-marker{display:none}
     }catch(e){}
   }
   window.__vfForceDue=vfForceDue;
+  function vfAnimatePublished(md,nums){
+    try{if(VF&&VF.issue===md.issue&&VF.phase==='revealing')return true;
+      VF={vf:Date.now(),issue:md.issue,enc:'',md:md,phase:'pending',revealed:0,nums:[],played:false,timer:null,timeline:vfTimeline(md.issue,VF_CFG)};
+      md.nums=[];try{D.newhk=md}catch(e){}
+      vfSetHead(md.issue);vfRender([],0,-1);vfProgress('开奖中… 0/7');
+      VF.nums=nums;VF.phase='revealing';vfStart(nums,true);return true;
+    }catch(e){console.error('[vf-animate]',e);return false}
+  }
   function vfApply(md){
     if(!md)return false;
     var vf=md.visibleFrom?Date.parse(md.visibleFrom):0;
@@ -679,7 +692,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     var _stored=vfLoadState(md.issue);
     if(_stored&&_stored.phase==='done'&&_stored.nums&&_stored.nums.length===7){if(vfDoneState(md.issue,_stored.nums,md))return false}
     var _pubMs=Date.parse(md.publishedAt||'');
-    if(isFinite(_pubMs)&&Date.now()>=_pubMs&&nums&&nums.length===7){if(vfDoneState(md.issue,nums,md))return false}
+    if(isFinite(_pubMs)&&Date.now()>=_pubMs&&nums&&nums.length===7){if(vfAnimatePublished(md,nums))return true;if(vfDoneState(md.issue,nums,md))return false}
     if(VF&&VF.issue===md.issue){
       md.issue=VF.issue;
       if(VF.phase==='done'){if(nums)md.nums=nums;return false}
@@ -697,7 +710,7 @@ details.mini>summary::-webkit-details-marker{display:none}
     if(prev&&prev.numsEnc&&(!prev.nums||!prev.nums.length)&&prev.visibleFrom)vfScheduleHist(md);
     if(prev&&prev.nums&&prev.nums.length===7){
       var _pIssue=prev.issue,_pNums=prev.nums,_pst=vfLoadState(_pIssue),_ppub=Date.parse(prev.publishedAt||'');
-      if((isFinite(_ppub)&&Date.now()>=_ppub)||(_pst&&_pst.phase==='done')){if(vfDoneState(_pIssue,_pNums,md))return false}
+      if((isFinite(_ppub)&&Date.now()>=_ppub)||(_pst&&_pst.phase==='done')){if(vfAnimatePublished({issue:_pIssue,nums:_pNums,history:md.history||[]},_pNums))return true;if(vfDoneState(_pIssue,_pNums,md))return false}
     }
     VF={vf:vf,issue:md.issue,enc:md.numsEnc,md:md,phase:'idle',revealed:0,nums:[],played:false,timer:null,timeline:vfTimeline(md.issue,VF_CFG),prevIssue:prev&&prev.issue,prevNums:prev&&prev.nums};
     if(prev&&prev.nums&&prev.nums.length){md.issue=prev.issue;md.nums=prev.nums}else{md.issue=md.issue-1;md.nums=[]}
