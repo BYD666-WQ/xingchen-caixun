@@ -5,6 +5,55 @@
  "status": "sample",
  "history": [
   {
+   "issue": 332,
+   "nums": [
+    {
+     "c": "42",
+     "z": "",
+     "color": "蓝",
+     "wuxing": ""
+    },
+    {
+     "c": "09",
+     "z": "",
+     "color": "蓝",
+     "wuxing": ""
+    },
+    {
+     "c": "11",
+     "z": "",
+     "color": "绿",
+     "wuxing": ""
+    },
+    {
+     "c": "25",
+     "z": "",
+     "color": "蓝",
+     "wuxing": ""
+    },
+    {
+     "c": "12",
+     "z": "",
+     "color": "红",
+     "wuxing": ""
+    },
+    {
+     "c": "47",
+     "z": "",
+     "color": "蓝",
+     "wuxing": ""
+    },
+    {
+     "c": "34",
+     "z": "",
+     "color": "红",
+     "wuxing": ""
+    }
+   ],
+   "visibleFrom": "2026-11-28T21:34:00.000+08:00",
+   "publishedAt": "2026-11-28T13:34:12.088Z"
+  },
+  {
    "issue": 331,
    "nums": [
     {
@@ -1371,12 +1420,12 @@
    ]
   }
  ],
- "updated": "2026-11-27T13:38:53.010Z",
+ "updated": "2026-11-28T13:34:12.088Z",
  "current": {
-  "issue": 332,
+  "issue": 333,
   "nums": [],
   "numsEnc": "",
-  "visibleFrom": "2026-11-28T13:34:00.000Z",
+  "visibleFrom": "2026-11-29T13:34:00.000Z",
   "publishedAt": null
  }
 }
