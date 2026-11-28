@@ -1444,10 +1444,15 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
   function status(s,err){var el=document.getElementById('lot-status');if(el){el.textContent=s;el.style.color=err?'#c74b4b':'#0b8a4b'}}
   function renderGames(){
     var box=document.getElementById('lot-games');if(!box)return;
-    var diffOpts=[['easy','简单(易中)'],['mid','中等(随机)'],['hard','困难(大注难中)'],['brutal','极难(大注几乎全杀)']];
-    box.innerHTML=GAMES.map(function(g,i){var dv='mid';try{dv=localStorage.getItem('lotDiff:'+g.id)||'mid'}catch(e){}var pv='random';try{pv=localStorage.getItem('lotPattern:'+g.id)||'random'}catch(e){}return '<div class="lot-game"><b>'+g.name+'</b><div class="lot-controls"><label><input type="checkbox" data-lot-game="'+i+'" '+(g.enabled?'checked':'')+'>启用</label><select data-lot-period="'+i+'">'+['30秒','1分钟','5分钟','10分钟','每日'].map(function(p){return '<option '+(p===g.period?'selected':'')+'>'+p+'</option>'}).join('')+'</select><select data-lot-source="'+i+'">'+['主站','模拟','未接入'].map(function(s){return '<option '+(s===g.source?'selected':'')+'>'+s+'</option>'}).join('')+'</select><select data-lot-diff="'+g.id+'">'+diffOpts.map(function(o){return '<option value="'+o[0]+'" '+(o[0]===dv?'selected':'')+'>'+o[1]+'</option>'}).join('')+'</select><select data-lot-pattern="'+g.id+'"><option value="random" '+(pv==='random'?'selected':'')+'>随机</option><option value="kill" '+(pv==='kill'?'selected':'')+'>杀大赔小</option><option value="kill_near" '+(pv==='kill_near'?'selected':'')+'>杀大赔小+近失</option></select><span class="lot-killbox" style="display:'+(pv==='random'?'none':'inline-flex')+'"><input type="number" step="0.01" data-lot-kill-rate="'+g.id+'" value="0.85" style="width:64px" title="执行率"><input type="number" data-lot-kill-max="'+g.id+'" value="5000" style="width:72px" title="单期最大赔付"></span></div><small style="display:block;font-size:10px;color:#888;margin-top:2px">演示站点配置，影响开奖结果分布</small></div>'}).join('');
+    box.innerHTML=GAMES.map(function(g,i){
+      var isMain=(g.id==='newhk'||g.id==='newmo'||g.id==='hk');
+      if(isMain)return '<div class="lot-game"><b>'+g.name+'</b><small style="color:#888">主站数据（只读）</small></div>';
+      if(g.id.indexOf('fast-')!==0)return '';
+      return '<div class="lot-game"><b>'+g.name+'</b><div class="lot-controls"><label><input type="checkbox" data-lot-game="'+i+'" '+(g.enabled?'checked':'')+'>启用</label><select data-lot-period="'+i+'">'+['30秒','1分钟','5分钟','10分钟'].map(function(p){return '<option '+(p===g.period?'selected':'')+'>'+p+'</option>'}).join('')+'</select></div></div>';
+    }).join('');
   }
-  function renderDraw(){var sel=document.getElementById('lot-draw-game');if(sel)sel.innerHTML=GAMES.map(function(g,i){return '<option value="'+i+'">'+g.name+'</option>'}).join('')}
+  function fastGames(){return GAMES.map(function(g,i){return {g:g,i:i}}).filter(function(x){return x.g.id.indexOf('fast-')===0})}
+  function renderDraw(){var sel=document.getElementById('lot-draw-game');if(sel)sel.innerHTML=fastGames().map(function(x){return '<option value="'+x.i+'">'+x.g.name+'</option>'}).join('')}
   async function loadAll(){
     status('正在读取配置（自建后端）…');
     try{await loadOdds();status('配置已加载')}
@@ -1611,7 +1616,7 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
   };
   window.__lotteryReal={get configs(){return CONFIGS},reload:loadAll};
   window.__lotteryLoadAll=loadAll;
-  function initManualDraw(){var sel=document.getElementById('lot-man-game');if(!sel)return;sel.innerHTML=GAMES.map(function(g){return '<option value="'+g.id+'">'+g.name+'</option>'}).join('');MAN_GAME=sel.value;try{var _mp=manLoad();if(_mp&&_mp.catch)_mp.catch(function(){})}catch(e){} }
+  function initManualDraw(){var sel=document.getElementById('lot-man-game');if(!sel)return;sel.innerHTML=fastGames().map(function(x){return '<option value="'+x.g.id+'">'+x.g.name+'</option>'}).join('');MAN_GAME=sel.value;try{var _mp=manLoad();if(_mp&&_mp.catch)_mp.catch(function(){})}catch(e){} }
   initManualDraw();renderGames();renderDraw();
   try{var _hot=JSON.parse(localStorage.getItem('lotHotCtl')||'null');if(_hot){document.getElementById('lot-hot-on').checked=!!_hot.enabled;document.getElementById('lot-hot-th').value=_hot.threshold||3;document.getElementById('lot-hot-mul').value=_hot.hotMul||2;document.getElementById('lot-hot-profit').value=_hot.profit24h||300;}}catch(e){}
   var ODDS_DIRTY = {}; var TIME_DIRTY = false; var DIFF_DIRTY = {}; var PATTERN_DIRTY = {}; var HOT_DIRTY = false;
