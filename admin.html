@@ -114,11 +114,15 @@ body{padding-bottom:76px}
 <div class="lot-key"><input id="lot-admin-key" type="password" autocomplete="off" placeholder="管理员密钥（4–6 位示例）"><button id="lot-admin-key-save" type="button">保存管理员密钥</button><span>加减积分走 Function /admin/points</span></div>
 <div id="lot-status" style="font-size:11px;color:#888;margin:6px 0 2px">请先填写管理员密钥</div>
 <div class="lot-balance" style="border:1px solid #d8ece1;background:#f7fcf9;border-radius:8px;padding:10px;margin:8px 0">
-  <h3 style="margin:0 0 8px">用户余额管理 <span class="lot-sub">按邮箱查询 / 调整</span></h3>
-  <div class="lot-key"><input id="lot-bal-email" type="email" placeholder="用户邮箱" autocomplete="off"><button id="lot-bal-query" type="button">查询用户</button></div>
-  <div id="lot-bal-user" style="font-size:12px;color:#456253;margin:6px 0;min-height:18px">输入邮箱后查询</div>
-  <div class="lot-key"><input id="lot-bal-amount" type="number" placeholder="金额，可正负，如 10 / -5"><input id="lot-bal-note" type="text" placeholder="备注"><button id="lot-bal-apply" type="button">调整余额</button></div>
+  <h3 style="margin:0 0 8px">用户管理 <span class="lot-sub">按用户名搜索 / 加扣余额</span></h3>
+  <div class="lot-key"><input id="lot-bal-search" type="search" placeholder="搜索用户名" autocomplete="off"><button id="lot-bal-search-btn" type="button">搜索</button><button id="lot-bal-refresh" type="button">刷新</button></div>
+  <div class="lot-scroll" style="margin-top:6px"><table class="lot-table"><thead><tr><th>序号</th><th>用户名</th><th>余额</th><th>注册时间</th><th>操作</th></tr></thead><tbody id="lot-bal-list"></tbody></table></div>
+  <div id="lot-bal-pager" style="display:flex;gap:8px;align-items:center;margin:6px 0;font-size:12px"><button id="lot-bal-prev" type="button">上一页</button><span id="lot-bal-page">第 1 页</span><button id="lot-bal-next" type="button">下一页</button></div>
   <div id="lot-bal-msg" style="font-size:12px;margin:4px 0;min-height:16px"></div>
+  <div id="lot-bal-edit" style="display:none;border:1px dashed #b9d9c8;border-radius:6px;padding:8px;margin:6px 0;background:#fff">
+    <div style="font-size:12px;font-weight:700;color:#173f2a;margin-bottom:6px">调整 <span id="lot-bal-sel"></span></div>
+    <div class="lot-key"><input id="lot-bal-amount" type="number" placeholder="金额，可正负"><input id="lot-bal-note" type="text" placeholder="备注"><button id="lot-bal-apply" type="button">确定</button><button id="lot-bal-cancel" type="button">取消</button></div>
+  </div>
   <div style="font-size:12px;font-weight:700;margin:8px 0 4px">最近 10 条调整</div>
   <div id="lot-bal-log" style="font-size:11px;color:#456253;line-height:1.6"></div>
 </div>
@@ -1474,21 +1478,24 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
     localStorage.setItem('lottery-admin-key',v);status('管理员密钥已保存（本机）');loadAll();
   };
   // 统一管理接口调用（Function execution，业务鉴权仅 x-admin-key）
-  var BAL_USER=null;
   var LH_BASE='https://198.13.51.135.sslip.io';
+  var BAL_USERS=[],BAL_TOTAL=0,BAL_OFF=0,BAL_LIMIT=50,BAL_Q='',BAL_SEL=null;
   function lbEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   async function lbFetch(path,opt){opt=opt||{};var h={'content-type':'application/json','x-admin-key':adminKey()};var r=await fetch(LH_BASE+path,{method:opt.method||'GET',headers:h,body:opt.body?JSON.stringify(opt.body):undefined});var j=null;try{j=await r.json()}catch(e){}if(!r.ok){var e=new Error((j&&(j.error||j.message))||('HTTP '+r.status));e.status=r.status;e.auth=r.status===401;throw e}return j}
   function balMsg(t,bad){var e=document.getElementById('lot-bal-msg');if(e){e.textContent=t||'';e.style.color=bad?'#b00020':'#0b7a45'}}
-  function renderBalUser(){var e=document.getElementById('lot-bal-user');if(!e||!BAL_USER)return;e.textContent='ID '+BAL_USER.id+' · '+BAL_USER.email+' · 余额 '+BAL_USER.balance+' · 注册 '+(BAL_USER.created_at||'-')}
-  async function renderBalLog(){var el=document.getElementById('lot-bal-log');if(!el)return;el.textContent='读取中…';try{var j=await lbFetch('/api/admin/points/log?limit=10');var l=(j&&j.logs)||[];el.innerHTML=l.length?l.map(function(x){return '<div>'+lbEsc(String(x.at||'').replace('T',' ').slice(0,19))+' · '+lbEsc(x.email)+' · '+(Number(x.amount)>0?'+':'')+lbEsc(x.amount)+(x.note?' · '+lbEsc(x.note):'')+(x.operator?' · '+lbEsc(x.operator):'')+'</div>'}).join(''):'暂无记录'}catch(e){el.textContent=e.auth?'401：管理员密钥无效':'记录读取失败：'+e.message}}
-  document.getElementById('lot-bal-query').onclick=async function(){
-    var email=document.getElementById('lot-bal-email').value.trim();if(!email)return balMsg('请输入邮箱',true);
-    if(!adminKey()){var k=prompt('请输入管理员密钥（只存本机）');if(!k)return balMsg('需要管理员密钥',true);localStorage.setItem('lottery-admin-key',k.trim());try{document.getElementById('lot-admin-key').value=k.trim()}catch(e){}}
-    balMsg('查询中…');try{var j=await lbFetch('/api/admin/users?email='+encodeURIComponent(email));BAL_USER=j.user||null;if(!BAL_USER)return balMsg('用户不存在',true);renderBalUser();balMsg('查询成功');renderBalLog()}catch(e){BAL_USER=null;balMsg(e.status===404?'用户不存在':(e.auth?'401：管理员密钥无效':'查询失败：'+e.message),true)}}
-  document.getElementById('lot-bal-apply').onclick=async function(){
-    if(!BAL_USER)return balMsg('请先查询用户',true);var amt=parseInt(document.getElementById('lot-bal-amount').value,10);if(!isFinite(amt)||amt===0)return balMsg('金额必须是非 0 整数',true);var note=document.getElementById('lot-bal-note').value.trim();
-    balMsg('提交中…');try{var j=await lbFetch('/api/admin/points',{method:'POST',body:{email:BAL_USER.email,amount:amt,note:note}});if(j&&j.user)BAL_USER=Object.assign({},BAL_USER,{balance:j.user.balance,email:j.user.email||BAL_USER.email});renderBalUser();balMsg('已调整 '+(amt>0?'+':'')+amt+'，新余额 '+BAL_USER.balance);renderBalLog()}catch(e){balMsg(e.auth?'401：管理员密钥无效':(e.status===400?'余额不足或金额非法：'+e.message:'调整失败：'+e.message),true)}}
-  renderBalLog();
+  function renderBalList(){var tb=document.getElementById('lot-bal-list');if(!tb)return;if(!BAL_USERS.length){tb.innerHTML='<tr><td colspan="5" style="color:#999">暂无用户</td></tr>'}else tb.innerHTML=BAL_USERS.map(function(u,i){return '<tr><td>'+(BAL_OFF+i+1)+'</td><td><b>'+lbEsc(u.username)+'</b></td><td class="num">'+Number(u.balance||0)+'</td><td>'+lbEsc(String(u.created_at||'').replace('T',' ').slice(0,19))+'</td><td><button type="button" data-bal-idx="'+i+'" style="min-height:27px;padding:2px 8px;font-size:11px">加扣</button></td></tr>'}).join('');var pg=document.getElementById('lot-bal-page');if(pg)pg.textContent='第 '+(Math.floor(BAL_OFF/BAL_LIMIT)+1)+' 页 · 共 '+BAL_TOTAL+' 人';var pv=document.getElementById('lot-bal-prev'),nx=document.getElementById('lot-bal-next');if(pv)pv.disabled=BAL_OFF<=0;if(nx)nx.disabled=BAL_OFF+BAL_LIMIT>=BAL_TOTAL}
+  async function loadBalList(reset){if(reset)BAL_OFF=0;var qs='?limit='+BAL_LIMIT+'&offset='+BAL_OFF;if(BAL_Q)qs+='&q='+encodeURIComponent(BAL_Q);balMsg('读取中…');try{var j=await lbFetch('/api/admin/users/list'+qs);BAL_USERS=(j&&j.users)||[];BAL_TOTAL=Number(j&&j.total)||BAL_USERS.length;renderBalList();balMsg('已加载 '+BAL_USERS.length+' 人');renderBalLog()}catch(e){BAL_USERS=[];BAL_TOTAL=0;renderBalList();balMsg(e.auth?'401：管理员密钥无效':'加载失败：'+e.message,true)}}
+  async function renderBalLog(){var el=document.getElementById('lot-bal-log');if(!el)return;el.textContent='读取中…';try{var j=await lbFetch('/api/admin/points/log?limit=10');var l=(j&&j.logs)||[];el.innerHTML=l.length?l.map(function(x){return '<div>'+lbEsc(String(x.at||'').replace('T',' ').slice(0,19))+' · '+lbEsc(x.email||x.username||'')+' · '+(Number(x.amount)>0?'+':'')+lbEsc(x.amount)+(x.note?' · '+lbEsc(x.note):'')+(x.operator?' · '+lbEsc(x.operator):'')+'</div>'}).join(''):'暂无记录'}catch(e){el.textContent=e.auth?'401：管理员密钥无效':'记录读取失败：'+e.message}}
+  function openBalEdit(idx){BAL_SEL=BAL_USERS[idx]||null;if(!BAL_SEL)return;document.getElementById('lot-bal-edit').style.display='block';document.getElementById('lot-bal-sel').textContent=BAL_SEL.username+'（当前 '+Number(BAL_SEL.balance||0)+'）';document.getElementById('lot-bal-amount').value='';document.getElementById('lot-bal-note').value='';document.getElementById('lot-bal-amount').focus()}
+  document.getElementById('lot-bal-list').onclick=function(e){var b=e.target.closest('[data-bal-idx]');if(b)openBalEdit(Number(b.getAttribute('data-bal-idx')))};
+  document.getElementById('lot-bal-search-btn').onclick=function(){BAL_Q=document.getElementById('lot-bal-search').value.trim();loadBalList(true)};
+  document.getElementById('lot-bal-search').onkeydown=function(e){if(e.key==='Enter'){BAL_Q=this.value.trim();loadBalList(true)}};
+  document.getElementById('lot-bal-refresh').onclick=function(){loadBalList(true)};
+  document.getElementById('lot-bal-prev').onclick=function(){if(BAL_OFF>0){BAL_OFF=Math.max(0,BAL_OFF-BAL_LIMIT);loadBalList(false)}};
+  document.getElementById('lot-bal-next').onclick=function(){if(BAL_OFF+BAL_LIMIT<BAL_TOTAL){BAL_OFF+=BAL_LIMIT;loadBalList(false)}};
+  document.getElementById('lot-bal-cancel').onclick=function(){document.getElementById('lot-bal-edit').style.display='none';BAL_SEL=null};
+  document.getElementById('lot-bal-apply').onclick=async function(){if(!BAL_SEL)return;var amt=parseInt(document.getElementById('lot-bal-amount').value,10);if(!isFinite(amt)||amt===0)return balMsg('金额必须是非 0 整数',true);var note=document.getElementById('lot-bal-note').value.trim();balMsg('提交中…');try{var j=await lbFetch('/api/admin/points',{method:'POST',body:{username:BAL_SEL.username,email:BAL_SEL.username,amount:amt,note:note}});var np=(j&&j.user&&j.user.balance!=null)?j.user.balance:(Number(BAL_SEL.balance||0)+amt);BAL_SEL.balance=np;document.getElementById('lot-bal-edit').style.display='none';renderBalList();balMsg('已调整 '+(amt>0?'+':'')+amt+'，'+BAL_SEL.username+' 新余额 '+np);renderBalLog()}catch(e){balMsg(e.auth?'401：管理员密钥无效':(e.status===400?'余额不足或金额非法：'+e.message:'调整失败：'+e.message),true)}};
+  renderBalLog();if(adminKey())loadBalList(true);
   document.getElementById('lot-users').onclick=async function(e){
     var b=e.target.closest('[data-lot-row]');if(!b)return;
     var row=USERS.find(function(x){return (x.uid||x.$id)===b.getAttribute('data-lot-row')});if(!row)return;
