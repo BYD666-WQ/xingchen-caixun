@@ -1513,7 +1513,7 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
     try{await lbFetch('/api/admin/interval',{method:'POST',body:{gameId:g.id,intervalSec:n}});var j=await lbFetch('/api/admin/interval?gameId='+encodeURIComponent(g.id));var got=Number(j.intervalSec)||n;var lb=document.getElementById('lot-draw-interval-label');if(lb)lb.textContent=got+' 秒 = '+fmtSec(got);if(st){st.textContent='已保存 · '+(j.source==='custom'?'自定义':'默认')+' · '+got+' 秒';st.style.color='#0b8a4b'}}
     catch(e){if(st){st.textContent=e.status===400?'间隔需在 5–3600 秒之间':(e.auth?'401 管理员密钥无效':'保存失败：'+e.message);st.style.color='#b00020'}}
   };
-  setTimeout(loadGameState,800);
+  
   try{var _hot=JSON.parse(localStorage.getItem('lotHotCtl')||'null');if(_hot){document.getElementById('lot-hot-on').checked=!!_hot.enabled;document.getElementById('lot-hot-th').value=_hot.threshold||3;document.getElementById('lot-hot-mul').value=_hot.hotMul||2;document.getElementById('lot-hot-profit').value=_hot.profit24h||300;}}catch(e){}
   var ODDS_DIRTY = {}; var TIME_DIRTY = false; var DIFF_DIRTY = {}; var PATTERN_DIRTY = {}; var HOT_DIRTY = false;
   function oddsLabel(k){return ({special:'特码',regular:'正码',zhengte:'正特',tail:'平特尾',colorWave:'色波',oneZodiac:'一肖/平特肖',horse:'马',specialZodiac:'特肖',flatZodiac:'平特肖',triAll:'快三全骰',triExact:'快三围骰'})[k]||k;}
