@@ -1421,7 +1421,9 @@ setTimeout(loadRevealConfig,2500);
 
 <script>
 (function(){
-  var LH_BASE='https://198.13.51.135.sslip.io';
+var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主站'],['hk','香港','每日','主站'],['fast-mark6-1','一分钟六合彩','1分钟','模拟'],['fast-mark6-5','5分钟六合彩','5分钟','模拟'],['fast-race-1','一分钟赛车','1分钟','模拟'],['fast-race-30','30秒赛车','30秒','模拟'],['fast-race-5','5分钟赛车','5分钟','模拟'],['fast-race-10','10分钟赛车','10分钟','模拟'],['fast-k3','大发快三','1分钟','模拟'],['fast-airship','一分飞艇','1分钟','模拟'],['oldmo','老澳','每日','未接入']].map(function(x){return {id:x[0],name:x[1],period:x[2],source:x[3],enabled:x[3]!=='未接入'}});
+  var USERS=[],BETS=[],CONFIGS={};
+    var LH_BASE='https://198.13.51.135.sslip.io';
   var $=function(s){return document.querySelector(s)};
   async function wfetch(path,opts){
     opts=opts||{};var ak=(localStorage.getItem('lottery-admin-key')||'').trim();
