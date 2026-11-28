@@ -1458,7 +1458,8 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
   function fastGames(){return GAMES.map(function(g,i){return {g:g,i:i}}).filter(function(x){return x.g.id.indexOf('fast-')===0})}
   function renderDraw(){var sel=document.getElementById('lot-draw-game');if(sel)sel.innerHTML=fastGames().map(function(x){return '<option value="'+x.i+'">'+x.g.name+'</option>'}).join('')}
   function fmtSec(n){n=Number(n)||0;if(n<60)return n+'秒';var m=Math.floor(n/60),s=n%60;return m+'分'+(s?s+'秒':'')}
-  async function loadInterval(){var sel=document.getElementById('lot-draw-game');if(!sel)return;var g=GAMES[parseInt(sel.value,10)];if(!g)return;try{var j=await lbFetch('/api/admin/interval?gameId='+encodeURIComponent(g.id));var n=Number(j.intervalSec)||0;var el=document.getElementById('lot-draw-interval');if(el)el.value=n;var lb=document.getElementById('lot-draw-interval-label');if(lb)lb.textContent=n+' 秒 = '+fmtSec(n);var st=document.getElementById('lot-draw-interval-state');if(st)st.textContent='当前 '+(j.source==='custom'?'自定义':'默认')+' · '+n+' 秒'}catch(e){var st2=document.getElementById('lot-draw-interval-state');if(st2)st2.textContent=e.auth?'401 管理员密钥无效':'读取失败：'+e.message}}
+  async function loadGameConfig(){var sel=document.getElementById('lot-draw-game');if(!sel)return;var g=GAMES[parseInt(sel.value,10)];if(!g)return;try{var j=await lbFetch('/api/admin/config?gameId='+encodeURIComponent(g.id));var c=(j&&j.config)||{};var d=c.difficulty||'medium';var m=c.mode||'random';var ds=document.getElementById('lot-draw-diff');if(ds)ds.value=(d==='easy'||d==='hard')?d:'medium';var ms=document.getElementById('lot-draw-mode');if(ms)ms.value=(m==='manual')?'manual':'random';}catch(e){var ds2=document.getElementById('lot-draw-diff');if(ds2)ds2.value='medium';var ms2=document.getElementById('lot-draw-mode');if(ms2)ms2.value='random'}}
+  async function loadGameState(){loadGameConfig();loadInterval()}async function loadInterval(){var sel=document.getElementById('lot-draw-game');if(!sel)return;var g=GAMES[parseInt(sel.value,10)];if(!g)return;try{var j=await lbFetch('/api/admin/interval?gameId='+encodeURIComponent(g.id));var n=Number(j.intervalSec)||0;var el=document.getElementById('lot-draw-interval');if(el)el.value=n;var lb=document.getElementById('lot-draw-interval-label');if(lb)lb.textContent=n+' 秒 = '+fmtSec(n);var st=document.getElementById('lot-draw-interval-state');if(st)st.textContent='当前 '+(j.source==='custom'?'自定义':'默认')+' · '+n+' 秒'}catch(e){var st2=document.getElementById('lot-draw-interval-state');if(st2)st2.textContent=e.auth?'401 管理员密钥无效':'读取失败：'+e.message}}
   async function loadAll(){
     status('正在读取配置（自建后端）…');
     try{await loadOdds();status('配置已加载')}
@@ -1610,12 +1611,13 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
     var body={gameId:g.id,mode:mode,difficulty:diff};if(mode==='manual')body.forcedResult=String(num);
     out.innerHTML='保存中…';
     try{
-      await wfetch('/admin/odds',{method:'POST',body:body});
-      var back=await wfetch('/games');
-      var got=(back&&back.oddsByPlay&&back.oddsByPlay.difficulty)||'';
+      await lbFetch('/api/admin/config',{method:'POST',body:body});
+      var back=await lbFetch('/api/admin/config?gameId='+encodeURIComponent(g.id));
+      var cfg=(back&&back.config)||{};var got=cfg.difficulty||diff;var gotMode=cfg.mode||mode;
       var label=got==='easy'?'易':got==='hard'?'难':'中';
+      var ms=document.getElementById('lot-draw-mode');if(ms)ms.value=gotMode==='manual'?'manual':'random';
       CONFIGS[g.id]=Object.assign({},CONFIGS[g.id]||{gameId:g.id},body);
-      out.innerHTML='<b style="color:#0b8a4b">已保存（难度：'+label+'）</b> · '+(mode==='manual'?'手动指定 特码 '+num:'随机')+'<br><span style="color:#999">GET /api/odds 回读 difficulty='+got+'</span>';
+      out.innerHTML='<b style="color:#0b8a4b">已保存（难度：'+label+'）</b> · '+(gotMode==='manual'?'手动指定':'随机')+'<br><span style="color:#999">GET /api/admin/config 回读 difficulty='+got+'</span>';
       status('开奖配置已保存');
     }catch(err){out.innerHTML='<b style="color:#c74b4b">保存失败：'+(err.status===401?'401 管理员密钥无效':err.message)+'</b>'}
   };
@@ -1623,7 +1625,7 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
   window.__lotteryLoadAll=loadAll;
   function initManualDraw(){var sel=document.getElementById('lot-man-game');if(!sel)return;sel.innerHTML=fastGames().map(function(x){return '<option value="'+x.g.id+'">'+x.g.name+'</option>'}).join('');MAN_GAME=sel.value;try{var _mp=manLoad();if(_mp&&_mp.catch)_mp.catch(function(){})}catch(e){} }
   initManualDraw();renderDraw();loadGameList();
-  document.getElementById('lot-draw-game').onchange=loadInterval;
+  document.getElementById('lot-draw-game').onchange=loadGameState;
   document.getElementById('lot-draw-interval-save').onclick=async function(){
     var sel=document.getElementById('lot-draw-game'),g=GAMES[parseInt(sel.value,10)],n=parseInt(document.getElementById('lot-draw-interval').value,10),st=document.getElementById('lot-draw-interval-state');
     if(!g)return;if(!isFinite(n)||n<5||n>3600){if(st){st.textContent='间隔需在 5–3600 秒之间';st.style.color='#b00020'}return}
@@ -1631,7 +1633,7 @@ var GAMES=[['newhk','新港','每日','主站'],['newmo','新澳','每日','主�
     try{await lbFetch('/api/admin/interval',{method:'POST',body:{gameId:g.id,intervalSec:n}});var j=await lbFetch('/api/admin/interval?gameId='+encodeURIComponent(g.id));var got=Number(j.intervalSec)||n;var lb=document.getElementById('lot-draw-interval-label');if(lb)lb.textContent=got+' 秒 = '+fmtSec(got);if(st){st.textContent='已保存 · '+(j.source==='custom'?'自定义':'默认')+' · '+got+' 秒';st.style.color='#0b8a4b'}}
     catch(e){if(st){st.textContent=e.status===400?'间隔需在 5–3600 秒之间':(e.auth?'401 管理员密钥无效':'保存失败：'+e.message);st.style.color='#b00020'}}
   };
-  setTimeout(loadInterval,800);
+  setTimeout(loadGameState,800);
   try{var _hot=JSON.parse(localStorage.getItem('lotHotCtl')||'null');if(_hot){document.getElementById('lot-hot-on').checked=!!_hot.enabled;document.getElementById('lot-hot-th').value=_hot.threshold||3;document.getElementById('lot-hot-mul').value=_hot.hotMul||2;document.getElementById('lot-hot-profit').value=_hot.profit24h||300;}}catch(e){}
   var ODDS_DIRTY = {}; var TIME_DIRTY = false; var DIFF_DIRTY = {}; var PATTERN_DIRTY = {}; var HOT_DIRTY = false;
   function oddsLabel(k){return ({special:'特码',regular:'正码',zhengte:'正特',tail:'平特尾',colorWave:'色波',oneZodiac:'一肖/平特肖',horse:'马',specialZodiac:'特肖',flatZodiac:'平特肖',triAll:'快三全骰',triExact:'快三围骰'})[k]||k;}
